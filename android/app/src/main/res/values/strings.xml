@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">Beer Tracker</string>
+    <string name="add_beer">Add Beer</string>
+    <string name="beer_name">Beer Name</string>
+    <string name="alcohol_percentage">Alcohol %</string>
+    <string name="volume_ml">Volume (ml)</string>
+    <string name="notes">Notes</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="daily_goal">Daily Goal</string>
+    <string name="weekly_goal">Weekly Goal</string>
+    <string name="set_goals">Set Goals</string>
+    <string name="baseline">Baseline</string>
+    <string name="progress">Progress</string>
+    <string name="today">Today</string>
+    <string name="this_week">This Week</string>
+    <string name="total_consumption">Total Consumption</string>
+    <string name="average_daily">Average Daily</string>
+    <string name="average_weekly">Average Weekly</string>
+    <string name="reduction_percentage">Reduction %</string>
+    <string name="no_entries">No entries found</string>
+    <string name="error_occurred">An error occurred</string>
+    <string name="invalid_input">Invalid input</string>
+    <string name="goal_set_successfully">Goal set successfully</string>
+    <string name="entry_added">Entry added successfully</string>
+    <string name="entry_updated">Entry updated successfully</string>
+    <string name="entry_deleted">Entry deleted successfully</string>
+</resources> 

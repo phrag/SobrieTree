@@ -1,0 +1,44 @@
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# Android
+android/.gradle/
+android/local.properties
+android/.idea/
+android/build/
+android/app/build/
+android/app/release/
+android/app/debug/
+android/.externalNativeBuild/
+android/captures/
+android/gradle/
+android/gradlew
+android/gradlew.bat
+android/local.properties
+android/.idea/workspace.xml
+android/.idea/tasks.xml
+android/.idea/gradle.xml
+android/.idea/assetWizardSettings.xml
+android/.idea/dictionaries
+android/.idea/libraries
+android/.idea/jarRepositories.xml
+android/.idea/compiler.xml
+android/.idea/libraries/
+android/.idea/modules.xml
+android/.idea/navEditor.xml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
