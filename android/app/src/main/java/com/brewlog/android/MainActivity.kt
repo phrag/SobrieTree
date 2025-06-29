@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter
 
 class MainActivity : AppCompatActivity() {
     private lateinit var adapter: BeerEntryAdapter
-    private var beerTracker: BeerTracker? = null
+    private var brewLog: BrewLog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
 
         setupRecyclerView()
         setupClickListeners()
-        initializeBeerTracker()
+        initializeBrewLog()
         loadData()
     }
 
@@ -41,27 +41,27 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.btn_set_goals).setOnClickListener { showSetGoalsDialog() }
     }
 
-    private fun initializeBeerTracker() {
+    private fun initializeBrewLog() {
         try {
-            beerTracker = BeerTracker()
+            brewLog = BrewLog()
         } catch (e: Exception) {
-            Toast.makeText(this, "Failed to initialize beer tracker", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Failed to initialize brew log", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun loadData() {
-        beerTracker?.let { tracker ->
+        brewLog?.let { log ->
             try {
                 val today = LocalDate.now()
                 val weekStart = LocalDate.now().minusDays(6)
                 
-                val todayConsumption = tracker.getDailyConsumption(today)
-                val weekConsumption = tracker.getWeeklyConsumption(weekStart)
+                val todayConsumption = log.getDailyConsumption(today)
+                val weekConsumption = log.getWeeklyConsumption(weekStart)
                 
                 findViewById<android.widget.TextView>(R.id.today_consumption).text = "${todayConsumption.toInt()} ml"
                 findViewById<android.widget.TextView>(R.id.week_consumption).text = "${weekConsumption.toInt()} ml"
                 
-                val entries = tracker.getBeerEntries(weekStart.toString(), today.toString())
+                val entries = log.getBeerEntries(weekStart.toString(), today.toString())
                 adapter.submitList(entries)
                 
                 findViewById<View>(R.id.empty_state).visibility = if (entries.isEmpty()) View.VISIBLE else View.GONE
@@ -159,9 +159,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addBeerEntry(name: String, alcoholPercentage: Double, volumeMl: Double, notes: String) {
-        beerTracker?.let { tracker ->
+        brewLog?.let { log ->
             try {
-                tracker.addBeerEntry(name, alcoholPercentage, volumeMl, notes)
+                log.addBeerEntry(name, alcoholPercentage, volumeMl, notes)
                 Toast.makeText(this, "Beer entry added successfully", Toast.LENGTH_SHORT).show()
                 loadData()
             } catch (e: Exception) {
@@ -171,9 +171,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateBeerEntry(id: String, name: String, alcoholPercentage: Double, volumeMl: Double, notes: String) {
-        beerTracker?.let { tracker ->
+        brewLog?.let { log ->
             try {
-                tracker.updateBeerEntry(id, name, alcoholPercentage, volumeMl, notes)
+                log.updateBeerEntry(id, name, alcoholPercentage, volumeMl, notes)
                 Toast.makeText(this, "Beer entry updated successfully", Toast.LENGTH_SHORT).show()
                 loadData()
             } catch (e: Exception) {
@@ -187,9 +187,9 @@ class MainActivity : AppCompatActivity() {
             .setTitle("Delete Entry")
             .setMessage("Are you sure you want to delete this beer entry?")
             .setPositiveButton("Delete") { _, _ ->
-                beerTracker?.let { tracker ->
+                brewLog?.let { log ->
                     try {
-                        tracker.deleteBeerEntry(entry.id)
+                        log.deleteBeerEntry(entry.id)
                         Toast.makeText(this, "Beer entry deleted successfully", Toast.LENGTH_SHORT).show()
                         loadData()
                     } catch (e: Exception) {
@@ -202,12 +202,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setConsumptionGoals(dailyTarget: Double, weeklyTarget: Double) {
-        beerTracker?.let { tracker ->
+        brewLog?.let { log ->
             try {
                 val today = LocalDate.now()
                 val endDate = LocalDate.now().plusWeeks(4)
                 
-                tracker.setConsumptionGoal(dailyTarget, weeklyTarget, today, endDate)
+                log.setConsumptionGoal(dailyTarget, weeklyTarget, today, endDate)
                 Toast.makeText(this, "Goals set successfully", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
                 Toast.makeText(this, "Failed to set goals", Toast.LENGTH_SHORT).show()

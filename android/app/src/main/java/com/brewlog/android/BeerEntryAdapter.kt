@@ -27,41 +27,32 @@ class BeerEntryAdapter(
         holder.bind(getItem(position))
     }
 
-    inner class BeerEntryViewHolder(
-        itemView: View
-    ) : RecyclerView.ViewHolder(itemView) {
+    inner class BeerEntryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val beerName: android.widget.TextView = itemView.findViewById(R.id.beer_name)
+        private val beerVolume: android.widget.TextView = itemView.findViewById(R.id.beer_volume)
+        private val beerAlcohol: android.widget.TextView = itemView.findViewById(R.id.beer_alcohol)
+        private val beerDate: android.widget.TextView = itemView.findViewById(R.id.beer_date)
+        private val btnEdit: android.widget.ImageButton = itemView.findViewById(R.id.btn_edit)
+        private val btnDelete: android.widget.ImageButton = itemView.findViewById(R.id.btn_delete)
 
         fun bind(entry: BeerEntry) {
-            itemView.findViewById<android.widget.TextView>(R.id.beer_name).text = entry.name
-            itemView.findViewById<android.widget.TextView>(R.id.beer_details).text = "${entry.alcoholPercentage}% • ${entry.volumeMl.toInt()}ml"
-            itemView.findViewById<android.widget.TextView>(R.id.beer_date).text = formatDate(entry.date)
+            beerName.text = entry.name
+            beerVolume.text = "${entry.volumeMl.toInt()}ml"
+            beerAlcohol.text = "${entry.alcoholPercentage}%"
             
-            val notesView = itemView.findViewById<android.widget.TextView>(R.id.beer_notes)
-            if (entry.notes.isNotEmpty()) {
-                notesView.text = entry.notes
-                notesView.visibility = View.VISIBLE
-            } else {
-                notesView.visibility = View.GONE
+            // Format the date
+            val entryDate = LocalDate.parse(entry.date)
+            val today = LocalDate.now()
+            val yesterday = today.minusDays(1)
+            
+            beerDate.text = when {
+                entryDate == today -> "Today"
+                entryDate == yesterday -> "Yesterday"
+                else -> entryDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
             }
 
-            itemView.findViewById<View>(R.id.btn_edit).setOnClickListener { onEditClick(entry) }
-            itemView.findViewById<View>(R.id.btn_delete).setOnClickListener { onDeleteClick(entry) }
-        }
-
-        private fun formatDate(dateString: String): String {
-            return try {
-                val date = LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE)
-                val today = LocalDate.now()
-                
-                when {
-                    date == today -> "Today"
-                    date == today.minusDays(1) -> "Yesterday"
-                    date.isAfter(today.minusDays(7)) -> date.format(DateTimeFormatter.ofPattern("EEEE"))
-                    else -> date.format(DateTimeFormatter.ofPattern("MMM dd"))
-                }
-            } catch (e: Exception) {
-                dateString
-            }
+            btnEdit.setOnClickListener { onEditClick(entry) }
+            btnDelete.setOnClickListener { onDeleteClick(entry) }
         }
     }
 

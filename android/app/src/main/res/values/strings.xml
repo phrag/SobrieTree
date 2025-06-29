@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Beer Tracker</string>
+    <string name="app_name">BrewLog</string>
     <string name="add_beer">Add Beer</string>
     <string name="beer_name">Beer Name</string>
     <string name="alcohol_percentage">Alcohol %</string>

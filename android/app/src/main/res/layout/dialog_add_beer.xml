@@ -1,23 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/background"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="24dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/add_beer"
-        android:textAppearance="?attr/textAppearanceHeadline6"
-        android:textColor="?attr/colorOnSurface"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="24dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/ic_circle_background"
+            android:padding="6dp"
+            android:src="@android:drawable/ic_input_add"
+            app:tint="@color/blue_500" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/add_beer"
+            android:textAppearance="@style/TextAppearance.BrewLog.Headline"
+            android:textColor="@color/text_primary" />
+
+    </LinearLayout>
+
+    <!-- Beer Name Input -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:hint="@string/beer_name"
+        app:boxBackgroundColor="@color/surface"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxStrokeColor="@color/blue_500"
+        app:hintTextColor="@color/blue_500"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -25,15 +54,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:textColor="@color/text_primary" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Alcohol Percentage Input -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:hint="@string/alcohol_percentage"
+        app:boxBackgroundColor="@color/surface"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxStrokeColor="@color/blue_500"
+        app:hintTextColor="@color/blue_500"
+        app:suffixText="%"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -41,15 +80,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:textColor="@color/text_primary" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Volume Input -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:hint="@string/volume_ml"
+        app:boxBackgroundColor="@color/surface"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxStrokeColor="@color/blue_500"
+        app:hintTextColor="@color/blue_500"
+        app:suffixText="ml"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -57,15 +106,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:textColor="@color/text_primary" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Notes Input -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="24dp"
         android:hint="@string/notes"
+        app:boxBackgroundColor="@color/surface"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxStrokeColor="@color/blue_500"
+        app:hintTextColor="@color/blue_500"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -73,29 +131,40 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textMultiLine"
-            android:maxLines="3" />
+            android:maxLines="3"
+            android:textColor="@color/text_primary" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Action Buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end">
+        android:orientation="horizontal">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
             android:layout_marginEnd="8dp"
+            android:layout_weight="1"
             android:text="@string/cancel"
-            style="@style/Widget.Material3.Button.TextButton" />
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            style="@style/Widget.BrewLog.Button.Outlined" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_save"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/save" />
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="@string/save"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            style="@style/Widget.BrewLog.Button" />
 
     </LinearLayout>
 

@@ -4,154 +4,254 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
+    android:theme="@style/Theme.BrewLog"
     tools:context=".MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Theme.BeerTracker">
+        android:background="@color/blue_500"
+        android:elevation="0dp"
+        android:theme="@style/Theme.BrewLog">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@color/blue_500"
             app:title="@string/app_name"
-            app:titleTextColor="?attr/colorOnPrimary" />
+            app:titleTextAppearance="@style/TextAppearance.BrewLog.Title"
+            app:titleTextColor="@color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="80dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="20dp">
 
-            <!-- Stats Cards -->
-            <com.google.android.material.card.MaterialCardView
+            <!-- Header Section -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
+                android:layout_marginBottom="24dp"
+                android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:text="Track Your Brews"
+                    android:textAppearance="@style/TextAppearance.BrewLog.Headline"
+                    android:textColor="@color/text_primary" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/today"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
-                        android:textColor="?attr/colorPrimary" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Monitor your beer consumption and stay on track with your goals"
+                    android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                    android:textColor="@color/text_secondary" />
 
-                    <TextView
-                        android:id="@+id/today_consumption"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="0 ml"
-                        android:textAppearance="?attr/textAppearanceHeadline4"
-                        android:textColor="?attr/colorOnSurface" />
+            </LinearLayout>
 
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
+            <!-- Stats Grid -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
+                android:layout_marginBottom="24dp"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <!-- Today's Consumption Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    app:cardBackgroundColor="@color/card_background"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:strokeColor="@color/border"
+                    app:strokeWidth="1dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/this_week"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
-                        android:textColor="?attr/colorPrimary" />
+                        android:orientation="vertical"
+                        android:padding="20dp">
 
-                    <TextView
-                        android:id="@+id/week_consumption"
-                        android:layout_width="wrap_content"
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginBottom="12dp"
+                            android:background="@drawable/ic_circle_background"
+                            android:src="@android:drawable/ic_menu_today"
+                            app:tint="@color/blue_500" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:text="@string/today"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:id="@+id/today_consumption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="8dp"
+                            android:text="0 ml"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                            android:textColor="@color/text_primary" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Weekly Consumption Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    app:cardBackgroundColor="@color/card_background"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:strokeColor="@color/border"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="0 ml"
-                        android:textAppearance="?attr/textAppearanceHeadline4"
-                        android:textColor="?attr/colorOnSurface" />
+                        android:orientation="vertical"
+                        android:padding="20dp">
 
-                </LinearLayout>
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginBottom="12dp"
+                            android:background="@drawable/ic_circle_background"
+                            android:src="@android:drawable/ic_menu_my_calendar"
+                            app:tint="@color/blue_500" />
 
-            </com.google.android.material.card.MaterialCardView>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:text="@string/this_week"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:id="@+id/week_consumption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="8dp"
+                            android:text="0 ml"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                            android:textColor="@color/text_primary" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
 
             <!-- Action Buttons -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="24dp"
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_add_beer"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="56dp"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     android:text="@string/add_beer"
-                    app:icon="@android:drawable/ic_input_add" />
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="12dp"
+                    app:icon="@android:drawable/ic_input_add"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_set_goals"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="56dp"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
                     android:text="@string/set_goals"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="12dp"
                     app:icon="@android:drawable/ic_menu_edit"
-                    style="@style/Widget.Material3.Button.OutlinedButton" />
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
+                    style="@style/Widget.BrewLog.Button.Outlined" />
 
             </LinearLayout>
 
-            <!-- Beer Entries List -->
+            <!-- Beer Entries Section -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
+                app:cardBackgroundColor="@color/card_background"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:strokeColor="@color/border"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Recent Entries"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
-                        android:textColor="?attr/colorPrimary" />
+                        android:layout_marginBottom="16dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginEnd="12dp"
+                            android:src="@android:drawable/ic_menu_recent_history"
+                            app:tint="@color/blue_500" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Recent Entries"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                            android:textColor="@color/text_primary" />
+
+                    </LinearLayout>
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recycler_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
                         android:nestedScrollingEnabled="false"
                         tools:listitem="@layout/item_beer_entry" />
 
@@ -159,11 +259,12 @@
                         android:id="@+id/empty_state"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="24dp"
+                        android:layout_marginBottom="8dp"
                         android:gravity="center"
                         android:text="@string/no_entries"
-                        android:textAppearance="?attr/textAppearanceBody2"
-                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                        android:textColor="@color/text_secondary"
                         android:visibility="gone" />
 
                 </LinearLayout>
@@ -179,8 +280,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
+        android:layout_margin="24dp"
         android:contentDescription="@string/add_beer"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        app:backgroundTint="@color/blue_500"
+        app:srcCompat="@android:drawable/ic_input_add"
+        app:tint="@color/white" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout> 

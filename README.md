@@ -1,6 +1,6 @@
-# Beer Tracker Android App
+# BrewLog
 
-A mobile application to help track and reduce beer consumption, built with Android (Kotlin) and Rust backend.
+A beer consumption tracking Android app built with Kotlin and Rust backend.
 
 ## Project Status
 
@@ -23,26 +23,41 @@ A mobile application to help track and reduce beer consumption, built with Andro
 ## Project Structure
 
 ```
-beer-tracker/
-├── rust/                    # Rust backend library
-│   ├── src/lib.rs          # Main library with beer tracking logic
-│   ├── Cargo.toml          # Rust dependencies
-│   └── target/             # Build artifacts
-├── android/                # Android app
+brewlog/
+├── android/                    # Android app
 │   ├── app/
 │   │   ├── src/main/
-│   │   │   ├── java/com/beertracker/android/
-│   │   │   │   ├── MainActivity.kt      # Main app activity
-│   │   │   │   ├── BeerTracker.kt       # Business logic wrapper
-│   │   │   │   ├── BeerEntry.kt         # Data model
-│   │   │   │   └── BeerEntryAdapter.kt  # RecyclerView adapter
-│   │   │   ├── res/layout/              # UI layouts
+│   │   │   ├── java/com/brewlog/android/
+│   │   │   │   ├── MainActivity.kt        # Main activity
+│   │   │   │   ├── BeerEntryAdapter.kt    # RecyclerView adapter
+│   │   │   │   ├── BeerEntry.kt           # Data model
+│   │   │   │   └── BrewLog.kt             # Business logic wrapper
+│   │   │   ├── res/
+│   │   │   │   ├── layout/
+│   │   │   │   │   ├── activity_main.xml
+│   │   │   │   │   ├── dialog_add_beer.xml
+│   │   │   │   │   └── item_beer_entry.xml
+│   │   │   │   ├── values/
+│   │   │   │   │   ├── colors.xml
+│   │   │   │   │   ├── strings.xml
+│   │   │   │   │   └── themes.xml
+│   │   │   │   └── mipmap-*/
+│   │   │   │       └── ic_launcher*.png
 │   │   │   └── AndroidManifest.xml
 │   │   └── build.gradle
 │   ├── build.gradle
+│   ├── gradle.properties
 │   └── settings.gradle
-├── build_android.sh        # Script to build Rust for Android
-└── README.md
+├── rust/                       # Rust backend
+│   ├── src/
+│   │   └── lib.rs             # Main library with JNI exports
+│   ├── Cargo.toml
+│   └── Cargo.lock
+├── build.sh                    # Build script for Rust
+├── build_android.sh           # Build script for Android
+├── setup.sh                   # Setup script
+├── README.md
+└── PROJECT_OVERVIEW.md
 ```
 
 ## Features
@@ -104,7 +119,7 @@ beer-tracker/
 ## Architecture
 
 ### Rust Backend
-- **BeerTracker**: Main business logic class
+- **BrewLog**: Main business logic class
 - **BeerEntry**: Data model for beer entries
 - **ConsumptionGoal**: Goal setting and tracking
 - **ProgressStats**: Analytics and progress calculation
@@ -112,7 +127,7 @@ beer-tracker/
 
 ### Android Frontend
 - **MainActivity**: Main UI controller
-- **BeerTracker**: JNI wrapper for Rust backend
+- **BrewLog**: JNI wrapper for Rust backend
 - **BeerEntryAdapter**: RecyclerView adapter for list display
 - **Material Design**: Modern UI components
 

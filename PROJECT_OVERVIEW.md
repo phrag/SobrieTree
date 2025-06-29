@@ -1,31 +1,55 @@
-# Beer Tracker App - Project Overview
+# BrewLog Project Overview
 
 ## 🍺 Project Description
 
-The Beer Tracker App is an Android application designed to help users track their beer consumption with the goal of reducing intake. The app features a modern Material Design interface and uses Rust with UniFFI for the backend logic, providing a robust and performant solution.
+BrewLog is an Android application designed to help users track and reduce their beer consumption. The app provides a comprehensive solution for monitoring daily and weekly beer intake, setting consumption goals, and tracking progress over time.
 
 ## 🏗️ Architecture
 
-### Backend (Rust + UniFFI)
-- **Language**: Rust
-- **Framework**: UniFFI for cross-platform bindings
-- **Database**: SQLite with rusqlite bindings
-- **Key Features**:
-  - Beer entry management (add, edit, delete)
-  - Consumption tracking (daily/weekly)
-  - Goal setting and progress monitoring
-  - Baseline calculation
-  - Data validation and error handling
+### Technology Stack
+- **Frontend**: Android (Kotlin) with Material Design 3
+- **Backend**: Rust with SQLite database
+- **Integration**: JNI (Java Native Interface)
+- **Build System**: Gradle (Android) + Cargo (Rust)
 
-### Frontend (Android)
-- **Language**: Kotlin
-- **UI Framework**: Material Design 3
-- **Architecture**: MVVM with ViewBinding
-- **Key Components**:
-  - Main activity with dashboard
-  - RecyclerView for beer entries
-  - Dialog-based forms
-  - Real-time statistics display
+### Project Structure
+```
+brewlog/
+├── android/                    # Android application
+│   ├── app/
+│   │   ├── src/main/
+│   │   │   ├── java/com/brewlog/android/
+│   │   │   │   ├── MainActivity.kt        # Main activity
+│   │   │   │   ├── BeerEntryAdapter.kt    # RecyclerView adapter
+│   │   │   │   ├── BeerEntry.kt           # Data model
+│   │   │   │   └── BrewLog.kt             # Business logic wrapper
+│   │   │   ├── res/
+│   │   │   │   ├── layout/
+│   │   │   │   │   ├── activity_main.xml
+│   │   │   │   │   ├── dialog_add_beer.xml
+│   │   │   │   │   └── item_beer_entry.xml
+│   │   │   │   ├── values/
+│   │   │   │   │   ├── colors.xml
+│   │   │   │   │   ├── strings.xml
+│   │   │   │   │   └── themes.xml
+│   │   │   │   └── mipmap-*/
+│   │   │   │       └── ic_launcher*.png
+│   │   │   └── AndroidManifest.xml
+│   │   └── build.gradle
+│   ├── build.gradle
+│   ├── gradle.properties
+│   └── settings.gradle
+├── rust/                       # Rust backend library
+│   ├── src/
+│   │   └── lib.rs             # Main library with JNI exports
+│   ├── Cargo.toml
+│   └── Cargo.lock
+├── build.sh                    # Build script for Rust
+├── build_android.sh           # Build script for Android
+├── setup.sh                   # Setup script
+├── README.md
+└── PROJECT_OVERVIEW.md
+```
 
 ## 📱 Features
 
@@ -77,7 +101,7 @@ rust/
 android/
 ├── app/
 │   ├── src/main/
-│   │   ├── java/com/beertracker/android/
+│   │   ├── java/com/brewlog/android/
 │   │   │   ├── MainActivity.kt
 │   │   │   └── BeerEntryAdapter.kt
 │   │   ├── res/
@@ -159,8 +183,8 @@ pub struct Baseline {
 
 ### UniFFI Configuration
 The app uses UniFFI to generate Kotlin bindings from the Rust backend:
-- **Package**: `com.beertracker.core`
-- **Library**: `beer_tracker_core`
+- **Package**: `com.brewlog.core`
+- **Library**: `brewlog_core`
 - **Supported Languages**: Kotlin, Swift, Python
 
 ### Android Configuration

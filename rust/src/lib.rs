@@ -8,7 +8,7 @@ use std::os::raw::c_char;
 use std::fmt;
 
 #[derive(Debug, thiserror::Error)]
-pub enum BeerTrackerError {
+pub enum BrewLogError {
     #[error("Database error: {0}")]
     DatabaseError(String),
     #[error("Invalid input: {0}")]
@@ -17,9 +17,9 @@ pub enum BeerTrackerError {
     NotFound(String),
 }
 
-impl From<rusqlite::Error> for BeerTrackerError {
+impl From<rusqlite::Error> for BrewLogError {
     fn from(err: rusqlite::Error) -> Self {
-        BeerTrackerError::DatabaseError(err.to_string())
+        BrewLogError::DatabaseError(err.to_string())
     }
 }
 
@@ -58,21 +58,21 @@ pub struct ProgressStats {
     pub period_end: String,
 }
 
-pub struct BeerTracker {
+pub struct BrewLog {
     db: Mutex<Connection>,
 }
 
-impl BeerTracker {
-    pub fn new() -> Result<Self, BeerTrackerError> {
+impl BrewLog {
+    pub fn new() -> Result<Self, BrewLogError> {
         let conn = Connection::open_in_memory()?;
-        let tracker = BeerTracker {
+        let log = BrewLog {
             db: Mutex::new(conn),
         };
-        tracker.init_database()?;
-        Ok(tracker)
+        log.init_database()?;
+        Ok(log)
     }
 
-    fn init_database(&self) -> Result<(), BeerTrackerError> {
+    fn init_database(&self) -> Result<(), BrewLogError> {
         let conn = self.db.lock().unwrap();
         
         conn.execute(
@@ -109,15 +109,15 @@ impl BeerTracker {
         alcohol_percentage: f64,
         volume_ml: f64,
         notes: String,
-    ) -> Result<(), BeerTrackerError> {
+    ) -> Result<(), BrewLogError> {
         if name.is_empty() {
-            return Err(BeerTrackerError::InvalidInput("Name cannot be empty".to_string()));
+            return Err(BrewLogError::InvalidInput("Name cannot be empty".to_string()));
         }
         if alcohol_percentage < 0.0 || alcohol_percentage > 100.0 {
-            return Err(BeerTrackerError::InvalidInput("Alcohol percentage must be between 0 and 100".to_string()));
+            return Err(BrewLogError::InvalidInput("Alcohol percentage must be between 0 and 100".to_string()));
         }
         if volume_ml <= 0.0 {
-            return Err(BeerTrackerError::InvalidInput("Volume must be positive".to_string()));
+            return Err(BrewLogError::InvalidInput("Volume must be positive".to_string()));
         }
 
         let conn = self.db.lock().unwrap();
@@ -134,7 +134,7 @@ impl BeerTracker {
         Ok(())
     }
 
-    pub fn get_beer_entries(&self, start_date: String, end_date: String) -> Result<Vec<BeerEntry>, BeerTrackerError> {
+    pub fn get_beer_entries(&self, start_date: String, end_date: String) -> Result<Vec<BeerEntry>, BrewLogError> {
         let conn = self.db.lock().unwrap();
         
         let mut stmt = conn.prepare(
@@ -165,22 +165,21 @@ impl BeerTracker {
         weekly_target: f64,
         start_date: String,
         end_date: String,
-    ) -> Result<(), BeerTrackerError> {
+    ) -> Result<(), BrewLogError> {
         if daily_target < 0.0 {
-            return Err(BeerTrackerError::InvalidInput("Daily target must be non-negative".to_string()));
+            return Err(BrewLogError::InvalidInput("Daily target must be non-negative".to_string()));
         }
         if weekly_target < 0.0 {
-            return Err(BeerTrackerError::InvalidInput("Weekly target must be non-negative".to_string()));
+            return Err(BrewLogError::InvalidInput("Weekly target must be non-negative".to_string()));
         }
 
         let conn = self.db.lock().unwrap();
         let id = Uuid::new_v4().to_string();
         let now = Utc::now().to_rfc3339();
 
-        // Delete existing goals
+        // Delete any existing goals
         conn.execute("DELETE FROM consumption_goals", [])?;
 
-        // Insert new goal
         conn.execute(
             "INSERT INTO consumption_goals (id, daily_target, weekly_target, start_date, end_date, created_at) 
              VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
@@ -190,7 +189,7 @@ impl BeerTracker {
         Ok(())
     }
 
-    pub fn get_current_goal(&self) -> Result<ConsumptionGoal, BeerTrackerError> {
+    pub fn get_current_goal(&self) -> Result<ConsumptionGoal, BrewLogError> {
         let conn = self.db.lock().unwrap();
         
         let mut stmt = conn.prepare(
@@ -213,11 +212,11 @@ impl BeerTracker {
         Ok(goal)
     }
 
-    pub fn calculate_baseline(&self, start_date: String, end_date: String) -> Result<Baseline, BeerTrackerError> {
+    pub fn calculate_baseline(&self, start_date: String, end_date: String) -> Result<Baseline, BrewLogError> {
         let entries = self.get_beer_entries(start_date.clone(), end_date.clone())?;
         
         if entries.is_empty() {
-            return Err(BeerTrackerError::NotFound("No entries found for baseline calculation".to_string()));
+            return Err(BrewLogError::NotFound("No entries found for baseline calculation".to_string()));
         }
 
         let total_volume: f64 = entries.iter().map(|e| e.volume_ml).sum();
@@ -233,11 +232,11 @@ impl BeerTracker {
         })
     }
 
-    pub fn get_progress_stats(&self, period_start: String, period_end: String) -> Result<ProgressStats, BeerTrackerError> {
+    pub fn get_progress_stats(&self, period_start: String, period_end: String) -> Result<ProgressStats, BrewLogError> {
         let current_entries = self.get_beer_entries(period_start.clone(), period_end.clone())?;
         
         if current_entries.is_empty() {
-            return Err(BeerTrackerError::NotFound("No entries found for progress calculation".to_string()));
+            return Err(BrewLogError::NotFound("No entries found for progress calculation".to_string()));
         }
 
         let total_volume: f64 = current_entries.iter().map(|e| e.volume_ml).sum();
@@ -259,16 +258,16 @@ impl BeerTracker {
         })
     }
 
-    pub fn get_daily_consumption(&self, date: String) -> Result<f64, BeerTrackerError> {
+    pub fn get_daily_consumption(&self, date: String) -> Result<f64, BrewLogError> {
         let entries = self.get_beer_entries(date.clone(), date)?;
         let total_volume: f64 = entries.iter().map(|e| e.volume_ml).sum();
         Ok(total_volume)
     }
 
-    pub fn get_weekly_consumption(&self, week_start_date: String) -> Result<f64, BeerTrackerError> {
+    pub fn get_weekly_consumption(&self, week_start_date: String) -> Result<f64, BrewLogError> {
         // Calculate end of week (7 days later)
         let start_date = NaiveDate::parse_from_str(&week_start_date, "%Y-%m-%d")
-            .map_err(|_| BeerTrackerError::InvalidInput("Invalid date format".to_string()))?;
+            .map_err(|_| BrewLogError::InvalidInput("Invalid date format".to_string()))?;
         let end_date = start_date + chrono::Duration::days(6);
         
         let entries = self.get_beer_entries(week_start_date, end_date.to_string())?;
@@ -276,13 +275,13 @@ impl BeerTracker {
         Ok(total_volume)
     }
 
-    pub fn delete_beer_entry(&self, id: String) -> Result<(), BeerTrackerError> {
+    pub fn delete_beer_entry(&self, id: String) -> Result<(), BrewLogError> {
         let conn = self.db.lock().unwrap();
         
         let rows_affected = conn.execute("DELETE FROM beer_entries WHERE id = ?1", [&id])?;
         
         if rows_affected == 0 {
-            return Err(BeerTrackerError::NotFound(format!("Beer entry with id {} not found", id)));
+            return Err(BrewLogError::NotFound(format!("Beer entry with id {} not found", id)));
         }
 
         Ok(())
@@ -295,15 +294,15 @@ impl BeerTracker {
         alcohol_percentage: f64,
         volume_ml: f64,
         notes: String,
-    ) -> Result<(), BeerTrackerError> {
+    ) -> Result<(), BrewLogError> {
         if name.is_empty() {
-            return Err(BeerTrackerError::InvalidInput("Name cannot be empty".to_string()));
+            return Err(BrewLogError::InvalidInput("Name cannot be empty".to_string()));
         }
         if alcohol_percentage < 0.0 || alcohol_percentage > 100.0 {
-            return Err(BeerTrackerError::InvalidInput("Alcohol percentage must be between 0 and 100".to_string()));
+            return Err(BrewLogError::InvalidInput("Alcohol percentage must be between 0 and 100".to_string()));
         }
         if volume_ml <= 0.0 {
-            return Err(BeerTrackerError::InvalidInput("Volume must be positive".to_string()));
+            return Err(BrewLogError::InvalidInput("Volume must be positive".to_string()));
         }
 
         let conn = self.db.lock().unwrap();
@@ -316,7 +315,7 @@ impl BeerTracker {
         )?;
 
         if rows_affected == 0 {
-            return Err(BeerTrackerError::NotFound(format!("Beer entry with id {} not found", id)));
+            return Err(BrewLogError::NotFound(format!("Beer entry with id {} not found", id)));
         }
 
         Ok(())
@@ -324,15 +323,15 @@ impl BeerTracker {
 }
 
 // Global instance for JNI
-static mut TRACKER: Option<BeerTracker> = None;
+static mut LOG: Option<BrewLog> = None;
 
 // JNI Functions
 #[no_mangle]
-pub extern "C" fn init_beer_tracker() -> *mut c_char {
+pub extern "C" fn init_brew_log() -> *mut c_char {
     unsafe {
-        match BeerTracker::new() {
-            Ok(tracker) => {
-                TRACKER = Some(tracker);
+        match BrewLog::new() {
+            Ok(log) => {
+                LOG = Some(log);
                 CString::new("OK").unwrap().into_raw()
             }
             Err(e) => CString::new(format!("Error: {}", e)).unwrap().into_raw()
@@ -348,14 +347,14 @@ pub extern "C" fn add_beer_entry(
     notes: *const c_char,
 ) -> *mut c_char {
     unsafe {
-        if TRACKER.is_none() {
-            return CString::new("Error: Tracker not initialized").unwrap().into_raw();
+        if LOG.is_none() {
+            return CString::new("Error: Log not initialized").unwrap().into_raw();
         }
 
         let name_str = CStr::from_ptr(name).to_string_lossy().into_owned();
         let notes_str = CStr::from_ptr(notes).to_string_lossy().into_owned();
 
-        match TRACKER.as_ref().unwrap().add_beer_entry(name_str, alcohol_percentage, volume_ml, notes_str) {
+        match LOG.as_ref().unwrap().add_beer_entry(name_str, alcohol_percentage, volume_ml, notes_str) {
             Ok(_) => CString::new("OK").unwrap().into_raw(),
             Err(e) => CString::new(format!("Error: {}", e)).unwrap().into_raw()
         }
@@ -365,12 +364,12 @@ pub extern "C" fn add_beer_entry(
 #[no_mangle]
 pub extern "C" fn get_daily_consumption(date: *const c_char) -> f64 {
     unsafe {
-        if TRACKER.is_none() {
+        if LOG.is_none() {
             return -1.0;
         }
 
         let date_str = CStr::from_ptr(date).to_string_lossy().into_owned();
-        match TRACKER.as_ref().unwrap().get_daily_consumption(date_str) {
+        match LOG.as_ref().unwrap().get_daily_consumption(date_str) {
             Ok(consumption) => consumption,
             Err(_) => -1.0
         }
@@ -380,12 +379,12 @@ pub extern "C" fn get_daily_consumption(date: *const c_char) -> f64 {
 #[no_mangle]
 pub extern "C" fn get_weekly_consumption(week_start_date: *const c_char) -> f64 {
     unsafe {
-        if TRACKER.is_none() {
+        if LOG.is_none() {
             return -1.0;
         }
 
         let date_str = CStr::from_ptr(week_start_date).to_string_lossy().into_owned();
-        match TRACKER.as_ref().unwrap().get_weekly_consumption(date_str) {
+        match LOG.as_ref().unwrap().get_weekly_consumption(date_str) {
             Ok(consumption) => consumption,
             Err(_) => -1.0
         }
@@ -400,14 +399,14 @@ pub extern "C" fn set_consumption_goal(
     end_date: *const c_char,
 ) -> *mut c_char {
     unsafe {
-        if TRACKER.is_none() {
-            return CString::new("Error: Tracker not initialized").unwrap().into_raw();
+        if LOG.is_none() {
+            return CString::new("Error: Log not initialized").unwrap().into_raw();
         }
 
         let start_date_str = CStr::from_ptr(start_date).to_string_lossy().into_owned();
         let end_date_str = CStr::from_ptr(end_date).to_string_lossy().into_owned();
 
-        match TRACKER.as_ref().unwrap().set_consumption_goal(daily_target, weekly_target, start_date_str, end_date_str) {
+        match LOG.as_ref().unwrap().set_consumption_goal(daily_target, weekly_target, start_date_str, end_date_str) {
             Ok(_) => CString::new("OK").unwrap().into_raw(),
             Err(e) => CString::new(format!("Error: {}", e)).unwrap().into_raw()
         }
@@ -420,16 +419,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_beer_tracker_creation() {
-        let tracker = BeerTracker::new();
-        assert!(tracker.is_ok());
+    fn test_brew_log_creation() {
+        let log = BrewLog::new();
+        assert!(log.is_ok());
     }
 
     #[test]
     fn test_add_beer_entry() {
-        let tracker = BeerTracker::new().unwrap();
+        let log = BrewLog::new().unwrap();
         
-        let result = tracker.add_beer_entry(
+        let result = log.add_beer_entry(
             "Test Beer".to_string(),
             5.0,
             330.0,
@@ -441,10 +440,10 @@ mod tests {
 
     #[test]
     fn test_add_beer_entry_validation() {
-        let tracker = BeerTracker::new().unwrap();
+        let log = BrewLog::new().unwrap();
         
         // Test empty name
-        let result = tracker.add_beer_entry(
+        let result = log.add_beer_entry(
             "".to_string(),
             5.0,
             330.0,
@@ -453,7 +452,7 @@ mod tests {
         assert!(result.is_err());
         
         // Test invalid alcohol percentage
-        let result = tracker.add_beer_entry(
+        let result = log.add_beer_entry(
             "Test Beer".to_string(),
             101.0,
             330.0,
@@ -462,7 +461,7 @@ mod tests {
         assert!(result.is_err());
         
         // Test invalid volume
-        let result = tracker.add_beer_entry(
+        let result = log.add_beer_entry(
             "Test Beer".to_string(),
             5.0,
             -1.0,
@@ -473,10 +472,10 @@ mod tests {
 
     #[test]
     fn test_get_beer_entries() {
-        let tracker = BeerTracker::new().unwrap();
+        let log = BrewLog::new().unwrap();
         
         // Add a test entry
-        tracker.add_beer_entry(
+        log.add_beer_entry(
             "Test Beer".to_string(),
             5.0,
             330.0,
@@ -484,7 +483,7 @@ mod tests {
         ).unwrap();
         
         let today = chrono::Utc::now().date_naive().to_string();
-        let entries = tracker.get_beer_entries(today.clone(), today);
+        let entries = log.get_beer_entries(today.clone(), today);
         
         assert!(entries.is_ok());
         let entries = entries.unwrap();
@@ -496,15 +495,15 @@ mod tests {
 
     #[test]
     fn test_set_and_get_goals() {
-        let tracker = BeerTracker::new().unwrap();
+        let log = BrewLog::new().unwrap();
         
         let today = chrono::Utc::now().date_naive().to_string();
         let end_date = (chrono::Utc::now().date_naive() + chrono::Duration::days(30)).to_string();
         
-        let result = tracker.set_consumption_goal(500.0, 3500.0, today, end_date);
+        let result = log.set_consumption_goal(500.0, 3500.0, today, end_date);
         assert!(result.is_ok());
         
-        let goal = tracker.get_current_goal();
+        let goal = log.get_current_goal();
         assert!(goal.is_ok());
         let goal = goal.unwrap();
         assert_eq!(goal.daily_target, 500.0);
@@ -513,10 +512,10 @@ mod tests {
 
     #[test]
     fn test_daily_consumption() {
-        let tracker = BeerTracker::new().unwrap();
+        let log = BrewLog::new().unwrap();
         
         // Add a test entry
-        tracker.add_beer_entry(
+        log.add_beer_entry(
             "Test Beer".to_string(),
             5.0,
             330.0,
@@ -524,7 +523,7 @@ mod tests {
         ).unwrap();
         
         let today = chrono::Utc::now().date_naive().to_string();
-        let consumption = tracker.get_daily_consumption(today);
+        let consumption = log.get_daily_consumption(today);
         
         assert!(consumption.is_ok());
         assert_eq!(consumption.unwrap(), 330.0);

@@ -3,7 +3,7 @@ package com.brewlog.android
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class BeerTracker {
+class BrewLog {
     // For now, we'll use a simple in-memory storage
     // Later we can integrate with the Rust backend
     private val entries = mutableListOf<BeerEntry>()
