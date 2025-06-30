@@ -15,10 +15,14 @@ data class Baseline(
 data class ProgressMetrics(
     val currentDailyAverage: Double,
     val currentWeeklyAverage: Double,
-    val reductionPercentage: Double,
+    val currentMonthlyAverage: Double,
+    val reductionPercentageDaily: Double,
+    val reductionPercentageWeekly: Double,
+    val reductionPercentageMonthly: Double,
     val daysSinceBaseline: Int,
     val baselineDailyAverage: Double,
-    val baselineWeeklyAverage: Double
+    val baselineWeeklyAverage: Double,
+    val baselineMonthlyAverage: Double
 )
 
 class BrewLog {
@@ -155,42 +159,59 @@ class BrewLog {
         val baselineDate = LocalDate.parse(currentBaseline.calculatedDate)
         val today = LocalDate.now()
         val daysSinceBaseline = baselineDate.until(today).days
-        
-        if (daysSinceBaseline < 7) {
-            // Need at least a week of data after baseline to calculate progress
-            return ProgressMetrics(
-                currentDailyAverage = 0.0,
-                currentWeeklyAverage = 0.0,
-                reductionPercentage = 0.0,
-                daysSinceBaseline = daysSinceBaseline,
-                baselineDailyAverage = currentBaseline.averageDailyConsumption,
-                baselineWeeklyAverage = currentBaseline.averageWeeklyConsumption
-            )
-        }
 
-        // Calculate current averages (last 7 days)
+        // Calculate current averages
+        // Daily (last 1 day)
+        val currentDayEntries = entries.filter { 
+            val entryDate = LocalDate.parse(it.date)
+            entryDate == today
+        }
+        val currentDayVolume = currentDayEntries.sumOf { it.volumeMl }
+        val currentDailyAverage = currentDayVolume.toDouble()
+
+        // Weekly (last 7 days)
         val weekStart = today.minusDays(6)
         val currentWeekEntries = entries.filter { 
             val entryDate = LocalDate.parse(it.date)
             entryDate >= weekStart && entryDate <= today
         }
-        
         val currentWeekVolume = currentWeekEntries.sumOf { it.volumeMl }
-        val currentDailyAverage = currentWeekVolume / 7.0
-        val currentWeeklyAverage = currentWeekVolume
+        val currentWeeklyAverage = currentWeekVolume.toDouble()
 
-        // Calculate reduction percentage
-        val dailyReduction = if (currentBaseline.averageDailyConsumption > 0) {
+        // Monthly (last 30 days)
+        val monthStart = today.minusDays(29)
+        val currentMonthEntries = entries.filter { 
+            val entryDate = LocalDate.parse(it.date)
+            entryDate >= monthStart && entryDate <= today
+        }
+        val currentMonthVolume = currentMonthEntries.sumOf { it.volumeMl }
+        val currentMonthlyAverage = currentMonthVolume.toDouble()
+
+        // Baseline monthly average
+        val baselineMonthlyAverage = currentBaseline.averageDailyConsumption * 30.0
+
+        // Calculate reduction percentages
+        val reductionPercentageDaily = if (currentBaseline.averageDailyConsumption > 0) {
             ((currentBaseline.averageDailyConsumption - currentDailyAverage) / currentBaseline.averageDailyConsumption) * 100
+        } else 0.0
+        val reductionPercentageWeekly = if (currentBaseline.averageWeeklyConsumption > 0) {
+            ((currentBaseline.averageWeeklyConsumption - currentWeeklyAverage) / currentBaseline.averageWeeklyConsumption) * 100
+        } else 0.0
+        val reductionPercentageMonthly = if (baselineMonthlyAverage > 0) {
+            ((baselineMonthlyAverage - currentMonthlyAverage) / baselineMonthlyAverage) * 100
         } else 0.0
 
         return ProgressMetrics(
             currentDailyAverage = currentDailyAverage,
             currentWeeklyAverage = currentWeeklyAverage,
-            reductionPercentage = dailyReduction,
+            currentMonthlyAverage = currentMonthlyAverage,
+            reductionPercentageDaily = reductionPercentageDaily,
+            reductionPercentageWeekly = reductionPercentageWeekly,
+            reductionPercentageMonthly = reductionPercentageMonthly,
             daysSinceBaseline = daysSinceBaseline,
             baselineDailyAverage = currentBaseline.averageDailyConsumption,
-            baselineWeeklyAverage = currentBaseline.averageWeeklyConsumption
+            baselineWeeklyAverage = currentBaseline.averageWeeklyConsumption,
+            baselineMonthlyAverage = baselineMonthlyAverage
         )
     }
 
