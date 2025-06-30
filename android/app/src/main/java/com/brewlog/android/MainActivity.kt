@@ -288,29 +288,45 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showSetGoalsDialog() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_add_beer, null)
-        
-        // Reuse the dialog layout but change the field hints
-        dialogView.findViewById<android.widget.EditText>(R.id.et_beer_name).hint = "Daily Target (ml)"
-        dialogView.findViewById<android.widget.EditText>(R.id.et_alcohol_percentage).hint = "Weekly Target (ml)"
-        dialogView.findViewById<View>(R.id.et_volume_ml).visibility = View.GONE
-        dialogView.findViewById<View>(R.id.et_notes).visibility = View.GONE
-        
+        val dialogView = layoutInflater.inflate(R.layout.dialog_set_goals, null)
+        val dailyGoalEdit = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_daily_goal)
+        val weeklyGoalEdit = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_weekly_goal)
+        val layoutDaily = dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.layout_daily_goal)
+        val layoutWeekly = dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.layout_weekly_goal)
+
+        // Optionally, pre-fill with current goals
+        val currentDaily = brewLog?.getDailyGoal() ?: 0.0
+        val currentWeekly = brewLog?.getWeeklyGoal() ?: 0.0
+        if (currentDaily > 0) dailyGoalEdit.setText(currentDaily.toInt().toString())
+        if (currentWeekly > 0) weeklyGoalEdit.setText(currentWeekly.toInt().toString())
+
         val dialog = AlertDialog.Builder(this)
-            .setTitle("Set Goals")
             .setView(dialogView)
             .create()
 
         dialogView.findViewById<View>(R.id.btn_cancel).setOnClickListener { dialog.dismiss() }
         dialogView.findViewById<View>(R.id.btn_save).setOnClickListener {
-            val dailyTarget = dialogView.findViewById<android.widget.EditText>(R.id.et_beer_name).text.toString().toDoubleOrNull() ?: 0.0
-            val weeklyTarget = dialogView.findViewById<android.widget.EditText>(R.id.et_alcohol_percentage).text.toString().toDoubleOrNull() ?: 0.0
-
-            if (dailyTarget >= 0 && weeklyTarget >= 0) {
-                setConsumptionGoals(dailyTarget, weeklyTarget)
-                dialog.dismiss()
+            val dailyTarget = dailyGoalEdit.text.toString().toDoubleOrNull()
+            val weeklyTarget = weeklyGoalEdit.text.toString().toDoubleOrNull()
+            var valid = true
+            if (dailyTarget == null || dailyTarget <= 0) {
+                layoutDaily.error = "Enter a valid daily target"
+                valid = false
             } else {
-                Toast.makeText(this, "Please enter valid targets", Toast.LENGTH_SHORT).show()
+                layoutDaily.error = null
+            }
+            if (weeklyTarget == null || weeklyTarget <= 0) {
+                layoutWeekly.error = "Enter a valid weekly target"
+                valid = false
+            } else {
+                layoutWeekly.error = null
+            }
+            if (valid) {
+                val today = java.time.LocalDate.now()
+                val endDate = today.plusWeeks(4)
+                brewLog?.setConsumptionGoal(dailyTarget!!, weeklyTarget!!, today, endDate)
+                Toast.makeText(this, "Goals set successfully", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
             }
         }
 
@@ -531,20 +547,6 @@ class MainActivity : AppCompatActivity() {
             }
             .setNegativeButton("Cancel", null)
             .show()
-    }
-
-    private fun setConsumptionGoals(dailyTarget: Double, weeklyTarget: Double) {
-        brewLog?.let { log ->
-            try {
-                val today = LocalDate.now()
-                val endDate = LocalDate.now().plusWeeks(4)
-                
-                log.setConsumptionGoal(dailyTarget, weeklyTarget, today, endDate)
-                Toast.makeText(this, "Goals set successfully", Toast.LENGTH_SHORT).show()
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed to set goals", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
     private fun resetBaseline() {
