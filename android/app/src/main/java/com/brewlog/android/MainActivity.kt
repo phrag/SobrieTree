@@ -9,6 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import android.widget.ArrayAdapter
+import org.json.JSONArray
+import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
     private lateinit var adapter: BeerEntryAdapter
@@ -82,6 +85,38 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private data class BeerPreset(val name: String, val volume: Int, val strength: Float) {
+        fun toJson(): JSONObject = JSONObject().apply {
+            put("name", name)
+            put("volume", volume)
+            put("strength", strength)
+        }
+        companion object {
+            fun fromJson(obj: JSONObject): BeerPreset =
+                BeerPreset(obj.getString("name"), obj.getInt("volume"), obj.getDouble("strength").toFloat())
+        }
+    }
+
+    private fun getBeerPresets(prefs: android.content.SharedPreferences): List<BeerPreset> {
+        val json = prefs.getString("beer_presets", "[]") ?: "[]"
+        val arr = JSONArray(json)
+        return List(arr.length()) { i -> BeerPreset.fromJson(arr.getJSONObject(i)) }
+    }
+
+    private fun saveBeerPresets(prefs: android.content.SharedPreferences, presets: List<BeerPreset>) {
+        val arr = JSONArray()
+        presets.forEach { arr.put(it.toJson()) }
+        prefs.edit().putString("beer_presets", arr.toString()).apply()
+    }
+
+    private fun addBeerPreset(prefs: android.content.SharedPreferences, preset: BeerPreset) {
+        val presets = getBeerPresets(prefs).toMutableList()
+        if (presets.none { it.name == preset.name && it.volume == preset.volume && it.strength == preset.strength }) {
+            presets.add(preset)
+            saveBeerPresets(prefs, presets)
+        }
+    }
+
     private fun showAddBeerDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_beer, null)
         val prefs = getSharedPreferences("brewlog_prefs", MODE_PRIVATE)
@@ -94,6 +129,31 @@ class MainActivity : AppCompatActivity() {
         val notesEdit = dialogView.findViewById<android.widget.EditText>(R.id.et_notes)
         val setDefaultBtn = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_set_default_beer)
         val makeDefaultCheckbox = dialogView.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.checkbox_make_default_beer)
+        val spinner = dialogView.findViewById<android.widget.Spinner>(R.id.spinner_saved_beers)
+        val savePresetBtn = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_save_preset_beer)
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        // Load presets
+        val presets = getBeerPresets(prefs)
+        val presetNames = listOf("Choose a saved beer...") + presets.map { "${it.name} (${it.volume}ml, ${it.strength}% ABV)" }
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, presetNames)
+        spinner.adapter = adapter
+
+        spinner.setSelection(0)
+        spinner.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>, view: android.view.View?, position: Int, id: Long) {
+                if (position > 0) {
+                    val preset = presets[position - 1]
+                    nameEdit.setText(preset.name)
+                    volumeEdit.setText(preset.volume.toString())
+                    strengthEdit.setText(preset.strength.toString())
+                }
+            }
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>) {}
+        }
 
         // Pre-fill with defaults
         volumeEdit.setText(defaultSize.toString())
@@ -110,9 +170,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        val dialog = AlertDialog.Builder(this)
-            .setView(dialogView)
-            .create()
+        savePresetBtn.setOnClickListener {
+            val name = nameEdit.text.toString()
+            val size = volumeEdit.text.toString().toIntOrNull()
+            val strength = strengthEdit.text.toString().toFloatOrNull()
+            if (name.isNotEmpty() && size != null && size > 0 && strength != null && strength > 0f) {
+                addBeerPreset(prefs, BeerPreset(name, size, strength))
+                Toast.makeText(this, "Saved as preset", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            } else {
+                Toast.makeText(this, "Enter valid name, size, and strength", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         dialogView.findViewById<View>(R.id.btn_cancel).setOnClickListener { dialog.dismiss() }
         dialogView.findViewById<View>(R.id.btn_save).setOnClickListener {
