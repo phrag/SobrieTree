@@ -34,6 +34,20 @@
 
     </LinearLayout>
 
+    <!-- Saved Beers Dropdown -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Saved Beers"
+        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+        android:textColor="@color/text_secondary"
+        android:layout_marginBottom="4dp" />
+    <Spinner
+        android:id="@+id/spinner_saved_beers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp" />
+
     <!-- Beer Name Input -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
@@ -135,6 +149,37 @@
             android:textColor="@color/text_primary" />
 
     </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Save as Preset Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_save_preset_beer"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Save as Preset"
+        android:textSize="14sp"
+        style="@style/Widget.BrewLog.Button.Outlined"
+        app:cornerRadius="12dp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Set as Default Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_set_default_beer"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Set as Default"
+        android:textSize="14sp"
+        style="@style/Widget.BrewLog.Button.Outlined"
+        app:cornerRadius="12dp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Make Default Checkbox -->
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/checkbox_make_default_beer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Make this my default beer"
+        android:textColor="@color/text_secondary"
+        android:layout_marginBottom="16dp" />
 
     <!-- Action Buttons -->
     <LinearLayout

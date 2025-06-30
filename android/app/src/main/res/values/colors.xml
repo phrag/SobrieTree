@@ -29,6 +29,7 @@
     <!-- Divider and Border Colors -->
     <color name="divider">#E8EAF6</color>
     <color name="border">#E3F2FD</color>
+    <color name="input_background">#F8F9FF</color>
     
     <!-- Beer Theme Colors -->
     <color name="beer_amber">#FF8C00</color>
