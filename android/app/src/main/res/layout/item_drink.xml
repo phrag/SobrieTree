@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="12dp"
+    android:background="@color/surface">
+
+    <ImageView
+        android:id="@+id/iv_favorite"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@android:drawable/btn_star_big_on"
+        android:contentDescription="Favorite"
+        android:layout_marginEnd="8dp"
+        android:tint="@color/blue_500" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_drink_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Beer Name"
+            android:textAppearance="@style/TextAppearance.BrewLog.Body"
+            android:textColor="@color/text_primary" />
+
+        <TextView
+            android:id="@+id/tv_drink_details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Type • 500ml • 5.0% ABV"
+            android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+            android:textColor="@color/text_secondary" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/iv_edit"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@android:drawable/ic_menu_edit"
+        android:contentDescription="Edit"
+        android:layout_marginEnd="12dp"
+        android:tint="@color/blue_500" />
+
+    <ImageView
+        android:id="@+id/iv_delete"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@android:drawable/ic_menu_delete"
+        android:contentDescription="Delete"
+        android:tint="@color/error" />
+
+</LinearLayout> 

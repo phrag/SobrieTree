@@ -12,6 +12,11 @@ import java.time.format.DateTimeFormatter
 import android.widget.ArrayAdapter
 import org.json.JSONArray
 import org.json.JSONObject
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.textfield.TextInputEditText
+import com.brewlog.android.DrinkPreset
+import com.brewlog.android.DrinkType
+import android.widget.LinearLayout
 
 class MainActivity : AppCompatActivity() {
     private lateinit var adapter: BeerEntryAdapter
@@ -85,36 +90,114 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private data class BeerPreset(val name: String, val volume: Int, val strength: Float) {
-        fun toJson(): JSONObject = JSONObject().apply {
-            put("name", name)
-            put("volume", volume)
-            put("strength", strength)
-        }
-        companion object {
-            fun fromJson(obj: JSONObject): BeerPreset =
-                BeerPreset(obj.getString("name"), obj.getInt("volume"), obj.getDouble("strength").toFloat())
-        }
-    }
-
-    private fun getBeerPresets(prefs: android.content.SharedPreferences): List<BeerPreset> {
-        val json = prefs.getString("beer_presets", "[]") ?: "[]"
+    fun getDrinkPresets(prefs: android.content.SharedPreferences): List<DrinkPreset> {
+        val json = prefs.getString("drink_presets", "[]") ?: "[]"
         val arr = JSONArray(json)
-        return List(arr.length()) { i -> BeerPreset.fromJson(arr.getJSONObject(i)) }
+        return List(arr.length()) { i -> DrinkPreset.fromJson(arr.getJSONObject(i)) }
     }
 
-    private fun saveBeerPresets(prefs: android.content.SharedPreferences, presets: List<BeerPreset>) {
+    fun saveDrinkPresets(prefs: android.content.SharedPreferences, presets: List<DrinkPreset>) {
         val arr = JSONArray()
         presets.forEach { arr.put(it.toJson()) }
-        prefs.edit().putString("beer_presets", arr.toString()).apply()
+        prefs.edit().putString("drink_presets", arr.toString()).apply()
     }
 
-    private fun addBeerPreset(prefs: android.content.SharedPreferences, preset: BeerPreset) {
-        val presets = getBeerPresets(prefs).toMutableList()
-        if (presets.none { it.name == preset.name && it.volume == preset.volume && it.strength == preset.strength }) {
+    fun addDrinkPreset(prefs: android.content.SharedPreferences, preset: DrinkPreset) {
+        val presets = getDrinkPresets(prefs).toMutableList()
+        if (presets.none { it.name == preset.name && it.type == preset.type && it.volume == preset.volume && it.strength == preset.strength }) {
             presets.add(preset)
-            saveBeerPresets(prefs, presets)
+            saveDrinkPresets(prefs, presets)
         }
+    }
+
+    private fun showDrinkManagerDialog(
+        onDrinkSelected: (DrinkPreset) -> Unit
+    ) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_drink_manager, null)
+        val prefs = getSharedPreferences("brewlog_prefs", MODE_PRIVATE)
+        val rv = dialogView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rv_drinks)
+        val addBtn = dialogView.findViewById<MaterialButton>(R.id.btn_add_new_drink)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        var drinks = getDrinkPresets(prefs).toMutableList()
+        lateinit var adapter: DrinkManagerAdapter
+        adapter = DrinkManagerAdapter(
+            drinks,
+            onSelect = {
+                onDrinkSelected(it)
+                dialog.dismiss()
+            },
+            onEdit = { drink ->
+                showEditDrinkDialog(drink) { updated ->
+                    val idx = drinks.indexOfFirst { it.name == drink.name && it.type == drink.type }
+                    if (idx != -1) {
+                        drinks[idx] = updated
+                        saveDrinkPresets(prefs, drinks)
+                        adapter.updateDrinks(drinks)
+                    }
+                }
+            },
+            onDelete = { drink ->
+                drinks.remove(drink)
+                saveDrinkPresets(prefs, drinks)
+                adapter.updateDrinks(drinks)
+            },
+            onFavorite = { drink ->
+                drinks = drinks.map { it.copy(favorite = it == drink) }.toMutableList()
+                saveDrinkPresets(prefs, drinks)
+                adapter.updateDrinks(drinks)
+            }
+        )
+        rv.layoutManager = LinearLayoutManager(this)
+        rv.adapter = adapter
+
+        addBtn.setOnClickListener {
+            showEditDrinkDialog(null) { newDrink ->
+                drinks.add(newDrink)
+                saveDrinkPresets(prefs, drinks)
+                adapter.updateDrinks(drinks)
+            }
+        }
+
+        dialog.show()
+    }
+
+    private fun showEditDrinkDialog(
+        drink: DrinkPreset?,
+        onSave: (DrinkPreset) -> Unit
+    ) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_beer, null)
+        val nameEdit = dialogView.findViewById<TextInputEditText>(R.id.et_beer_name)
+        val strengthEdit = dialogView.findViewById<TextInputEditText>(R.id.et_alcohol_percentage)
+        val volumeEdit = dialogView.findViewById<TextInputEditText>(R.id.et_volume_ml)
+        val typeSpinner = dialogView.findViewById<android.widget.Spinner>(R.id.spinner_drink_type)
+        val typeNames = DrinkType.values().map { it.displayName }
+        val typeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, typeNames)
+        typeSpinner.adapter = typeAdapter
+        if (drink != null) {
+            nameEdit.setText(drink.name)
+            strengthEdit.setText(drink.strength.toString())
+            volumeEdit.setText(drink.volume.toString())
+            typeSpinner.setSelection(DrinkType.values().indexOf(drink.type))
+        }
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(if (drink == null) "Add Drink" else "Edit Drink")
+            .setView(dialogView)
+            .setPositiveButton("Save") { d, _ ->
+                val name = nameEdit.text.toString()
+                val strength = strengthEdit.text.toString().toFloatOrNull() ?: 0f
+                val volume = volumeEdit.text.toString().toIntOrNull() ?: 0
+                val type = DrinkType.values()[typeSpinner.selectedItemPosition]
+                if (name.isNotEmpty() && strength > 0 && volume > 0) {
+                    onSave(DrinkPreset(name, type, volume, strength, drink?.favorite ?: false))
+                    d.dismiss()
+                }
+            }
+            .setNegativeButton("Cancel") { d, _ -> d.dismiss() }
+            .create()
+        dialog.show()
     }
 
     private fun showAddBeerDialog() {
@@ -127,61 +210,32 @@ class MainActivity : AppCompatActivity() {
         val strengthEdit = dialogView.findViewById<android.widget.EditText>(R.id.et_alcohol_percentage)
         val volumeEdit = dialogView.findViewById<android.widget.EditText>(R.id.et_volume_ml)
         val notesEdit = dialogView.findViewById<android.widget.EditText>(R.id.et_notes)
-        val setDefaultBtn = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_set_default_beer)
-        val makeDefaultCheckbox = dialogView.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.checkbox_make_default_beer)
-        val spinner = dialogView.findViewById<android.widget.Spinner>(R.id.spinner_saved_beers)
-        val savePresetBtn = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_save_preset_beer)
+        val typeSpinner = dialogView.findViewById<android.widget.Spinner>(R.id.spinner_drink_type)
+        val typeNames = DrinkType.values().map { it.displayName }
+        val typeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, typeNames)
+        typeSpinner.adapter = typeAdapter
+        typeSpinner.setSelection(0)
 
-        val dialog = AlertDialog.Builder(this)
-            .setView(dialogView)
-            .create()
-
-        // Load presets
-        val presets = getBeerPresets(prefs)
-        val presetNames = listOf("Choose a saved beer...") + presets.map { "${it.name} (${it.volume}ml, ${it.strength}% ABV)" }
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, presetNames)
-        spinner.adapter = adapter
-
-        spinner.setSelection(0)
-        spinner.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: android.widget.AdapterView<*>, view: android.view.View?, position: Int, id: Long) {
-                if (position > 0) {
-                    val preset = presets[position - 1]
-                    nameEdit.setText(preset.name)
-                    volumeEdit.setText(preset.volume.toString())
-                    strengthEdit.setText(preset.strength.toString())
+        val chooseDrinkBtn = MaterialButton(this).apply {
+            text = "Choose Drink"
+            setOnClickListener {
+                showDrinkManagerDialog { drink ->
+                    nameEdit.setText(drink.name)
+                    volumeEdit.setText(drink.volume.toString())
+                    strengthEdit.setText(drink.strength.toString())
+                    typeSpinner.setSelection(DrinkType.values().indexOf(drink.type))
                 }
             }
-            override fun onNothingSelected(parent: android.widget.AdapterView<*>) {}
         }
+        (dialogView as LinearLayout).addView(chooseDrinkBtn, 0)
 
         // Pre-fill with defaults
         volumeEdit.setText(defaultSize.toString())
         strengthEdit.setText(defaultStrength.toString())
 
-        setDefaultBtn.setOnClickListener {
-            val size = volumeEdit.text.toString().toIntOrNull()
-            val strength = strengthEdit.text.toString().toFloatOrNull()
-            if (size != null && size > 0 && strength != null && strength > 0f) {
-                prefs.edit().putInt("default_beer_size", size).putFloat("default_beer_strength", strength).apply()
-                Toast.makeText(this, "Set as default beer", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Enter valid size and strength first", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        savePresetBtn.setOnClickListener {
-            val name = nameEdit.text.toString()
-            val size = volumeEdit.text.toString().toIntOrNull()
-            val strength = strengthEdit.text.toString().toFloatOrNull()
-            if (name.isNotEmpty() && size != null && size > 0 && strength != null && strength > 0f) {
-                addBeerPreset(prefs, BeerPreset(name, size, strength))
-                Toast.makeText(this, "Saved as preset", Toast.LENGTH_SHORT).show()
-                dialog.dismiss()
-            } else {
-                Toast.makeText(this, "Enter valid name, size, and strength", Toast.LENGTH_SHORT).show()
-            }
-        }
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
 
         dialogView.findViewById<View>(R.id.btn_cancel).setOnClickListener { dialog.dismiss() }
         dialogView.findViewById<View>(R.id.btn_save).setOnClickListener {
@@ -189,13 +243,10 @@ class MainActivity : AppCompatActivity() {
             val alcoholPercentage = strengthEdit.text.toString().toDoubleOrNull() ?: 0.0
             val volumeMl = volumeEdit.text.toString().toDoubleOrNull() ?: 0.0
             val notes = notesEdit.text.toString()
+            val type = DrinkType.values()[typeSpinner.selectedItemPosition]
 
             if (name.isNotEmpty() && volumeMl > 0) {
                 addBeerEntry(name, alcoholPercentage, volumeMl, notes)
-                if (makeDefaultCheckbox.isChecked) {
-                    prefs.edit().putInt("default_beer_size", volumeMl.toInt()).putFloat("default_beer_strength", alcoholPercentage.toFloat()).apply()
-                    Toast.makeText(this, "Set as default beer", Toast.LENGTH_SHORT).show()
-                }
                 dialog.dismiss()
             } else {
                 Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
