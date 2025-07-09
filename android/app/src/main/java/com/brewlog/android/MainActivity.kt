@@ -17,6 +17,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.brewlog.android.DrinkPreset
 import com.brewlog.android.DrinkType
 import android.widget.LinearLayout
+import androidx.appcompat.app.AppCompatDelegate
 
 class MainActivity : AppCompatActivity() {
     private lateinit var adapter: BeerEntryAdapter
@@ -50,7 +51,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupClickListeners() {
-        findViewById<View>(R.id.btn_add_beer).setOnClickListener { showAddBeerDialog() }
         findViewById<View>(R.id.fab_add).setOnClickListener { showAddBeerDialog() }
         findViewById<View>(R.id.btn_set_goals).setOnClickListener { showSetGoalsDialog() }
         
@@ -103,11 +103,9 @@ class MainActivity : AppCompatActivity() {
                 if (progressMetrics != null) {
                     dailyView.text = "${String.format("%.1f", progressMetrics.reductionPercentageDaily)}%"
                     weeklyView.text = "${String.format("%.1f", progressMetrics.reductionPercentageWeekly)}%"
-                    monthlyView.text = "${String.format("%.1f", progressMetrics.reductionPercentageMonthly)}%"
                 } else {
                     dailyView.text = "--"
                     weeklyView.text = "--"
-                    monthlyView.text = "--"
                 }
 
             } catch (e: Exception) {
@@ -334,20 +332,14 @@ class MainActivity : AppCompatActivity() {
         val drinkName = defaultDrink?.name ?: "beer"
 
         fun updateSummary() {
-            val dailyMl = dailyGoalEdit.text.toString().toDoubleOrNull() ?: 0.0
-            val weeklyMl = weeklyGoalEdit.text.toString().toDoubleOrNull() ?: 0.0
-            val dailyDrinks = if (drinkVolume > 0) (dailyMl / drinkVolume) else 0.0
-            val weeklyDrinks = if (drinkVolume > 0) (weeklyMl / drinkVolume) else 0.0
+            val dailyDrinks = dailyGoalEdit.text.toString().toDoubleOrNull() ?: 0.0
+            val weeklyDrinks = dailyDrinks * 7
+            weeklyGoalEdit.setText(weeklyDrinks.toInt().toString())
             summaryView.text =
-                "Daily: ${dailyMl.toInt()} ml (${dailyDrinks.toInt()} × ${drinkVolume.toInt()}ml $drinkName${if (dailyDrinks.toInt() == 1) "" else "s"})\n" +
-                "Weekly: ${weeklyMl.toInt()} ml (${weeklyDrinks.toInt()} × ${drinkVolume.toInt()}ml $drinkName${if (weeklyDrinks.toInt() == 1) "" else "s"})"
+                "Daily: ${dailyDrinks.toInt()} drinks\n" +
+                "Weekly: ${weeklyDrinks.toInt()} drinks"
         }
         dailyGoalEdit.addTextChangedListener(object : android.text.TextWatcher {
-            override fun afterTextChanged(s: android.text.Editable?) { updateSummary() }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
-        weeklyGoalEdit.addTextChangedListener(object : android.text.TextWatcher {
             override fun afterTextChanged(s: android.text.Editable?) { updateSummary() }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -356,23 +348,23 @@ class MainActivity : AppCompatActivity() {
         val currentDaily = brewLog?.getDailyGoal() ?: 0.0
         val currentWeekly = brewLog?.getWeeklyGoal() ?: 0.0
         if (currentDaily > 0) dailyGoalEdit.setText(currentDaily.toInt().toString())
-        if (currentWeekly > 0) weeklyGoalEdit.setText(currentWeekly.toInt().toString())
+        if (currentWeekly > 0) weeklyGoalEdit.setText((currentWeekly / 500).toInt().toString())
         updateSummary()
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
             .create()
         dialogView.findViewById<View>(R.id.btn_cancel).setOnClickListener { dialog.dismiss() }
         dialogView.findViewById<View>(R.id.btn_save).setOnClickListener {
-            val dailyTarget = dailyGoalEdit.text.toString().toDoubleOrNull()
-            val weeklyTarget = weeklyGoalEdit.text.toString().toDoubleOrNull()
+            val dailyTarget = (dailyGoalEdit.text.toString().toDoubleOrNull() ?: 0.0) * 500
+            val weeklyTarget = (weeklyGoalEdit.text.toString().toDoubleOrNull() ?: 0.0) * 500
             var valid = true
-            if (dailyTarget == null || dailyTarget <= 0) {
+            if (dailyTarget <= 0) {
                 layoutDaily.error = "Enter a valid daily target"
                 valid = false
             } else {
                 layoutDaily.error = null
             }
-            if (weeklyTarget == null || weeklyTarget <= 0) {
+            if (weeklyTarget <= 0) {
                 layoutWeekly.error = "Enter a valid weekly target"
                 valid = false
             } else {
@@ -381,7 +373,7 @@ class MainActivity : AppCompatActivity() {
             if (valid) {
                 val today = java.time.LocalDate.now()
                 val endDate = today.plusWeeks(4)
-                brewLog?.setConsumptionGoal(dailyTarget!!, weeklyTarget!!, today, endDate)
+                brewLog?.setConsumptionGoal(dailyTarget, weeklyTarget, today, endDate)
                 Toast.makeText(this, "Goals set successfully", Toast.LENGTH_SHORT).show()
                 dialog.dismiss()
             }
@@ -392,25 +384,10 @@ class MainActivity : AppCompatActivity() {
     private fun showBaselineDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_set_baseline, null)
         val prefs = getSharedPreferences("brewlog_prefs", MODE_PRIVATE)
-        val drinkSpinner = dialogView.findViewById<android.widget.Spinner>(R.id.spinner_baseline_drink)
-        val numberLabel = dialogView.findViewById<android.widget.TextView>(R.id.tv_number_drinks_label)
-        val numberEdit = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_baseline_beer_count)
-        val perDayEdit = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_drinks_per_day)
-        val perWeekEdit = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_drinks_per_week)
         val totalEdit = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_total_consumption)
-        val dailyAvgEdit = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_daily_average)
-        val summaryView = dialogView.findViewById<android.widget.TextView>(R.id.tv_baseline_summary)
         val startDateView = dialogView.findViewById<android.widget.TextView>(R.id.tv_start_date)
         val endDateView = dialogView.findViewById<android.widget.TextView>(R.id.tv_end_date)
 
-        // Load drink presets
-        val drinks = getDrinkPresets(prefs)
-        val drinkNames = listOf("Choose a drink preset...") + drinks.map { "${it.name} (${it.volume}ml, ${it.strength}% ABV)" }
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, drinkNames)
-        drinkSpinner.adapter = adapter
-        drinkSpinner.setSelection(0)
-
-        var selectedDrink: DrinkPreset? = null
         var daysInPeriod = 1
         var weeksInPeriod = 1.0
 
@@ -424,122 +401,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        fun updateSummary(drinksCount: Double, totalMl: Double) {
-            val drink = selectedDrink
-            if (drink != null) {
-                summaryView.text = "This equals ${totalMl.toInt()} ml (${drinksCount.toInt()} × ${drink.volume}ml ${drink.name}${if (drinksCount.toInt() == 1) "" else "s"}) for the period."
-            } else {
-                summaryView.text = "This equals ${drinksCount.toInt()} drinks and ${totalMl.toInt()} ml for the period."
-            }
-        }
-
-        fun recalcFromPerDay() {
-            val drink = selectedDrink ?: return
-            updatePeriod()
-            val perDay = perDayEdit.text.toString().toDoubleOrNull() ?: 0.0
-            val drinksPeriod = perDay * daysInPeriod
-            val totalMl = drinksPeriod * drink.volume
-            numberEdit.setText(if (drinksPeriod > 0) drinksPeriod.toInt().toString() else "")
-            totalEdit.setText(if (totalMl > 0) totalMl.toInt().toString() else "")
-            dailyAvgEdit.setText(if (totalMl > 0) (totalMl / daysInPeriod).toInt().toString() else "")
-            perWeekEdit.setText(if (perDay > 0) (perDay * 7).toInt().toString() else "")
-            updateSummary(drinksPeriod, totalMl)
-        }
-
-        fun recalcFromPerWeek() {
-            val drink = selectedDrink ?: return
-            updatePeriod()
-            val perWeek = perWeekEdit.text.toString().toDoubleOrNull() ?: 0.0
-            val drinksPeriod = perWeek * weeksInPeriod
-            val totalMl = drinksPeriod * drink.volume
-            numberEdit.setText(if (drinksPeriod > 0) drinksPeriod.toInt().toString() else "")
-            totalEdit.setText(if (totalMl > 0) totalMl.toInt().toString() else "")
-            dailyAvgEdit.setText(if (totalMl > 0) (totalMl / daysInPeriod).toInt().toString() else "")
-            perDayEdit.setText(if (perWeek > 0) (perWeek / 7).toInt().toString() else "")
-            updateSummary(drinksPeriod, totalMl)
-        }
-
-        fun recalcFromNumber() {
-            val drink = selectedDrink ?: return
-            updatePeriod()
-            val drinksPeriod = numberEdit.text.toString().toDoubleOrNull() ?: 0.0
-            val totalMl = drinksPeriod * drink.volume
-            totalEdit.setText(if (totalMl > 0) totalMl.toInt().toString() else "")
-            dailyAvgEdit.setText(if (totalMl > 0) (totalMl / daysInPeriod).toInt().toString() else "")
-            perDayEdit.setText(if (drinksPeriod > 0) (drinksPeriod / daysInPeriod).toInt().toString() else "")
-            perWeekEdit.setText(if (drinksPeriod > 0) (drinksPeriod / weeksInPeriod).toInt().toString() else "")
-            updateSummary(drinksPeriod, totalMl)
-        }
-
-        fun recalcFromTotal() {
-            val drink = selectedDrink ?: return
-            updatePeriod()
-            val totalMl = totalEdit.text.toString().toDoubleOrNull() ?: 0.0
-            val drinksPeriod = if (drink.volume > 0) totalMl / drink.volume else 0.0
-            numberEdit.setText(if (drinksPeriod > 0) drinksPeriod.toInt().toString() else "")
-            dailyAvgEdit.setText(if (totalMl > 0) (totalMl / daysInPeriod).toInt().toString() else "")
-            perDayEdit.setText(if (drinksPeriod > 0) (drinksPeriod / daysInPeriod).toInt().toString() else "")
-            perWeekEdit.setText(if (drinksPeriod > 0) (drinksPeriod / weeksInPeriod).toInt().toString() else "")
-            updateSummary(drinksPeriod, totalMl)
-        }
-
-        fun recalcFromDailyAvg() {
-            val drink = selectedDrink ?: return
-            updatePeriod()
-            val dailyAvg = dailyAvgEdit.text.toString().toDoubleOrNull() ?: 0.0
-            val totalMl = dailyAvg * daysInPeriod
-            val drinksPeriod = if (drink.volume > 0) totalMl / drink.volume else 0.0
-            numberEdit.setText(if (drinksPeriod > 0) drinksPeriod.toInt().toString() else "")
-            totalEdit.setText(if (totalMl > 0) totalMl.toInt().toString() else "")
-            perDayEdit.setText(if (drinksPeriod > 0) (drinksPeriod / daysInPeriod).toInt().toString() else "")
-            perWeekEdit.setText(if (drinksPeriod > 0) (drinksPeriod / weeksInPeriod).toInt().toString() else "")
-            updateSummary(drinksPeriod, totalMl)
-        }
-
-        drinkSpinner.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: android.widget.AdapterView<*>, view: android.view.View?, position: Int, id: Long) {
-                if (position > 0) {
-                    selectedDrink = drinks[position - 1]
-                    numberLabel.text = "Number of ${selectedDrink!!.volume}ml ${selectedDrink!!.name}s:"
-                    numberEdit.setText("")
-                    perDayEdit.setText("")
-                    perWeekEdit.setText("")
-                    totalEdit.setText("")
-                    dailyAvgEdit.setText("")
-                    summaryView.text = ""
-                } else {
-                    selectedDrink = null
-                    numberLabel.text = "Number of 500ml beers:"
-                }
-            }
-            override fun onNothingSelected(parent: android.widget.AdapterView<*>) {}
-        }
-
-        numberEdit.addTextChangedListener(object : android.text.TextWatcher {
-            override fun afterTextChanged(s: android.text.Editable?) { if (numberEdit.isFocused) recalcFromNumber() }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
-        perDayEdit.addTextChangedListener(object : android.text.TextWatcher {
-            override fun afterTextChanged(s: android.text.Editable?) { if (perDayEdit.isFocused) recalcFromPerDay() }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
-        perWeekEdit.addTextChangedListener(object : android.text.TextWatcher {
-            override fun afterTextChanged(s: android.text.Editable?) { if (perWeekEdit.isFocused) recalcFromPerWeek() }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
-        totalEdit.addTextChangedListener(object : android.text.TextWatcher {
-            override fun afterTextChanged(s: android.text.Editable?) { if (totalEdit.isFocused) recalcFromTotal() }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
-        dailyAvgEdit.addTextChangedListener(object : android.text.TextWatcher {
-            override fun afterTextChanged(s: android.text.Editable?) { if (dailyAvgEdit.isFocused) recalcFromDailyAvg() }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
 
         startDateView.setOnClickListener {
             showDatePicker { date ->
@@ -562,22 +423,13 @@ class MainActivity : AppCompatActivity() {
         dialogView.findViewById<View>(R.id.btn_save_baseline).setOnClickListener {
             if (selectedStartDate != null && selectedEndDate != null) {
                 if (selectedStartDate!! <= selectedEndDate!!) {
-                    val totalConsumption = totalEdit.text.toString().toDoubleOrNull()
-                    val dailyAverage = dailyAvgEdit.text.toString().toDoubleOrNull()
-                    if (totalConsumption == null && dailyAverage == null) {
-                        Toast.makeText(this, "Please enter either total consumption or daily average", Toast.LENGTH_SHORT).show()
-                        return@setOnClickListener
-                    }
-                    if (totalConsumption != null && totalConsumption < 0) {
+                    val totalConsumption = (totalEdit.text.toString().toDoubleOrNull() ?: 0.0) * 500
+                    if (totalConsumption < 0) {
                         Toast.makeText(this, "Total consumption cannot be negative", Toast.LENGTH_SHORT).show()
                         return@setOnClickListener
                     }
-                    if (dailyAverage != null && dailyAverage < 0) {
-                        Toast.makeText(this, "Daily average cannot be negative", Toast.LENGTH_SHORT).show()
-                        return@setOnClickListener
-                    }
                     try {
-                        val baseline = brewLog?.setBaseline(selectedStartDate!!, selectedEndDate!!, totalConsumption, dailyAverage)
+                        val baseline = brewLog?.setBaseline(selectedStartDate!!, selectedEndDate!!, totalConsumption, null)
                         Toast.makeText(this, "Baseline set: ${baseline?.averageDailyConsumption?.toInt()} ml/day average", Toast.LENGTH_LONG).show()
                         dialog.dismiss()
                     } catch (e: Exception) {
@@ -626,12 +478,6 @@ class MainActivity : AppCompatActivity() {
         dialogView.findViewById<android.widget.TextView>(R.id.tv_current_weekly).text =
             formatMlAndDrinks(progressMetrics.currentWeeklyAverage) + "/week"
         // Monthly fields
-        dialogView.findViewById<android.widget.TextView>(R.id.tv_baseline_monthly)?.text =
-            formatMlAndDrinks(progressMetrics.baselineMonthlyAverage) + "/month"
-        dialogView.findViewById<android.widget.TextView>(R.id.tv_current_monthly)?.text =
-            formatMlAndDrinks(progressMetrics.currentMonthlyAverage) + "/month"
-        dialogView.findViewById<android.widget.TextView>(R.id.tv_reduction_percentage_monthly)?.text =
-            "${String.format("%.1f", progressMetrics.reductionPercentageMonthly)}%"
 
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
@@ -738,9 +584,11 @@ class MainActivity : AppCompatActivity() {
         val beerStrengthEdit = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_beer_strength)
         val beerSizeLayout = dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.beer_size_layout)
         val beerStrengthLayout = dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.beer_strength_layout)
+        val themeSwitch = dialogView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switch_theme)
 
         beerSizeEdit.setText(defaultSize.toString())
         beerStrengthEdit.setText(defaultStrength.toString())
+        themeSwitch.isChecked = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
 
         val dialog = AlertDialog.Builder(this)
             .setTitle(null)
@@ -768,7 +616,17 @@ class MainActivity : AppCompatActivity() {
                     beerStrengthLayout.error = null
                 }
                 if (valid) {
-                    prefs.edit().putInt("default_beer_size", size!!).putFloat("default_beer_strength", strength!!).apply()
+                    prefs.edit()
+                        .putInt("default_beer_size", size!!)
+                        .putFloat("default_beer_strength", strength!!)
+                        .apply()
+
+                    if (themeSwitch.isChecked) {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                    } else {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                    }
+
                     Toast.makeText(this, "Settings saved", Toast.LENGTH_SHORT).show()
                     dialog.dismiss()
                 }

@@ -18,8 +18,8 @@
         android:id="@+id/layout_daily_goal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Daily Target (ml)"
-        app:helperText="How much you want to drink per day."
+        android:hint="Daily Target (drinks)"
+        app:helperText="How many drinks you want to have per day."
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_marginBottom="16dp">
 
@@ -35,8 +35,8 @@
         android:id="@+id/layout_weekly_goal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Weekly Target (ml)"
-        app:helperText="How much you want to drink per week."
+        android:hint="Weekly Target (drinks)"
+        app:helperText="How many drinks you want to have per week."
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_marginBottom="16dp">
 

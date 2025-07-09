@@ -164,115 +164,12 @@
                         android:textAppearance="@style/TextAppearance.BrewLog.Title"
                         android:textColor="@color/text_primary" />
 
-                    <!-- Drink Preset Dropdown -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Drink Preset"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Body"
-                        android:textColor="@color/text_secondary"
-                        android:layout_marginBottom="4dp" />
-                    <Spinner
-                        android:id="@+id/spinner_baseline_drink"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp" />
-
-                    <!-- Drinks per Day -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Drinks per day"
-                        app:helperText="How many of this drink you have per day."
-                        app:boxBackgroundColor="@color/input_background"
-                        app:boxCornerRadiusBottomEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusTopStart="8dp"
-                        app:boxStrokeColor="@color/blue_500"
-                        app:hintTextColor="@color/blue_500"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_marginBottom="12dp">
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_drinks_per_day"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="numberDecimal"
-                            android:textColor="@color/text_primary" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- Drinks per Week -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Drinks per week"
-                        app:helperText="How many of this drink you have per week."
-                        app:boxBackgroundColor="@color/input_background"
-                        app:boxCornerRadiusBottomEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusTopStart="8dp"
-                        app:boxStrokeColor="@color/blue_500"
-                        app:hintTextColor="@color/blue_500"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_marginBottom="12dp">
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_drinks_per_week"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="numberDecimal"
-                            android:textColor="@color/text_primary" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- Summary -->
-                    <TextView
-                        android:id="@+id/tv_baseline_summary"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
-                        android:textColor="@color/blue_700"
-                        android:layout_marginBottom="12dp"
-                        android:gravity="center_horizontal" />
-
-                    <!-- Number of Drinks -->
-                    <TextView
-                        android:id="@+id/tv_number_drinks_label"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Number of 500ml beers:"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Body"
-                        android:textColor="@color/text_secondary"
-                        android:layout_marginBottom="4dp" />
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="e.g. 4"
-                        app:boxBackgroundColor="@color/input_background"
-                        app:boxCornerRadiusBottomEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusTopStart="8dp"
-                        app:boxStrokeColor="@color/blue_500"
-                        app:hintTextColor="@color/blue_500"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_marginBottom="16dp">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_baseline_beer_count"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="number"
-                            android:textColor="@color/text_primary" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
                     <!-- Total Consumption -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Total consumption (ml)"
-                        app:helperText="Sum of all drinks during the period."
+                        android:hint="Total consumption (drinks)"
+                        app:helperText="Sum of all drinks during the period (1 drink = 500ml)."
                         app:boxBackgroundColor="@color/input_background"
                         app:boxCornerRadiusBottomEnd="8dp"
                         app:boxCornerRadiusBottomStart="8dp"
@@ -285,30 +182,6 @@
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_total_consumption"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="numberDecimal"
-                            android:textColor="@color/text_primary" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- Daily Average -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Daily average (ml)"
-                        app:helperText="Optional: Enter if you know your daily average."
-                        app:boxBackgroundColor="@color/input_background"
-                        app:boxCornerRadiusBottomEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusTopStart="8dp"
-                        app:boxStrokeColor="@color/blue_500"
-                        app:hintTextColor="@color/blue_500"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_daily_average"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="numberDecimal"

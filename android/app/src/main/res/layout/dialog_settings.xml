@@ -46,4 +46,11 @@
             android:textColor="@color/text_primary" />
     </com.google.android.material.textfield.TextInputLayout>
 
-</LinearLayout> 
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/switch_theme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Dark Theme"
+        android:layout_marginTop="16dp"/>
+
+</LinearLayout>

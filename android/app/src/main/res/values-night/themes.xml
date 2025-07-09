@@ -1,0 +1,43 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.BrewLog" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/blue_200</item>
+        <item name="colorPrimaryVariant">@color/blue_700</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/accent</item>
+        <item name="colorSecondaryVariant">@color/accent</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Background colors -->
+        <item name="android:colorBackground">@color/dark_background</item>
+        <item name="colorSurface">@color/dark_surface</item>
+        <item name="colorSurfaceVariant">@color/dark_surface_variant</item>
+        <item name="colorOnSurface">@color/dark_text_on_surface</item>
+        <!-- Text colors -->
+        <item name="android:textColorPrimary">@color/dark_text_primary</item>
+        <item name="android:textColorSecondary">@color/dark_text_secondary</item>
+        <item name="android:textColorHint">@color/dark_text_hint</item>
+        <!-- Card styling -->
+        <item name="cardBackgroundColor">@color/dark_card_background</item>
+        <item name="cardElevation">4dp</item>
+        <item name="cardCornerRadius">24dp</item>
+        <!-- Button styling -->
+        <item name="materialButtonStyle">@style/Widget.BrewLog.Button.Bubble</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.BrewLog.Button.Outlined.Bubble</item>
+    </style>
+
+    <style name="Widget.BrewLog.Button.Bubble" parent="Widget.Material3.Button">
+        <item name="android:textColor">@color/white</item>
+        <item name="backgroundTint">@color/blue_500</item>
+        <item name="cornerRadius">24dp</item>
+    </style>
+
+    <style name="Widget.BrewLog.Button.Outlined.Bubble" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textColor">@color/blue_200</item>
+        <item name="strokeColor">@color/blue_200</item>
+        <item name="cornerRadius">24dp</item>
+    </style>
+</resources>

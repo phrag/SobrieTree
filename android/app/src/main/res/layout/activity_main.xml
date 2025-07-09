@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
     android:theme="@style/Theme.BrewLog"
     tools:context=".MainActivity">
 
@@ -334,24 +333,10 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_add_beer"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/add_beer"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="12dp"
-                    app:icon="@android:drawable/ic_input_add"
-                    app:iconGravity="textStart"
-                    app:iconPadding="8dp" />
-
-                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_set_goals"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     android:text="@string/set_goals"
                     android:textSize="14sp"
@@ -361,9 +346,7 @@
                     app:iconGravity="textStart"
                     app:iconPadding="8dp"
                     style="@style/Widget.BrewLog.Button.Outlined" />
-
             </LinearLayout>
-
             <!-- Baseline and Progress Buttons -->
             <LinearLayout
                 android:layout_width="match_parent"

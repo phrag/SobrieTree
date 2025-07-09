@@ -145,14 +145,6 @@
                     android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                     android:textColor="@color/text_secondary" />
 
-                <TextView
-                    android:id="@+id/tv_baseline_monthly"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:text="0 ml/month"
-                    android:textAppearance="@style/TextAppearance.BrewLog.Caption"
-                    android:textColor="@color/text_secondary" />
 
             </LinearLayout>
 
@@ -204,14 +196,6 @@
                     android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                     android:textColor="@color/text_secondary" />
 
-                <TextView
-                    android:id="@+id/tv_current_monthly"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:text="0 ml/month"
-                    android:textAppearance="@style/TextAppearance.BrewLog.Caption"
-                    android:textColor="@color/text_secondary" />
 
             </LinearLayout>
 
@@ -219,48 +203,6 @@
 
     </LinearLayout>
 
-    <!-- Add a new card or section for monthly reduction percentage -->
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        app:cardBackgroundColor="@color/surface"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
-        app:strokeColor="@color/border"
-        app:strokeWidth="1dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_reduction_percentage_monthly"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0%"
-                    android:textAppearance="@style/TextAppearance.BrewLog.Headline"
-                    android:textColor="@color/success"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Monthly Reduction from Baseline"
-                    android:textAppearance="@style/TextAppearance.BrewLog.Caption"
-                    android:textColor="@color/text_secondary" />
-            </LinearLayout>
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
 
     <!-- Action Buttons -->
     <LinearLayout

@@ -1,0 +1,11 @@
+<resources>
+    <!-- Dark Theme Colors -->
+    <color name="dark_background">#121212</color>
+    <color name="dark_surface">#1E1E1E</color>
+    <color name="dark_surface_variant">#2C2C2C</color>
+    <color name="dark_card_background">#2C2C2C</color>
+    <color name="dark_text_primary">#FFFFFF</color>
+    <color name="dark_text_secondary">#B3FFFFFF</color>
+    <color name="dark_text_hint">#80FFFFFF</color>
+    <color name="dark_text_on_surface">#FFFFFF</color>
+</resources>
