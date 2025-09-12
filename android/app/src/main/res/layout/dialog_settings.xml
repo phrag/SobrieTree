@@ -53,4 +53,11 @@
         android:text="Dark Theme"
         android:layout_marginTop="16dp"/>
 
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/switch_secure"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Block screenshots (FLAG_SECURE)"
+        android:layout_marginTop="12dp"/>
+
 </LinearLayout>

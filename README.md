@@ -1,223 +1,124 @@
 # BrewLog
 
-Track your beer consumption with a clean Android app. Kotlin frontend with an optional Rust core.
+A simple, private beer consumption tracker for Android.
 
-## Project Status
+- Set daily/weekly goals in drinks (based on your default drink size)
+- See a fun Beer Glass that fills as you log drinks
+- One‑tap Quick Add and tap‑the‑glass to repeat the last drink
+- A Progress screen shows Today/This Week and your reduction vs. baseline
+- Works fully offline. No account, no cloud, no analytics, no ads
 
-✅ **Completed:**
-- Rust backend with beer tracking functionality (CRUD operations, goal setting, progress tracking)
-- Android app structure with Material Design UI
-- Data models and business logic
-- RecyclerView adapter for displaying beer entries
-- Dialog-based input forms for adding/editing entries
+## Quick Start
 
-🔄 **Current State:**
-- Modernized Android UI with bottom navigation (Home, Progress)
-- Home shows a custom Beer Glass with animations, quick-add chips, and sound
-- Unified Goals & Baseline dialog: set both on a single screen in drinks
-- Defaults start at 0; app prompts to set up on first run
+1) Install the app
+- Download `BrewLog-debug.apk` from the repository root and install on your phone
+- You may need to enable “Install unknown apps” in Android settings
 
-❌ **Blocked by:**
-- Missing Java/JDK installation for Android development
-- Android NDK not set up for Rust cross-compilation
+2) First‑time setup
+- Open the app → menu ▸ Set Goals & Baseline
+- Pick your default drink size (e.g., 500 ml)
+- Enter your Daily Goal (in drinks). Weekly auto‑fills as 7× daily
 
-## Project Structure
+3) Add a drink
+- Tap a Quick Add chip, or tap the Beer Glass to repeat the last drink
+- The Beer Glass shows daily progress (e.g., “2 / 5 drinks”)
 
+4) View Progress
+- Bottom navigation ▸ Progress
+- See Today and This Week in drinks, plus reduction vs. baseline
+
+### Privacy & Security
+BrewLog is privacy‑focused by design:
+- No account or sign‑in
+- No dangerous/runtime permissions requested (no contacts, location, camera, mic)
+- Network‑free by default: the app does not make any internet requests
+- All data stays on your device; nothing is uploaded or shared
+- No analytics, trackers, ads, or third‑party SDKs
+- Works completely offline; no cloud services are required
+
+Your data, your control:
+- Entries live in the app’s private storage; uninstalling the app or clearing its data removes everything
+- Open‑source codebase — audit how data is handled
+- Battery‑friendly: no background sync, polling, or push connections
+
+### Screenshots
+- Home: `screenshots/home.png`
+- Beer Glass: `screenshots/home_after_beerglass.png`
+- Progress: `screenshots/progress_screen.png`
+
+---
+
+## Developer Guide
+
+### Requirements
+- JDK 17+
+- Android Studio (SDK + NDK + CMake)
+- Rust toolchain
+- cargo‑ndk (`cargo install cargo-ndk`)
+
+### One‑command build
+From the repository root:
+```bash
+./build.sh              # builds Rust with cargo‑ndk, builds the APK, copies it to ./BrewLog-debug.apk
+PRUNE=1 ./build.sh      # optional: also cargo clean + prune stale jniLibs
 ```
-brewlog/
-├── android/                    # Android app
-│   ├── app/
-│   │   ├── src/main/
-│   │   │   ├── java/com/brewlog/android/
-│   │   │   │   ├── MainActivity.kt        # Main activity
-│   │   │   │   ├── BeerEntryAdapter.kt    # RecyclerView adapter
-│   │   │   │   ├── BeerEntry.kt           # Data model
-│   │   │   │   └── BrewLog.kt             # Business logic wrapper
-│   │   │   ├── res/
-│   │   │   │   ├── layout/
-│   │   │   │   │   ├── activity_main.xml
-│   │   │   │   │   ├── dialog_add_beer.xml
-│   │   │   │   │   └── item_beer_entry.xml
-│   │   │   │   ├── values/
-│   │   │   │   │   ├── colors.xml
-│   │   │   │   │   ├── strings.xml
-│   │   │   │   │   └── themes.xml
-│   │   │   │   └── mipmap-*/
-│   │   │   │       └── ic_launcher*.png
-│   │   │   └── AndroidManifest.xml
-│   │   └── build.gradle
-│   ├── build.gradle
-│   ├── gradle.properties
-│   └── settings.gradle
-├── rust/                       # Rust backend
-│   ├── src/
-│   │   └── lib.rs             # Main library with JNI exports
-│   ├── Cargo.toml
-│   └── Cargo.lock
-├── build.sh                    # Build script for Rust
-├── build_android.sh           # Build script for Android
-├── setup.sh                   # Setup script
-├── README.md
-└── PROJECT_OVERVIEW.md
+Notes:
+- The script prefers cargo‑ndk; if absent it falls back to plain cargo (requires NDK toolchains on PATH)
+- Output APK: `BrewLog-debug.apk` at the repo root
+
+### Manual build (if you prefer)
+```bash
+# macOS defaults
+export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk"
+export ANDROID_NDK_HOME="$ANDROID_SDK_ROOT/ndk/26.1.10909125"
+# add toolchains bin to PATH (use aarch64 or x86_64 prebuilt dir, depending on host)
+if [ -d "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/darwin-aarch64/bin" ]; then
+  export PATH="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/darwin-aarch64/bin:$PATH"
+else
+  export PATH="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/darwin-x86_64/bin:$PATH"
+fi
+
+# Build Rust core into jniLibs
+cd rust
+cargo ndk -t arm64-v8a -o ../android/app/src/main/jniLibs build --release
+
+# Build Android app
+cd ../android
+./gradlew assembleDebug
 ```
 
-## Features
-
-### Core Functionality
-- **Add Beer Entries**: Track beer name, ABV, volume, and notes
-- **Quick Add**: One-tap chips and glass tap to add last drink
-- **Beer Glass**: Visual daily progress with foam, bubbles, sparkle, overflow
-- **Sound FX**: Realistic clink/open sound when adding a drink
-- **Goals & Baseline**: Unified dialog to configure both (in drinks)
-- **Progress Screen**: Today/Week metrics and reductions
-- **Edit/Delete**: Modify or remove entries
-
-### Technical Features
-- **Rust Backend**: High-performance data processing and storage
-- **SQLite Database**: Persistent storage for beer entries and goals
-- **Material Design**: Modern, accessible UI components
-- **RecyclerView**: Efficient list display with smooth scrolling
-- **View Binding**: Type-safe view access
-
-## Getting Started
-
-### Prerequisites
-
-1. **Java Development Kit (JDK)**
-   ```bash
-   # Install OpenJDK 11 or later
-   brew install openjdk@11
-   # or download from Oracle/AdoptOpenJDK
-   ```
-
-2. **Android Studio** (recommended)
-   - Download from https://developer.android.com/studio
-   - Install Android SDK and NDK
-
-3. **Rust** (already installed)
-   ```bash
-   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-   ```
-
-### Building the Project
-
-1. **Build Rust Library**
-   ```bash
-   cd rust
-   cargo build
-   cargo test
-   ```
-
-2. **Build Android App**
-   ```bash
-   cd android
-   ./gradlew assembleDebug
-   ```
-
-3. **Run on Device/Emulator**
-### Release builds
-
-Build a signed release APK:
+### Release build
 ```bash
 cd android
 ./gradlew assembleRelease
 open app/build/outputs/apk/release
 ```
+(The output name is configured in the module’s `build.gradle`.)
 
-The APK file will be named like `BrewLog-<version>.apk`.
+### Project Structure
+```
+brewlog/
+├── android/                    # Android app (Kotlin)
+│   ├── app/src/main/java/com/brewlog/android/
+│   │   ├── MainActivity.kt     # Home + Beer Glass + Quick Add
+│   │   ├── ProgressActivity.kt # Progress metrics
+│   │   ├── BeerGlassView.kt    # Custom view & animation
+│   │   └── BrewLog.kt          # In‑memory model & metrics
+│   └── app/src/main/jniLibs/   # Native libs (arm64‑v8a)
+├── rust/                       # Rust core (optional)
+│   ├── src/lib.rs              # JNI‑ready core API
+│   └── Cargo.toml
+├── build.sh                    # Unified build (Rust + Android), copies APK to repo root
+└── README.md
+```
 
-### Sounds
+### Troubleshooting
+- aarch64‑linux‑android‑clang not found
+  - Ensure the NDK is installed and `ANDROID_NDK_HOME` is set; add toolchain bin to `PATH` (see Manual build)
+- Lint/AGP warnings
+  - Project uses Android Gradle Plugin 8.5.x and Gradle 8.7
+- Missing SDK dir warning
+  - Ensure `android/local.properties` points to your SDK or export `ANDROID_SDK_ROOT`
 
-Place your audio in `android/app/src/main/res/raw/` (e.g., `clink_beer.ogg`, `open_beer.ogg`).
-Zero-byte placeholders are ignored; system tones are used as fallback on device.
-   ```bash
-   ./gradlew installDebug
-   ```
-
-## Architecture
-
-### Rust Backend
-- **BrewLog**: Main business logic class
-- **BeerEntry**: Data model for beer entries
-- **ConsumptionGoal**: Goal setting and tracking
-- **ProgressStats**: Analytics and progress calculation
-- **SQLite Integration**: Persistent data storage
-
-### Android Frontend
-- **MainActivity**: Home + Beer Glass + Quick Add + menu
-- **ProgressActivity**: Reduction metrics and weekly view
-- **BeerGlassView**: Custom view with foam, bubbles, sparkle, overflow
-- **Dialogs**: `dialog_setup` (goals+baseline), add/edit drinks
-
-## Development Roadmap
-
-### Phase 1: Basic App (Current)
-- [x] Home, Progress, BeerGlassView, sounds, quick add
-- [x] Unified setup dialog; defaults at 0 with prompt
-- [x] Release APK pipeline
-
-### Phase 2: Rust Integration
-- [ ] Android NDK setup
-- [ ] Cross-compilation for Android architectures
-- [ ] JNI integration
-- [ ] Performance optimization
-
-### Phase 3: Enhanced Features
-- [ ] Data persistence improvements
-- [ ] Charts and analytics
-- [ ] Export/import functionality
-- [ ] Cloud sync (optional)
-
-### Phase 4: Polish
-- [ ] UI/UX improvements
-- [ ] Accessibility features
-- [ ] Performance optimization
-- [ ] App store preparation
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Java not found**
-   ```bash
-   # Install Java
-   brew install openjdk@11
-   export JAVA_HOME=/opt/homebrew/opt/openjdk@11
-   ```
-
-2. **Android NDK not found**
-   ```bash
-   # Install via Android Studio SDK Manager
-   # or download standalone NDK
-   ```
-
-3. **Gradle build failures**
-   ```bash
-   # Clean and rebuild
-   ./gradlew clean
-   ./gradlew assembleDebug
-   ```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Next Steps
-
-To get the app running:
-
-1. **Install Java/JDK** (required for Android development)
-2. **Build the Android app** using `./gradlew assembleDebug`
-3. **Test on device/emulator**
-4. **Set up Android NDK** for Rust integration
-5. **Build Rust for Android** using the provided script
-
-The Rust backend is fully functional and tested. The Android app structure is complete and ready to build once Java is installed. 
+### License
+MIT — see `LICENSE`. 

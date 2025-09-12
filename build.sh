@@ -5,21 +5,19 @@ echo "�� Building BrewLog App"
 # Install Android target for Rust (if not already installed)
 rustup target add aarch64-linux-android
 
-# Build Rust library for Android
+# Build Rust library for Android via cargo-ndk if available
 cd rust
-cargo build --release --target aarch64-linux-android
+if command -v cargo-ndk >/dev/null 2>&1; then
+  cargo ndk -t arm64-v8a -o ../android/app/src/main/jniLibs build --release
+else
+  echo "ℹ️ cargo-ndk not found; falling back to direct cargo build (NDK setup required)"
+  cargo build --release --target aarch64-linux-android
+  mkdir -p ../android/app/src/main/jniLibs/arm64-v8a/
+  cp target/aarch64-linux-android/release/libbrewlog_core.so ../android/app/src/main/jniLibs/arm64-v8a/ 2>/dev/null || true
+fi
 
 # Copy library files to Android
 mkdir -p ../android/app/src/main/jniLibs/arm64-v8a/
-# mkdir -p ../android/app/src/main/jniLibs/armeabi-v7a/
-# mkdir -p ../android/app/src/main/jniLibs/x86/
-# mkdir -p ../android/app/src/main/jniLibs/x86_64/
-
-# Copy the compiled library for arm64-v8a
-cp target/aarch64-linux-android/release/libbrewlog_core.so ../android/app/src/main/jniLibs/arm64-v8a/
-# cp target/aarch64-linux-android/release/libbrewlog_core.so ../android/app/src/main/jniLibs/armeabi-v7a/
-# cp target/aarch64-linux-android/release/libbrewlog_core.so ../android/app/src/main/jniLibs/x86/
-# cp target/aarch64-linux-android/release/libbrewlog_core.so ../android/app/src/main/jniLibs/x86_64/
 
 cd ..
 
@@ -39,3 +37,10 @@ fi
 cd ..
 
 echo "✅ Build complete!"
+
+# Cleanup: prune Rust target and stale jniLibs ABIs to keep repo lean (set PRUNE=0 to skip)
+if [ -z "$PRUNE" ] || [ "$PRUNE" = "1" ]; then
+  echo "🧹 Pruning Rust target and stale jniLibs..."
+  (cd rust && cargo clean)
+  find android/app/src/main/jniLibs -mindepth 1 -maxdepth 1 -type d ! -name 'arm64-v8a' -exec rm -rf {} + 2>/dev/null || true
+fi

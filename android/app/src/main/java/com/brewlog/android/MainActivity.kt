@@ -33,6 +33,11 @@ class MainActivity : AppCompatActivity() {
         val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
+        // Apply FLAG_SECURE at startup (default ON)
+        if (getSharedPreferences(prefsName, MODE_PRIVATE).getBoolean("flag_secure", true)) {
+            window.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+        }
+
         setupRecyclerView()
         setupClickListeners()
         initializeBrewLog()
@@ -52,7 +57,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupClickListeners() {
-        findViewById<View>(R.id.fab_add).setOnClickListener { showAddBeerDialog() }
+        findViewById<View>(R.id.fab_add).setOnClickListener { showQuickAddSheet() }
         
         // Add baseline and set goals button click listeners
         findViewById<View>(R.id.btn_baseline).setOnClickListener { showBaselineDialog() }
@@ -168,6 +173,11 @@ class MainActivity : AppCompatActivity() {
                     chipGroup.addView(chip)
                 }
 
+                // If user has no presets yet, nudge a favorite-setup sheet
+                if (presets.isEmpty()) {
+                    showFavoriteSetupSheet()
+                }
+
                 // If goals/baseline are zero, gently prompt once
                 if ((log.getDailyGoal() <= 0.0) || (log.getCurrentBaseline() == null)) {
                     android.app.AlertDialog.Builder(this)
@@ -183,6 +193,42 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Failed to load data", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun showFavoriteSetupSheet() {
+        val sheet = layoutInflater.inflate(R.layout.bottom_sheet_favorite_setup, null)
+        val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(this)
+        dialog.setContentView(sheet)
+        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
+        val defaultSize = prefs.getInt("default_beer_size", 500)
+        val defaultStrength = prefs.getFloat("default_beer_strength", 5.0f)
+        val etName = sheet.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_name)
+        val etVol = sheet.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_volume)
+        val etStr = sheet.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_strength)
+        etName.setText("Beer")
+        etVol.setText(defaultSize.toString())
+        etStr.setText(defaultStrength.toString())
+
+        fun saveFavorite(addOne: Boolean) {
+            val name = etName.text?.toString()?.trim().orEmpty()
+            val vol = etVol.text?.toString()?.toIntOrNull() ?: defaultSize
+            val str = etStr.text?.toString()?.toFloatOrNull() ?: defaultStrength
+            if (name.isEmpty() || vol <= 0 || str <= 0f) {
+                Toast.makeText(this, "Enter a valid favorite drink", Toast.LENGTH_SHORT).show()
+                return
+            }
+            addDrinkPreset(prefs, DrinkPreset(name, DrinkType.BEER, vol, str, favorite = true))
+            if (addOne) {
+                addBeerEntry(name, str.toDouble(), vol.toDouble(), "")
+            } else {
+                loadData()
+            }
+            dialog.dismiss()
+        }
+
+        sheet.findViewById<View>(R.id.btn_save_and_add).setOnClickListener { saveFavorite(true) }
+        sheet.findViewById<View>(R.id.btn_save_only).setOnClickListener { saveFavorite(false) }
+        dialog.show()
     }
 
     fun getDrinkPresets(prefs: android.content.SharedPreferences): List<DrinkPreset> {
@@ -306,6 +352,8 @@ class MainActivity : AppCompatActivity() {
         val volumeEdit = dialogView.findViewById<android.widget.EditText>(R.id.et_volume_ml)
         val notesEdit = dialogView.findViewById<android.widget.EditText>(R.id.et_notes)
         val typeSpinner = dialogView.findViewById<android.widget.Spinner>(R.id.spinner_drink_type)
+        val savePresetSwitch = dialogView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switch_save_preset)
+        val favoriteSwitch = dialogView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switch_favorite)
         val typeNames = DrinkType.values().map { it.displayName }
         val typeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, typeNames)
         typeSpinner.adapter = typeAdapter
@@ -338,9 +386,21 @@ class MainActivity : AppCompatActivity() {
             val alcoholPercentage = strengthEdit.text.toString().toDoubleOrNull() ?: 0.0
             val volumeMl = volumeEdit.text.toString().toDoubleOrNull() ?: 0.0
             val notes = notesEdit.text.toString()
-            // Type is currently informational; not used in save
+            val type = DrinkType.values()[typeSpinner.selectedItemPosition]
             if (name.isNotEmpty() && volumeMl > 0) {
                 addBeerEntry(name, alcoholPercentage, volumeMl, notes)
+                if (savePresetSwitch?.isChecked == true) {
+                    addDrinkPreset(
+                        prefs,
+                        DrinkPreset(
+                            name = name,
+                            type = type,
+                            volume = volumeMl.toInt(),
+                            strength = alcoholPercentage.toFloat(),
+                            favorite = favoriteSwitch?.isChecked == true
+                        )
+                    )
+                }
                 dialog.dismiss()
                 // Refresh home to update goal/drinks
                 loadData()
@@ -553,10 +613,36 @@ class MainActivity : AppCompatActivity() {
                     playClink()
                 } catch (_: Exception) {}
                 loadData()
+                maybePromptSavePreset(name, volumeMl, alcoholPercentage)
             } catch (e: Exception) {
                 Toast.makeText(this, "Failed to add beer entry", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun maybePromptSavePreset(name: String, volumeMl: Double, strength: Double) {
+        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
+        val hasAny = getDrinkPresets(prefs).isNotEmpty()
+        if (hasAny) return
+        AlertDialog.Builder(this)
+            .setTitle("Save as preset?")
+            .setMessage("You just added your first drink. Save it for one‑tap adding next time?")
+            .setPositiveButton("Save") { d, _ ->
+                addDrinkPreset(
+                    prefs,
+                    DrinkPreset(
+                        name = name,
+                        type = DrinkType.BEER,
+                        volume = volumeMl.toInt(),
+                        strength = strength.toFloat(),
+                        favorite = true
+                    )
+                )
+                d.dismiss()
+                loadData()
+            }
+            .setNegativeButton("Not now", null)
+            .show()
     }
 
     private fun updateBeerEntry(id: String, name: String, alcoholPercentage: Double, volumeMl: Double, notes: String) {
@@ -690,10 +776,13 @@ class MainActivity : AppCompatActivity() {
         val beerSizeLayout = dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.beer_size_layout)
         val beerStrengthLayout = dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.beer_strength_layout)
         val themeSwitch = dialogView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switch_theme)
+        val secureSwitch = dialogView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switch_secure)
 
         beerSizeEdit.setText(defaultSize.toString())
         beerStrengthEdit.setText(defaultStrength.toString())
         themeSwitch.isChecked = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
+        // Restore secure toggle
+        secureSwitch.isChecked = getSharedPreferences(prefsName, MODE_PRIVATE).getBoolean("flag_secure", true)
 
         val dialog = AlertDialog.Builder(this)
             .setTitle(null)
@@ -732,11 +821,57 @@ class MainActivity : AppCompatActivity() {
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                     }
 
+                    // Apply FLAG_SECURE preference
+                    val enableSecure = secureSwitch.isChecked
+                    prefs.edit().putBoolean("flag_secure", enableSecure).apply()
+                    if (enableSecure) {
+                        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+                    } else {
+                        window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+                    }
+
                     Toast.makeText(this, "Settings saved", Toast.LENGTH_SHORT).show()
                     dialog.dismiss()
                 }
             }
         }
+        dialog.show()
+    }
+
+    private fun showQuickAddSheet() {
+        val sheetView = layoutInflater.inflate(R.layout.bottom_sheet_quick_add, null)
+        val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(this)
+        dialog.setContentView(sheetView)
+
+        val group = sheetView.findViewById<com.google.android.material.chip.ChipGroup>(R.id.group_presets)
+        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
+        val presets = getDrinkPresets(prefs).sortedByDescending { it.favorite }.take(12)
+        group.removeAllViews()
+        presets.forEach { preset ->
+            val chip = com.google.android.material.chip.Chip(this).apply {
+                text = "${preset.volume}ml ${preset.name}"
+                isCheckable = false
+                isClickable = true
+                setOnClickListener {
+                    addBeerEntry(
+                        name = preset.name,
+                        alcoholPercentage = preset.strength.toDouble(),
+                        volumeMl = preset.volume.toDouble(),
+                        notes = ""
+                    )
+                    dialog.dismiss()
+                }
+            }
+            group.addView(chip)
+        }
+
+        sheetView.findViewById<View>(R.id.btn_manage_drinks).setOnClickListener {
+            dialog.dismiss()
+            showDrinkManagerDialog { selected ->
+                addBeerEntry(selected.name, selected.strength.toDouble(), selected.volume.toDouble(), "")
+            }
+        }
+        sheetView.findViewById<View>(R.id.btn_close).setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
 } 
