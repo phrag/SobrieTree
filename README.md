@@ -1,6 +1,6 @@
 # BrewLog
 
-A beer consumption tracking Android app built with Kotlin and Rust backend.
+Track your beer consumption with a clean Android app. Kotlin frontend with an optional Rust core.
 
 ## Project Status
 
@@ -12,9 +12,10 @@ A beer consumption tracking Android app built with Kotlin and Rust backend.
 - Dialog-based input forms for adding/editing entries
 
 🔄 **Current State:**
-- Rust library builds successfully and passes all tests
-- Android app structure is complete but needs Java/JDK to build
-- Simplified approach without UniFFI (using basic JNI instead)
+- Modernized Android UI with bottom navigation (Home, Progress)
+- Home shows a custom Beer Glass with animations, quick-add chips, and sound
+- Unified Goals & Baseline dialog: set both on a single screen in drinks
+- Defaults start at 0; app prompts to set up on first run
 
 ❌ **Blocked by:**
 - Missing Java/JDK installation for Android development
@@ -63,11 +64,13 @@ brewlog/
 ## Features
 
 ### Core Functionality
-- **Add Beer Entries**: Track beer name, alcohol percentage, volume, and notes
-- **View Consumption**: Daily and weekly consumption tracking
-- **Set Goals**: Configure daily and weekly consumption targets
-- **Progress Tracking**: Monitor reduction progress over time
-- **Edit/Delete**: Modify or remove existing entries
+- **Add Beer Entries**: Track beer name, ABV, volume, and notes
+- **Quick Add**: One-tap chips and glass tap to add last drink
+- **Beer Glass**: Visual daily progress with foam, bubbles, sparkle, overflow
+- **Sound FX**: Realistic clink/open sound when adding a drink
+- **Goals & Baseline**: Unified dialog to configure both (in drinks)
+- **Progress Screen**: Today/Week metrics and reductions
+- **Edit/Delete**: Modify or remove entries
 
 ### Technical Features
 - **Rust Backend**: High-performance data processing and storage
@@ -112,6 +115,21 @@ brewlog/
    ```
 
 3. **Run on Device/Emulator**
+### Release builds
+
+Build a signed release APK:
+```bash
+cd android
+./gradlew assembleRelease
+open app/build/outputs/apk/release
+```
+
+The APK file will be named like `BrewLog-<version>.apk`.
+
+### Sounds
+
+Place your audio in `android/app/src/main/res/raw/` (e.g., `clink_beer.ogg`, `open_beer.ogg`).
+Zero-byte placeholders are ignored; system tones are used as fallback on device.
    ```bash
    ./gradlew installDebug
    ```
@@ -126,19 +144,17 @@ brewlog/
 - **SQLite Integration**: Persistent data storage
 
 ### Android Frontend
-- **MainActivity**: Main UI controller
-- **BrewLog**: JNI wrapper for Rust backend
-- **BeerEntryAdapter**: RecyclerView adapter for list display
-- **Material Design**: Modern UI components
+- **MainActivity**: Home + Beer Glass + Quick Add + menu
+- **ProgressActivity**: Reduction metrics and weekly view
+- **BeerGlassView**: Custom view with foam, bubbles, sparkle, overflow
+- **Dialogs**: `dialog_setup` (goals+baseline), add/edit drinks
 
 ## Development Roadmap
 
 ### Phase 1: Basic App (Current)
-- [x] Rust backend with core functionality
-- [x] Android UI structure
-- [ ] Java/JDK installation
-- [ ] Android app compilation
-- [ ] Basic testing
+- [x] Home, Progress, BeerGlassView, sounds, quick add
+- [x] Unified setup dialog; defaults at 0 with prompt
+- [x] Release APK pipeline
 
 ### Phase 2: Rust Integration
 - [ ] Android NDK setup

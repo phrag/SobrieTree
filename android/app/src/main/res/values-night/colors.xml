@@ -1,11 +1,23 @@
 <resources>
-    <!-- Dark Theme Colors -->
+    <!-- Base dark palette -->
     <color name="dark_background">#121212</color>
     <color name="dark_surface">#1E1E1E</color>
     <color name="dark_surface_variant">#2C2C2C</color>
     <color name="dark_card_background">#2C2C2C</color>
-    <color name="dark_text_primary">#FFFFFF</color>
+    <color name="dark_text_primary">#FFFFFFFF</color>
     <color name="dark_text_secondary">#B3FFFFFF</color>
     <color name="dark_text_hint">#80FFFFFF</color>
-    <color name="dark_text_on_surface">#FFFFFF</color>
+    <color name="dark_text_on_surface">#FFFFFFFF</color>
+
+    <!-- Map light color names to dark variants for night mode -->
+    <color name="background">@color/dark_background</color>
+    <color name="surface">@color/dark_surface</color>
+    <color name="surface_variant">@color/dark_surface_variant</color>
+    <color name="card_background">@color/dark_card_background</color>
+    <color name="input_background">@color/dark_surface_variant</color>
+
+    <color name="text_primary">@color/dark_text_primary</color>
+    <color name="text_secondary">@color/dark_text_secondary</color>
+    <color name="text_hint">@color/dark_text_hint</color>
+    <color name="text_on_surface">@color/dark_text_on_surface</color>
 </resources>

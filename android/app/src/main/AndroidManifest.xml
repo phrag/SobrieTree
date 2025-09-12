@@ -18,6 +18,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ProgressActivity"
+            android:exported="false"
+            android:theme="@style/Theme.BrewLog" />
     </application>
 
 </manifest> 

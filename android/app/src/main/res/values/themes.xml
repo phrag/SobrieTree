@@ -28,6 +28,8 @@
         <!-- Button styling -->
         <item name="materialButtonStyle">@style/Widget.BrewLog.Button</item>
         <item name="materialButtonOutlinedStyle">@style/Widget.BrewLog.Button.Outlined</item>
+        <!-- Input field styling -->
+        <item name="textInputStyle">@style/Widget.BrewLog.TextInputLayout.OutlinedBox</item>
     </style>
 
     <!-- Custom Button Styles -->
@@ -87,4 +89,16 @@
         <item name="android:textColor">@color/text_hint</item>
         <item name="android:textSize">14sp</item>
     </style>
-</resources> 
+
+    <!-- Custom Input Field Styles -->
+    <style name="Widget.BrewLog.TextInputLayout.OutlinedBox" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundMode">filled</item>
+        <item name="boxBackgroundColor">@color/input_background</item>
+        <item name="boxCornerRadiusBottomEnd">12dp</item>
+        <item name="boxCornerRadiusBottomStart">12dp</item>
+        <item name="boxCornerRadiusTopEnd">12dp</item>
+        <item name="boxCornerRadiusTopStart">12dp</item>
+        <item name="boxStrokeColor">@color/blue_500</item>
+        <item name="hintTextColor">@color/blue_500</item>
+    </style>
+</resources>

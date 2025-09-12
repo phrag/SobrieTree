@@ -30,8 +30,8 @@ class BrewLog {
     // Later we can integrate with the Rust backend
     private val entries = mutableListOf<BeerEntry>()
     private var nextId = 1
-    private var dailyGoal = 500.0
-    private var weeklyGoal = 3500.0
+    private var dailyGoal = 0.0
+    private var weeklyGoal = 0.0
     private var baseline: Baseline? = null
 
     fun addBeerEntry(name: String, alcoholPercentage: Double, volumeMl: Double, notes: String) {

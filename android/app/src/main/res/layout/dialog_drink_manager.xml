@@ -27,7 +27,6 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:text="Add New Drink"
-        android:textSize="14sp"
         style="@style/Widget.BrewLog.Button"
         app:cornerRadius="12dp" />
 

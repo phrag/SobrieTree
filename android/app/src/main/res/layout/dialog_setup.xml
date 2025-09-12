@@ -10,16 +10,15 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Set Goals"
+        android:text="Set Goals & Baseline"
         android:textAppearance="@style/TextAppearance.BrewLog.Headline"
         android:layout_marginBottom="16dp" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/layout_daily_goal"
+        android:id="@+id/layout_default_drink"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Daily Target (drinks)"
-        app:helperText="How many drinks you want to have per day."
+        android:hint="Default Drink Size (ml)"
         style="?attr/textInputStyle"
         app:boxBackgroundMode="filled"
         app:boxBackgroundColor="@color/input_background"
@@ -27,7 +26,7 @@
         android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_daily_goal"
+            android:id="@+id/et_default_drink_ml"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="number"
@@ -36,11 +35,11 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/layout_weekly_goal"
+        android:id="@+id/layout_daily_goal_drinks"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Weekly Target (drinks)"
-        app:helperText="How many drinks you want to have per week."
+        android:hint="Daily Goal (drinks)"
+        app:helperText="Daily target expressed in drinks"
         style="?attr/textInputStyle"
         app:boxBackgroundMode="filled"
         app:boxBackgroundColor="@color/input_background"
@@ -48,7 +47,7 @@
         android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_weekly_goal"
+            android:id="@+id/et_goal_daily_drinks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="number"
@@ -56,7 +55,69 @@
             android:textColorHint="@color/text_hint" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Info Card -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layout_weekly_goal_drinks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Weekly Goal (drinks)"
+        app:helperText="Calculated from daily ×7; you can override"
+        style="?attr/textInputStyle"
+        app:boxBackgroundMode="filled"
+        app:boxBackgroundColor="@color/input_background"
+        app:hintTextColor="@color/text_hint"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_goal_weekly_drinks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:textColor="@color/text_on_surface"
+            android:textColorHint="@color/text_hint" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layout_daily_baseline_drinks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Baseline Daily (drinks)"
+        app:helperText="Your average daily consumption"
+        style="?attr/textInputStyle"
+        app:boxBackgroundMode="filled"
+        app:boxBackgroundColor="@color/input_background"
+        app:hintTextColor="@color/text_hint"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_baseline_daily_drinks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:textColor="@color/text_on_surface"
+            android:textColorHint="@color/text_hint" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layout_weekly_baseline_drinks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Baseline Weekly (drinks)"
+        app:helperText="Calculated from daily ×7; you can override"
+        style="?attr/textInputStyle"
+        app:boxBackgroundMode="filled"
+        app:boxBackgroundColor="@color/input_background"
+        app:hintTextColor="@color/text_hint"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_baseline_weekly_drinks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:textColor="@color/text_on_surface"
+            android:textColorHint="@color/text_hint" />
+    </com.google.android.material.textfield.TextInputLayout>
+
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -81,7 +142,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Tip: Many health guidelines recommend no more than 2 standard drinks (about 500ml beer) per day."
+                android:text="Tip: Many health guidelines recommend no more than 2 standard drinks per day."
                 android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                 android:textColor="@color/blue_700" />
 
@@ -89,7 +150,6 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Action Buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -115,4 +175,6 @@
 
     </LinearLayout>
 
-</LinearLayout> 
+</LinearLayout>
+
+

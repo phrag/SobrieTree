@@ -5,4 +5,9 @@
         android:title="Settings"
         android:icon="@android:drawable/ic_menu_preferences"
         android:showAsAction="always" />
+    <item
+        android:id="@+id/action_set_goals"
+        android:title="Set Goals"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:showAsAction="never" />
 </menu> 

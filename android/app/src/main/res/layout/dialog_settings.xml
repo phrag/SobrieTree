@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:hint="Default beer size (ml)"
         app:helperText="This is the size used for beer presets and calculations."
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        style="?attr/textInputStyle"
         android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="number"
-            android:textColor="@color/text_primary" />
+            android:textColor="@color/text_on_surface" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -36,14 +36,14 @@
         android:layout_height="wrap_content"
         android:hint="Default beer strength (% ABV)"
         app:helperText="Used for info and calculations."
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+        style="?attr/textInputStyle">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_beer_strength"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
-            android:textColor="@color/text_primary" />
+            android:textColor="@color/text_on_surface" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.switchmaterial.SwitchMaterial
