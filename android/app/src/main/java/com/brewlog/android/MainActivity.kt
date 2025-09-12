@@ -117,7 +117,8 @@ class MainActivity : AppCompatActivity() {
                 val weekStart = LocalDate.now().minusDays(6)
 
                 val todayConsumption = log.getDailyConsumption(today)
-                val weekConsumption = log.getWeeklyConsumption(weekStart)
+                // Weekly consumption used on Progress screen
+                /* val weekConsumption = */ log.getWeeklyConsumption(weekStart)
 
                 val entries = log.getBeerEntries(weekStart.toString(), today.toString())
                 adapter.submitList(entries)
@@ -337,8 +338,7 @@ class MainActivity : AppCompatActivity() {
             val alcoholPercentage = strengthEdit.text.toString().toDoubleOrNull() ?: 0.0
             val volumeMl = volumeEdit.text.toString().toDoubleOrNull() ?: 0.0
             val notes = notesEdit.text.toString()
-            val type = DrinkType.values()[typeSpinner.selectedItemPosition]
-
+            // Type is currently informational; not used in save
             if (name.isNotEmpty() && volumeMl > 0) {
                 addBeerEntry(name, alcoholPercentage, volumeMl, notes)
                 dialog.dismiss()
@@ -496,7 +496,6 @@ class MainActivity : AppCompatActivity() {
         val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
         val drinks = getDrinkPresets(prefs)
         val defaultDrink = drinks.firstOrNull { it.favorite } ?: drinks.firstOrNull()
-        val drinkLabel = if (defaultDrink != null) " (${(defaultDrink.volume).toInt()}ml ${defaultDrink.name}${if (defaultDrink.name.endsWith("s")) "" else "s"})" else ""
         val drinkVolume = defaultDrink?.volume?.toDouble() ?: 500.0
 
         // Helper to format ml + drink equivalent

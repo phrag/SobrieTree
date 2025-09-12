@@ -26,6 +26,16 @@ cd ..
 # Build Android app
 cd android
 ./gradlew assembleDebug
+
+# Copy latest APK to repo root
+APK_PATH="app/build/outputs/apk/debug/app-debug.apk"
+if [ -f "$APK_PATH" ]; then
+  cp -f "$APK_PATH" ../BrewLog-debug.apk
+  echo "📦 Copied APK to $(pwd)/../BrewLog-debug.apk"
+else
+  echo "⚠️ APK not found at $APK_PATH"
+fi
+
 cd ..
 
 echo "✅ Build complete!"
