@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     private var brewLog: BrewLog? = null
     private var selectedStartDate: LocalDate? = null
     private var selectedEndDate: LocalDate? = null
+    private val prefsName = "brewlog_prefs"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,8 +89,24 @@ class MainActivity : AppCompatActivity() {
     private fun initializeBrewLog() {
         try {
             brewLog = BrewLog()
+            restoreGoalsAndBaseline()
         } catch (e: Exception) {
             Toast.makeText(this, "Failed to initialize brew log", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun restoreGoalsAndBaseline() {
+        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
+        val goalDaily = prefs.getFloat("goal_daily_ml", 0f).toDouble()
+        val goalWeekly = prefs.getFloat("goal_weekly_ml", 0f).toDouble()
+        if (goalDaily > 0.0 || goalWeekly > 0.0) {
+            val today = LocalDate.now()
+            brewLog?.setConsumptionGoal(goalDaily, goalWeekly, today, today.plusWeeks(4))
+        }
+        val baselineDaily = prefs.getFloat("baseline_daily_ml", 0f).toDouble()
+        if (baselineDaily > 0.0) {
+            val today = LocalDate.now()
+            brewLog?.setBaseline(startDate = today, endDate = today.plusWeeks(4), totalConsumption = null, dailyAverage = baselineDaily)
         }
     }
 
@@ -117,7 +134,7 @@ class MainActivity : AppCompatActivity() {
                 beerGlass.setProgress(ratio)
 
                 // Show in drinks instead of ml
-                val prefs = getSharedPreferences("brewlog_prefs", MODE_PRIVATE)
+                val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
                 val drinks = getDrinkPresets(prefs)
                 val defaultDrink = drinks.firstOrNull { it.favorite } ?: drinks.firstOrNull()
                 val drinkVolume = defaultDrink?.volume?.toDouble() ?: 500.0
@@ -131,7 +148,7 @@ class MainActivity : AppCompatActivity() {
                 // Populate Quick Add chips from presets (prioritize favorite, last-added)
                 val chipGroup = findViewById<com.google.android.material.chip.ChipGroup>(R.id.quick_add_group)
                 chipGroup.removeAllViews()
-                val presets = getDrinkPresets(getSharedPreferences("brewlog_prefs", MODE_PRIVATE))
+                val presets = getDrinkPresets(getSharedPreferences(prefsName, MODE_PRIVATE))
                 val topPresets = presets.sortedByDescending { it.favorite }.take(6)
                 topPresets.forEach { preset ->
                     val chip = com.google.android.material.chip.Chip(this).apply {
@@ -279,7 +296,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showAddBeerDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_beer, null)
-        val prefs = getSharedPreferences("brewlog_prefs", MODE_PRIVATE)
+        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
         val defaultSize = prefs.getInt("default_beer_size", 500)
         val defaultStrength = prefs.getFloat("default_beer_strength", 5.0f)
 
@@ -387,7 +404,7 @@ class MainActivity : AppCompatActivity() {
         val layoutDailyBaseline = dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.layout_daily_baseline_drinks)
         val layoutWeeklyBaseline = dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.layout_weekly_baseline_drinks)
 
-        val prefs = getSharedPreferences("brewlog_prefs", MODE_PRIVATE)
+        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
         val drinks = getDrinkPresets(prefs)
         val defaultDrink = drinks.firstOrNull { it.favorite } ?: drinks.firstOrNull()
         val defaultSizeMl = defaultDrink?.volume ?: prefs.getInt("default_beer_size", 500)
@@ -426,7 +443,7 @@ class MainActivity : AppCompatActivity() {
 
         dialogView.findViewById<View>(R.id.btn_cancel).setOnClickListener { dialog.dismiss() }
         dialogView.findViewById<View>(R.id.btn_save).setOnClickListener {
-            val size = defaultDrinkEdit.text.toString().toIntOrNull() ?: 0
+            val sizeInput = defaultDrinkEdit.text.toString().toIntOrNull() ?: 0
             val dailyGoal = dailyGoalDrinks.text.toString().toDoubleOrNull() ?: 0.0
             val weeklyGoal = weeklyGoalDrinks.text.toString().toDoubleOrNull() ?: 0.0
             val dailyBase = dailyBaselineDrinks.text.toString().toDoubleOrNull() ?: 0.0
@@ -440,17 +457,25 @@ class MainActivity : AppCompatActivity() {
 
             if (!valid) return@setOnClickListener
 
-            if (size > 0) {
-                prefs.edit().putInt("default_beer_size", size).apply()
+            val effectiveSize = if (sizeInput > 0) sizeInput else defaultSizeMl
+            if (effectiveSize > 0) {
+                prefs.edit().putInt("default_beer_size", effectiveSize).apply()
             }
 
-            val mlDailyGoal = dailyGoal * size
-            val mlWeeklyGoal = weeklyGoal * size
-            val mlDailyBaseline = dailyBase * size
+            val mlDailyGoal = dailyGoal * effectiveSize
+            val mlWeeklyGoal = weeklyGoal * effectiveSize
+            val mlDailyBaseline = dailyBase * effectiveSize
 
             val today = LocalDate.now()
             brewLog?.setConsumptionGoal(mlDailyGoal, mlWeeklyGoal, today, today.plusWeeks(4))
             brewLog?.setBaseline(startDate = today, endDate = today.plusWeeks(4), totalConsumption = null, dailyAverage = mlDailyBaseline)
+
+            // Persist selections for next launch
+            prefs.edit()
+                .putFloat("goal_daily_ml", mlDailyGoal.toFloat())
+                .putFloat("goal_weekly_ml", mlWeeklyGoal.toFloat())
+                .putFloat("baseline_daily_ml", mlDailyBaseline.toFloat())
+                .apply()
 
             Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
@@ -468,7 +493,7 @@ class MainActivity : AppCompatActivity() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_progress_metrics, null)
 
         // Get default or most recent drink size
-        val prefs = getSharedPreferences("brewlog_prefs", MODE_PRIVATE)
+        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
         val drinks = getDrinkPresets(prefs)
         val defaultDrink = drinks.firstOrNull { it.favorite } ?: drinks.firstOrNull()
         val drinkLabel = if (defaultDrink != null) " (${(defaultDrink.volume).toInt()}ml ${defaultDrink.name}${if (defaultDrink.name.endsWith("s")) "" else "s"})" else ""
@@ -657,7 +682,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showSettingsDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_settings, null)
-        val prefs = getSharedPreferences("brewlog_prefs", MODE_PRIVATE)
+        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
         val defaultSize = prefs.getInt("default_beer_size", 500)
         val defaultStrength = prefs.getFloat("default_beer_strength", 5.0f)
 

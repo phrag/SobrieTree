@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Set Goals & Baseline"
+        android:text="Set Goals &amp; Baseline"
         android:textAppearance="@style/TextAppearance.BrewLog.Headline"
         android:layout_marginBottom="16dp" />
 
