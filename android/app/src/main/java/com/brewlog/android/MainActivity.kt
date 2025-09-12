@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initializeBrewLog() {
         try {
-            brewLog = BrewLog()
+            brewLog = BrewLogProvider.instance
             restoreGoalsAndBaseline()
         } catch (e: Exception) {
             Toast.makeText(this, "Failed to initialize brew log", Toast.LENGTH_SHORT).show()

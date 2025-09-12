@@ -105,10 +105,10 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            app:cardBackgroundColor="@color/blue_50"
+            app:cardBackgroundColor="@color/surface"
             app:cardCornerRadius="12dp"
             app:cardElevation="2dp"
-            app:strokeColor="@color/blue_200"
+            app:strokeColor="@color/border"
             app:strokeWidth="1dp">
 
             <LinearLayout
@@ -124,7 +124,7 @@
                     android:layout_marginBottom="8dp"
                     android:text="Baseline"
                     android:textAppearance="@style/TextAppearance.BrewLog.Caption"
-                    android:textColor="@color/blue_700"
+                    android:textColor="@color/text_secondary"
                     android:textStyle="bold" />
 
                 <TextView
@@ -132,7 +132,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="0 ml/day"
+                    android:text="0 drinks/day"
                     android:textAppearance="@style/TextAppearance.BrewLog.Title"
                     android:textColor="@color/text_primary" />
 
@@ -141,7 +141,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="0 ml/week"
+                    android:text="0 drinks/week"
                     android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                     android:textColor="@color/text_secondary" />
 

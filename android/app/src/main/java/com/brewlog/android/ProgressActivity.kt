@@ -13,14 +13,28 @@ class ProgressActivity : AppCompatActivity() {
 		supportActionBar?.setDisplayHomeAsUpEnabled(true)
 		toolbar.setNavigationOnClickListener { finish() }
 
-		val brewLog = BrewLog()
+		val brewLog = BrewLogProvider.instance
 		val metrics = brewLog.getProgressMetrics()
+		val today = java.time.LocalDate.now()
+		val weekStart = today.minusDays(6)
+		val todayMl = brewLog.getDailyConsumption(today)
+		val weekMl = brewLog.getWeeklyConsumption(weekStart)
+		val prefs = getSharedPreferences("brewlog_prefs", MODE_PRIVATE)
+		val sizeMl = prefs.getInt("default_beer_size", 500).toDouble().coerceAtLeast(1.0)
+		fun drinksOf(ml: Double) = (ml / sizeMl).toInt()
+		findViewById<android.widget.TextView>(R.id.today_consumption).text = "${drinksOf(todayMl)} drinks"
+		findViewById<android.widget.TextView>(R.id.week_consumption).text = "${drinksOf(weekMl)} drinks"
+
 		if (metrics != null) {
+			// Convert ml to drinks using default size
+			val prefs = getSharedPreferences("brewlog_prefs", MODE_PRIVATE)
+			val defaultSizeMl = prefs.getInt("default_beer_size", 500).toDouble().coerceAtLeast(1.0)
+			fun drinksOf(ml: Double) = (ml / defaultSizeMl).toInt()
 			findViewById<android.widget.TextView>(R.id.tv_reduction_percentage).text = "${String.format("%.1f", metrics.reductionPercentageDaily)}%"
-			findViewById<android.widget.TextView>(R.id.tv_baseline_daily).text = "${metrics.baselineDailyAverage.toInt()} ml/day"
-			findViewById<android.widget.TextView>(R.id.tv_current_daily).text = "${metrics.currentDailyAverage.toInt()} ml/day"
-			findViewById<android.widget.TextView>(R.id.tv_baseline_weekly).text = "${metrics.baselineWeeklyAverage.toInt()} ml/week"
-			findViewById<android.widget.TextView>(R.id.tv_current_weekly).text = "${metrics.currentWeeklyAverage.toInt()} ml/week"
+			findViewById<android.widget.TextView>(R.id.tv_baseline_daily).text = "${drinksOf(metrics.baselineDailyAverage)} drinks/day"
+			findViewById<android.widget.TextView>(R.id.tv_current_daily).text = "${drinksOf(metrics.currentDailyAverage)} drinks/day"
+			findViewById<android.widget.TextView>(R.id.tv_baseline_weekly).text = "${drinksOf(metrics.baselineWeeklyAverage)} drinks/week"
+			findViewById<android.widget.TextView>(R.id.tv_current_weekly).text = "${drinksOf(metrics.currentWeeklyAverage)} drinks/week"
 		}
 
 		// Bottom nav

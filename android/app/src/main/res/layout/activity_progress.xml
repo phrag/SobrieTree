@@ -74,7 +74,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
                             android:layout_marginTop="8dp"
-                            android:text="0 ml"
+                            android:text="0 drinks"
                             android:textAppearance="@style/TextAppearance.BrewLog.Title"
                             android:textColor="@color/text_primary" />
 
@@ -118,7 +118,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
                             android:layout_marginTop="8dp"
-                            android:text="0 ml"
+                            android:text="0 drinks"
                             android:textAppearance="@style/TextAppearance.BrewLog.Title"
                             android:textColor="@color/text_primary" />
 
