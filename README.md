@@ -8,10 +8,24 @@ A simple, private beer consumption tracker for Android.
 - A Progress screen shows Today/This Week and your reduction vs. baseline
 - Works fully offline. No account, no cloud, no analytics, no ads
 
+### Privacy & Security
+BrewLog is privacy‑focused by design:
+- No account or sign‑in
+- No dangerous/runtime permissions requested (no contacts, location, camera, mic)
+- Network‑free by default: the app does not make any internet requests
+- All data stays on your device; nothing is uploaded or shared
+- No analytics, trackers, ads, or third‑party SDKs
+- Works completely offline; no cloud services are required
+
+Your data, your control:
+- Entries live in the app’s private storage; uninstalling the app or clearing its data removes everything
+- Open‑source codebase — audit how data is handled
+- Battery‑friendly: no background sync, polling, or push connections
+
 ## Quick Start
 
 1) Install the app
-- Download `BrewLog-debug.apk` from the repository root and install on your phone
+- Download `BrewLog-debug.apk` and install on your phone
 - You may need to enable “Install unknown apps” in Android settings
 
 2) First‑time setup
@@ -26,20 +40,6 @@ A simple, private beer consumption tracker for Android.
 4) View Progress
 - Bottom navigation ▸ Progress
 - See Today and This Week in drinks, plus reduction vs. baseline
-
-### Privacy & Security
-BrewLog is privacy‑focused by design:
-- No account or sign‑in
-- No dangerous/runtime permissions requested (no contacts, location, camera, mic)
-- Network‑free by default: the app does not make any internet requests
-- All data stays on your device; nothing is uploaded or shared
-- No analytics, trackers, ads, or third‑party SDKs
-- Works completely offline; no cloud services are required
-
-Your data, your control:
-- Entries live in the app’s private storage; uninstalling the app or clearing its data removes everything
-- Open‑source codebase — audit how data is handled
-- Battery‑friendly: no background sync, polling, or push connections
 
 ### Screenshots
 - Home: `screenshots/home.png`
