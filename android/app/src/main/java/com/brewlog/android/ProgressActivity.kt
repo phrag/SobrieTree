@@ -15,7 +15,7 @@ class ProgressActivity : AppCompatActivity() {
 
 		val brewLog = BrewLogProvider.instance
 		val metrics = brewLog.getProgressMetrics()
-		val today = java.time.LocalDate.now()
+		val today = brewLog.nowEffectiveDate()
 		val weekStart = today.minusDays(6)
 		val todayMl = brewLog.getDailyConsumption(today)
 		val weekMl = brewLog.getWeeklyConsumption(weekStart)
@@ -35,6 +35,18 @@ class ProgressActivity : AppCompatActivity() {
 			findViewById<android.widget.TextView>(R.id.tv_current_daily).text = "${drinksOf(metrics.currentDailyAverage)} drinks/day"
 			findViewById<android.widget.TextView>(R.id.tv_baseline_weekly).text = "${drinksOf(metrics.baselineWeeklyAverage)} drinks/week"
 			findViewById<android.widget.TextView>(R.id.tv_current_weekly).text = "${drinksOf(metrics.currentWeeklyAverage)} drinks/week"
+		}
+
+		// Buttons to set baseline/goals
+		findViewById<android.view.View>(R.id.btn_set_baseline_progress).setOnClickListener {
+			startActivity(android.content.Intent(this, MainActivity::class.java).apply {
+				putExtra("open_setup_dialog", true)
+			})
+		}
+		findViewById<android.view.View>(R.id.btn_set_goals_progress).setOnClickListener {
+			startActivity(android.content.Intent(this, MainActivity::class.java).apply {
+				putExtra("open_setup_dialog", true)
+			})
 		}
 
 		// Bottom nav

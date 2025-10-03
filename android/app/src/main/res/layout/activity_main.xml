@@ -127,6 +127,89 @@
                             app:indicatorDirectionLinear="leftToRight"
                             app:trackThickness="8dp" />
 
+                        <TextView
+                            android:id="@+id/daily_reduction_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="Reduction: —"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:id="@+id/weekly_glass_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Weekly Goal"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:id="@+id/weekly_glass_progress"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="0 / 0 drinks"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                            android:textColor="@color/text_primary" />
+
+                        <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/weekly_goal_progress"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:indicatorColor="@color/green_500"
+                            app:trackColor="@color/blue_50"
+                            app:indicatorDirectionLinear="leftToRight"
+                            app:trackThickness="8dp" />
+
+                        <TextView
+                            android:id="@+id/weekly_reduction_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="Reduction: —"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:id="@+id/monthly_glass_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Monthly Goal"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:id="@+id/monthly_glass_progress"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="0 / 0 drinks"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                            android:textColor="@color/text_primary" />
+
+                        <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/monthly_goal_progress"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:indicatorColor="@color/green_500"
+                            app:trackColor="@color/blue_50"
+                            app:indicatorDirectionLinear="leftToRight"
+                            app:trackThickness="8dp" />
+
+                        <TextView
+                            android:id="@+id/monthly_reduction_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="Reduction: —"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                            android:textColor="@color/text_secondary" />
+
                     </LinearLayout>
 
                 </LinearLayout>
@@ -190,38 +273,7 @@
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
-            <!-- Baseline and Progress Buttons -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:orientation="horizontal">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_baseline"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:text="Set Baseline"
-                    app:icon="@android:drawable/ic_menu_myplaces"
-                    app:iconGravity="textStart"
-                    app:iconPadding="8dp"
-                    style="@style/Widget.BrewLog.Button.Outlined" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_set_goals"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/set_goals"
-                    app:icon="@android:drawable/ic_menu_edit"
-                    app:iconGravity="textStart"
-                    app:iconPadding="8dp"
-                    style="@style/Widget.BrewLog.Button.Outlined" />
-
-            </LinearLayout>
+            <!-- Baseline/Goals buttons moved to Progress screen -->
 
             <!-- Beer Entries Section -->
             <com.google.android.material.card.MaterialCardView

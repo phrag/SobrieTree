@@ -130,6 +130,36 @@
 
             <include layout="@layout/dialog_progress_metrics" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_set_baseline_progress"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Set Baseline"
+                    app:icon="@android:drawable/ic_menu_myplaces"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
+                    style="@style/Widget.BrewLog.Button.Outlined" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_set_goals_progress"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:text="Set Goals"
+                    app:icon="@android:drawable/ic_menu_edit"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
+                    style="@style/Widget.BrewLog.Button.Outlined" />
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 

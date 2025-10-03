@@ -60,4 +60,42 @@
         android:text="Block screenshots (FLAG_SECURE)"
         android:layout_marginTop="12dp"/>
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/eod_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="End of day hour (0-23, default 3)"
+        app:helperText="Entries before this hour count toward the previous day.">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_end_of_day"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:textColor="@color/text_on_surface" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_export"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Export Data" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_import"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:text="Import Data" />
+    </LinearLayout>
+
 </LinearLayout>

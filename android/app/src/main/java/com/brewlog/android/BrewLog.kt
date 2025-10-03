@@ -1,7 +1,10 @@
 package com.brewlog.android
 
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import org.json.JSONArray
+import org.json.JSONObject
 
 data class Baseline(
     val id: String,
@@ -33,6 +36,7 @@ class BrewLog {
     private var dailyGoal = 0.0
     private var weeklyGoal = 0.0
     private var baseline: Baseline? = null
+    private var endOfDayHour: Int = 3
 
     fun addBeerEntry(name: String, alcoholPercentage: Double, volumeMl: Double, notes: String) {
         val entry = BeerEntry(
@@ -40,7 +44,7 @@ class BrewLog {
             name = name,
             alcoholPercentage = alcoholPercentage,
             volumeMl = volumeMl,
-            date = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE),
+            date = nowEffectiveDate().format(DateTimeFormatter.ISO_LOCAL_DATE),
             notes = notes
         )
         entries.add(entry)
@@ -73,13 +77,31 @@ class BrewLog {
     fun updateBeerEntry(id: String, name: String, alcoholPercentage: Double, volumeMl: Double, notes: String) {
         val index = entries.indexOfFirst { it.id == id }
         if (index != -1) {
+            val existing = entries[index]
             entries[index] = BeerEntry(
                 id = id,
                 name = name,
                 alcoholPercentage = alcoholPercentage,
                 volumeMl = volumeMl,
-                date = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE),
+                date = existing.date,
                 notes = notes
+            )
+        } else {
+            throw RuntimeException("Beer entry not found")
+        }
+    }
+
+    fun updateBeerEntryDate(id: String, date: LocalDate) {
+        val index = entries.indexOfFirst { it.id == id }
+        if (index != -1) {
+            val existing = entries[index]
+            entries[index] = BeerEntry(
+                id = id,
+                name = existing.name,
+                alcoholPercentage = existing.alcoholPercentage,
+                volumeMl = existing.volumeMl,
+                date = date.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                notes = existing.notes
             )
         } else {
             throw RuntimeException("Beer entry not found")
@@ -157,7 +179,7 @@ class BrewLog {
         val currentBaseline = baseline ?: return null
         
         val baselineDate = LocalDate.parse(currentBaseline.calculatedDate)
-        val today = LocalDate.now()
+        val today = nowEffectiveDate()
         val daysSinceBaseline = baselineDate.until(today).days
 
         // Calculate current averages
@@ -218,4 +240,65 @@ class BrewLog {
     fun clearBaseline() {
         baseline = null
     }
+
+    fun setEndOfDayHour(hour: Int) {
+        endOfDayHour = hour.coerceIn(0, 23)
+    }
+
+    fun getEndOfDayHour(): Int = endOfDayHour
+
+    fun nowEffectiveDate(): LocalDate {
+        val now = LocalDateTime.now()
+        return if (now.hour < endOfDayHour) now.toLocalDate().minusDays(1) else now.toLocalDate()
+    }
+
+    fun getMonthlyConsumption(monthStartDate: LocalDate): Double {
+        val endDate = monthStartDate.plusDays(29)
+        return entries.filter {
+            val entryDate = LocalDate.parse(it.date)
+            entryDate >= monthStartDate && entryDate <= endDate
+        }.sumOf { it.volumeMl }
+    }
+
+    fun toJson(): String {
+        val arr = JSONArray()
+        entries.forEach {
+            val obj = JSONObject()
+                .put("id", it.id)
+                .put("name", it.name)
+                .put("alcoholPercentage", it.alcoholPercentage)
+                .put("volumeMl", it.volumeMl)
+                .put("date", it.date)
+                .put("notes", it.notes)
+            arr.put(obj)
+        }
+        return arr.toString()
+    }
+
+    fun loadFromJson(json: String) {
+        entries.clear()
+        try {
+            val arr = JSONArray(json)
+            for (i in 0 until arr.length()) {
+                val o = arr.getJSONObject(i)
+                entries.add(
+                    BeerEntry(
+                        id = o.optString("id", (nextId++).toString()),
+                        name = o.getString("name"),
+                        alcoholPercentage = o.optDouble("alcoholPercentage", 0.0),
+                        volumeMl = o.optDouble("volumeMl", 0.0),
+                        date = o.getString("date"),
+                        notes = o.optString("notes", "")
+                    )
+                )
+            }
+            // Reset nextId to max(existing)+1 if ids are numeric
+            val maxId = entries.mapNotNull { it.id.toIntOrNull() }.maxOrNull() ?: 0
+            nextId = maxId + 1
+        } catch (_: Exception) {
+            // ignore malformed json
+        }
+    }
+
+    fun getAllEntries(): List<BeerEntry> = entries.toList()
 } 

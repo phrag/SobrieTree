@@ -2,6 +2,8 @@
 
 A simple, private beer consumption tracker for Android.
 
+![Home screen](screenshots/home.png)
+
 - Set daily/weekly goals in drinks (based on your default drink size)
 - See a fun Beer Glass that fills as you log drinks
 - One‑tap Quick Add and tap‑the‑glass to repeat the last drink
@@ -42,9 +44,12 @@ Your data, your control:
 - See Today and This Week in drinks, plus reduction vs. baseline
 
 ### Screenshots
-- Home: `screenshots/home.png`
-- Beer Glass: `screenshots/home_after_beerglass.png`
-- Progress: `screenshots/progress_screen.png`
+
+![Home](screenshots/home.png)
+
+![Beer Glass](screenshots/home_after_beerglass.png)
+
+![Progress](screenshots/progress_screen.png)
 
 ---
 
