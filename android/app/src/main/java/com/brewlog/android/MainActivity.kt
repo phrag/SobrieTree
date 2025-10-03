@@ -284,6 +284,10 @@ class MainActivity : AppCompatActivity() {
                                 notes = ""
                             )
                         }
+                        setOnLongClickListener {
+                            showPresetOptions(preset) { loadData() }
+                            true
+                        }
                     }
                     chipGroup.addView(chip)
                 }
@@ -1061,9 +1065,36 @@ class MainActivity : AppCompatActivity() {
                     )
                     dialog.dismiss()
                 }
+                setOnLongClickListener {
+                    showPresetOptions(preset) {
+                        // Rebuild chips after change
+                        dialog.dismiss()
+                        showQuickAddSheet()
+                    }
+                    true
+                }
             }
             group.addView(chip)
         }
+
+        // Add New chip for quick access
+        val addNewChip = com.google.android.material.chip.Chip(this).apply {
+            text = "+ Add New"
+            isCheckable = false
+            isClickable = true
+            setChipIconResource(android.R.drawable.ic_input_add)
+            isChipIconVisible = true
+            setOnClickListener {
+                dialog.dismiss()
+                showEditDrinkDialog(null) { newDrink ->
+                    val all = getDrinkPresets(prefs).toMutableList()
+                    all.add(newDrink)
+                    saveDrinkPresets(prefs, all)
+                    loadData()
+                }
+            }
+        }
+        group.addView(addNewChip, 0)
 
         sheetView.findViewById<View>(R.id.btn_manage_drinks).setOnClickListener {
             dialog.dismiss()
@@ -1073,5 +1104,41 @@ class MainActivity : AppCompatActivity() {
         }
         sheetView.findViewById<View>(R.id.btn_close).setOnClickListener { dialog.dismiss() }
         dialog.show()
+    }
+
+    private fun showPresetOptions(preset: DrinkPreset, onChanged: () -> Unit) {
+        val items = arrayOf("Edit", if (preset.favorite) "Unfavorite" else "Favorite", "Delete")
+        AlertDialog.Builder(this)
+            .setTitle(preset.name)
+            .setItems(items) { d, which ->
+                val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
+                var list = getDrinkPresets(prefs).toMutableList()
+                when (which) {
+                    0 -> { // Edit
+                        showEditDrinkDialog(preset) { updated ->
+                            val idx = list.indexOfFirst { it.name == preset.name && it.type == preset.type && it.volume == preset.volume && it.strength == preset.strength }
+                            if (idx != -1) list[idx] = updated else list.add(updated)
+                            saveDrinkPresets(prefs, list)
+                            onChanged()
+                        }
+                    }
+                    1 -> { // Favorite toggle
+                        list = list.map { it.copy(favorite = (it.name == preset.name && it.type == preset.type && it.volume == preset.volume && it.strength == preset.strength)) }.toMutableList()
+                        // If already favorite, unfavorite all
+                        if (preset.favorite) {
+                            list = list.map { it.copy(favorite = false) }.toMutableList()
+                        }
+                        saveDrinkPresets(prefs, list)
+                        onChanged()
+                    }
+                    2 -> { // Delete
+                        list.removeAll { it.name == preset.name && it.type == preset.type && it.volume == preset.volume && it.strength == preset.strength }
+                        saveDrinkPresets(prefs, list)
+                        onChanged()
+                    }
+                }
+                d.dismiss()
+            }
+            .show()
     }
 } 
