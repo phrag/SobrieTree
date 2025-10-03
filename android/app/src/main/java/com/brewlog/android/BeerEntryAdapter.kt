@@ -36,6 +36,7 @@ class BeerEntryAdapter(
         private val btnDelete: android.widget.ImageButton = itemView.findViewById(R.id.btn_delete)
 
         fun bind(entry: BeerEntry) {
+            val beerName: android.widget.TextView = itemView.findViewById(R.id.beer_name)
             beerName.text = entry.name
             beerVolume.text = "${entry.volumeMl.toInt()}ml"
             beerAlcohol.text = "${entry.alcoholPercentage}%"
