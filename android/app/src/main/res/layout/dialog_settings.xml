@@ -98,4 +98,15 @@
             android:text="Import Data" />
     </LinearLayout>
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_delete_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Delete All Data"
+        style="@style/Widget.BrewLog.Button.Outlined"
+        app:icon="@android:drawable/ic_menu_delete"
+        app:iconGravity="textStart"
+        app:iconPadding="8dp"/>
+
 </LinearLayout>
