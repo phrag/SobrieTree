@@ -21,17 +21,28 @@ mkdir -p ../android/app/src/main/jniLibs/arm64-v8a/
 
 cd ..
 
-# Build Android app
+# Build Android app (release preferred to embed version in filename)
 cd android
-./gradlew assembleDebug
+# Read versionName from Gradle to construct the expected filename (BSD sed compatible)
+VERSION=$(awk -F '"' '/versionName[[:space:]]*"/{print $2; exit}' app/build.gradle)
+if [ -z "$VERSION" ]; then
+  echo "⚠️ Could not parse versionName from app/build.gradle; defaulting to 0.0.0"
+  VERSION="0.0.0"
+fi
+./gradlew assembleRelease || ./gradlew assembleDebug
 
-# Copy latest APK to repo root
-APK_PATH="app/build/outputs/apk/debug/app-debug.apk"
-if [ -f "$APK_PATH" ]; then
-  cp -f "$APK_PATH" ../BrewLog-debug.apk
-  echo "📦 Copied APK to $(pwd)/../BrewLog-debug.apk"
+# Prefer Release artifact named by outputs config; fall back to Debug
+REL_APK="app/build/outputs/apk/release/BrewLog-${VERSION}.apk"
+DBG_APK="app/build/outputs/apk/debug/app-debug.apk"
+DEST="../BrewLog-${VERSION}.apk"
+if [ -f "$REL_APK" ]; then
+  cp -f "$REL_APK" "$DEST"
+  echo "📦 Copied APK to $(pwd)/$DEST"
+elif [ -f "$DBG_APK" ]; then
+  cp -f "$DBG_APK" "$DEST"
+  echo "📦 Copied APK (debug) to $(pwd)/$DEST"
 else
-  echo "⚠️ APK not found at $APK_PATH"
+  echo "⚠️ APK not found (checked $REL_APK and $DBG_APK)"
 fi
 
 cd ..

@@ -48,7 +48,6 @@ Your data, your control:
 
 ### Screenshots
 
-![Home](screenshots/home.png)
 
 ---
 

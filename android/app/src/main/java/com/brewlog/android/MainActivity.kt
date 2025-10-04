@@ -306,16 +306,7 @@ class MainActivity : AppCompatActivity() {
                     showFavoriteSetupSheet()
                 }
 
-                // If goals/baseline are zero, gently prompt once
-                if ((log.getDailyGoal() <= 0.0) || (log.getCurrentBaseline() == null)) {
-                    android.app.AlertDialog.Builder(this)
-                        .setMessage("Set your daily goal and baseline to track progress.")
-                        .setPositiveButton("Set Now") { d, _ ->
-                            showSetGoalsDialog(); d.dismiss()
-                        }
-                        .setNegativeButton("Later", null)
-                        .show()
-                }
+                // Removed initial tip dialog to avoid obscuring buttons on small screens
 
             } catch (e: Exception) {
                 Toast.makeText(this, "Failed to load data", Toast.LENGTH_SHORT).show()
