@@ -48,6 +48,7 @@ Your data, your control:
 
 ### Screenshots
 
+![Home](screenshots/home.png)
 
 ---
 
@@ -124,4 +125,4 @@ brewlog/
   - Ensure `android/local.properties` points to your SDK or export `ANDROID_SDK_ROOT`
 
 ### License
-GPL3 — see `LICENSE`. 
+MIT — see `LICENSE`. 
