@@ -123,7 +123,7 @@ impl BrewLog {
         if name.is_empty() {
             return Err(BrewLogError::InvalidInput("Name cannot be empty".to_string()));
         }
-        if alcohol_percentage < 0.0 || alcohol_percentage > 100.0 {
+        if !(0.0..=100.0).contains(&alcohol_percentage) {
             return Err(BrewLogError::InvalidInput("Alcohol percentage must be between 0 and 100".to_string()));
         }
         if volume_ml <= 0.0 {
@@ -291,7 +291,7 @@ impl BrewLog {
         let rows_affected = conn.execute("DELETE FROM beer_entries WHERE id = ?1", [&id])?;
         
         if rows_affected == 0 {
-            return Err(BrewLogError::NotFound(format!("Beer entry with id {} not found", id)));
+            return Err(BrewLogError::NotFound(format!("Beer entry with id {id} not found")));
         }
 
         Ok(())
@@ -308,7 +308,7 @@ impl BrewLog {
         if name.is_empty() {
             return Err(BrewLogError::InvalidInput("Name cannot be empty".to_string()));
         }
-        if alcohol_percentage < 0.0 || alcohol_percentage > 100.0 {
+        if !(0.0..=100.0).contains(&alcohol_percentage) {
             return Err(BrewLogError::InvalidInput("Alcohol percentage must be between 0 and 100".to_string()));
         }
         if volume_ml <= 0.0 {
@@ -325,7 +325,7 @@ impl BrewLog {
         )?;
 
         if rows_affected == 0 {
-            return Err(BrewLogError::NotFound(format!("Beer entry with id {} not found", id)));
+            return Err(BrewLogError::NotFound(format!("Beer entry with id {id} not found")));
         }
 
         Ok(())
@@ -338,7 +338,7 @@ impl BrewLog {
             (&date, &id),
         )?;
         if rows == 0 {
-            return Err(BrewLogError::NotFound(format!("Beer entry with id {} not found", id)));
+            return Err(BrewLogError::NotFound(format!("Beer entry with id {id} not found")));
         }
         Ok(())
     }
@@ -353,7 +353,7 @@ impl BrewLog {
         notes: String,
     ) -> Result<(), BrewLogError> {
         if name.is_empty() { return Err(BrewLogError::InvalidInput("Name cannot be empty".to_string())); }
-        if alcohol_percentage < 0.0 || alcohol_percentage > 100.0 { return Err(BrewLogError::InvalidInput("Alcohol percentage must be between 0 and 100".to_string())); }
+        if !(0.0..=100.0).contains(&alcohol_percentage) { return Err(BrewLogError::InvalidInput("Alcohol percentage must be between 0 and 100".to_string())); }
         if volume_ml <= 0.0 { return Err(BrewLogError::InvalidInput("Volume must be positive".to_string())); }
         let conn = self.db.lock().unwrap();
         let idv = id.unwrap_or_else(|| Uuid::new_v4().to_string());
@@ -381,26 +381,30 @@ static LOG: OnceLock<BrewLog> = OnceLock::new();
 pub extern "C" fn init_brew_log() -> *mut c_char {
     let msg = match BrewLog::new() {
         Ok(log) => { let _ = LOG.set(log); "OK".to_string() },
-        Err(e) => format!("Error: {}", e),
+        Err(e) => format!("Error: {e}"),
     };
     CString::new(msg).unwrap().into_raw()
 }
 
 #[no_mangle]
-pub extern "C" fn init_brew_log_with_path(path: *const c_char) -> *mut c_char {
+/// # Safety
+/// `path` must be a valid, non-null C string pointer.
+pub unsafe extern "C" fn init_brew_log_with_path(path: *const c_char) -> *mut c_char {
     if path.is_null() {
         return CString::new("Error: path is null").unwrap().into_raw();
     }
     let path_str = unsafe { CStr::from_ptr(path).to_string_lossy().into_owned() };
     let msg = match BrewLog::new_with_path(&path_str) {
         Ok(log) => { let _ = LOG.set(log); "OK".to_string() },
-        Err(e) => format!("Error: {}", e),
+        Err(e) => format!("Error: {e}"),
     };
     CString::new(msg).unwrap().into_raw()
 }
 
 #[no_mangle]
-pub extern "C" fn add_beer_entry(
+/// # Safety
+/// All pointer arguments must be valid, non-null C string pointers.
+pub unsafe extern "C" fn add_beer_entry(
     name: *const c_char,
     alcohol_percentage: f64,
     volume_ml: f64,
@@ -412,31 +416,37 @@ pub extern "C" fn add_beer_entry(
         let notes_str = CStr::from_ptr(notes).to_string_lossy().into_owned();
         match log.add_beer_entry(name_str, alcohol_percentage, volume_ml, notes_str) {
             Ok(_) => CString::new("OK").unwrap().into_raw(),
-            Err(e) => CString::new(format!("Error: {}", e)).unwrap().into_raw(),
+            Err(e) => CString::new(format!("Error: {e}")).unwrap().into_raw(),
         }
     }
 }
 
 #[no_mangle]
-pub extern "C" fn get_daily_consumption(date: *const c_char) -> f64 {
+/// # Safety
+/// `date` must be a valid, non-null C string pointer.
+pub unsafe extern "C" fn get_daily_consumption(date: *const c_char) -> f64 {
     unsafe {
         let Some(log) = LOG.get() else { return -1.0; };
         let date_str = CStr::from_ptr(date).to_string_lossy().into_owned();
-        match log.get_daily_consumption(date_str) { Ok(consumption) => consumption, Err(_) => -1.0, }
+        log.get_daily_consumption(date_str).unwrap_or(-1.0)
     }
 }
 
 #[no_mangle]
-pub extern "C" fn get_weekly_consumption(week_start_date: *const c_char) -> f64 {
+/// # Safety
+/// `week_start_date` must be a valid, non-null C string pointer.
+pub unsafe extern "C" fn get_weekly_consumption(week_start_date: *const c_char) -> f64 {
     unsafe {
         let Some(log) = LOG.get() else { return -1.0; };
         let date_str = CStr::from_ptr(week_start_date).to_string_lossy().into_owned();
-        match log.get_weekly_consumption(date_str) { Ok(consumption) => consumption, Err(_) => -1.0, }
+        log.get_weekly_consumption(date_str).unwrap_or(-1.0)
     }
 }
 
 #[no_mangle]
-pub extern "C" fn set_consumption_goal(
+/// # Safety
+/// All pointer arguments must be valid, non-null C string pointers.
+pub unsafe extern "C" fn set_consumption_goal(
     daily_target: f64,
     weekly_target: f64,
     start_date: *const c_char,
@@ -448,13 +458,15 @@ pub extern "C" fn set_consumption_goal(
         let end_date_str = CStr::from_ptr(end_date).to_string_lossy().into_owned();
         match log.set_consumption_goal(daily_target, weekly_target, start_date_str, end_date_str) {
             Ok(_) => CString::new("OK").unwrap().into_raw(),
-            Err(e) => CString::new(format!("Error: {}", e)).unwrap().into_raw(),
+            Err(e) => CString::new(format!("Error: {e}")).unwrap().into_raw(),
         }
     }
 }
 
 #[no_mangle]
-pub extern "C" fn get_beer_entries_json(start_date: *const c_char, end_date: *const c_char) -> *mut c_char {
+/// # Safety
+/// `start_date` and `end_date` must be valid, non-null C string pointers.
+pub unsafe extern "C" fn get_beer_entries_json(start_date: *const c_char, end_date: *const c_char) -> *mut c_char {
     unsafe {
         let Some(log) = LOG.get() else { return CString::new("Error: Log not initialized").unwrap().into_raw(); };
         let start = CStr::from_ptr(start_date).to_string_lossy().into_owned();
@@ -462,27 +474,31 @@ pub extern "C" fn get_beer_entries_json(start_date: *const c_char, end_date: *co
         match log.get_beer_entries(start, end) {
             Ok(entries) => match serde_json::to_string(&entries) {
                 Ok(s) => CString::new(s).unwrap().into_raw(),
-                Err(e) => CString::new(format!("Error: {}", e)).unwrap().into_raw(),
+                Err(e) => CString::new(format!("Error: {e}")).unwrap().into_raw(),
             },
-            Err(e) => CString::new(format!("Error: {}", e)).unwrap().into_raw(),
+            Err(e) => CString::new(format!("Error: {e}")).unwrap().into_raw(),
         }
     }
 }
 
 #[no_mangle]
-pub extern "C" fn delete_beer_entry_jni(id: *const c_char) -> *mut c_char {
+/// # Safety
+/// `id` must be a valid, non-null C string pointer.
+pub unsafe extern "C" fn delete_beer_entry_jni(id: *const c_char) -> *mut c_char {
     unsafe {
         let Some(log) = LOG.get() else { return CString::new("Error: Log not initialized").unwrap().into_raw(); };
         let id_str = CStr::from_ptr(id).to_string_lossy().into_owned();
         match log.delete_beer_entry(id_str) {
             Ok(()) => CString::new("OK").unwrap().into_raw(),
-            Err(e) => CString::new(format!("Error: {}", e)).unwrap().into_raw(),
+            Err(e) => CString::new(format!("Error: {e}")).unwrap().into_raw(),
         }
     }
 }
 
 #[no_mangle]
-pub extern "C" fn update_beer_entry_jni(
+/// # Safety
+/// All pointer arguments must be valid, non-null C string pointers.
+pub unsafe extern "C" fn update_beer_entry_jni(
     id: *const c_char,
     name: *const c_char,
     alcohol_percentage: f64,
@@ -496,7 +512,7 @@ pub extern "C" fn update_beer_entry_jni(
         let notes_str = CStr::from_ptr(notes).to_string_lossy().into_owned();
         match log.update_beer_entry(id_str, name_str, alcohol_percentage, volume_ml, notes_str) {
             Ok(()) => CString::new("OK").unwrap().into_raw(),
-            Err(e) => CString::new(format!("Error: {}", e)).unwrap().into_raw(),
+            Err(e) => CString::new(format!("Error: {e}")).unwrap().into_raw(),
         }
     }
 }
@@ -506,7 +522,7 @@ pub extern "C" fn update_beer_entry_jni(
 pub extern "system" fn Java_com_brewlog_android_BrewLogNative_init_1brew_1log(env: JNIEnv, _cls: JClass) -> jni_jstring {
     let msg = match BrewLog::new() {
         Ok(log) => { let _ = LOG.set(log); "OK".to_string() },
-        Err(e) => format!("Error: {}", e),
+        Err(e) => format!("Error: {e}"),
     };
     env.new_string(msg).unwrap().into_raw()
 }
@@ -516,7 +532,7 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_init_1brew_1log_1w
     let path_str: String = env.get_string(&path).unwrap().into();
     let msg = match BrewLog::new_with_path(&path_str) {
         Ok(log) => { let _ = LOG.set(log); "OK".to_string() },
-        Err(e) => format!("Error: {}", e),
+        Err(e) => format!("Error: {e}"),
     };
     env.new_string(msg).unwrap().into_raw()
 }
@@ -526,9 +542,9 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_add_1beer_1entry(m
     let msg = if let Some(log) = LOG.get() {
         let n: String = env.get_string(&name).unwrap().into();
         let notes_s: String = env.get_string(&notes).unwrap().into();
-        match log.add_beer_entry(n, alcohol_percentage as f64, volume_ml as f64, notes_s) {
+        match log.add_beer_entry(n, alcohol_percentage, volume_ml, notes_s) {
             Ok(_) => "OK".to_string(),
-            Err(e) => format!("Error: {}", e),
+            Err(e) => format!("Error: {e}"),
         }
     } else { "Error: Log not initialized".to_string() };
     env.new_string(msg).unwrap().into_raw()
@@ -538,10 +554,7 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_add_1beer_1entry(m
 pub extern "system" fn Java_com_brewlog_android_BrewLogNative_get_1daily_1consumption(mut env: JNIEnv, _cls: JClass, date: JString) -> jdouble {
     if let Some(log) = LOG.get() {
         let d: String = env.get_string(&date).unwrap().into();
-        match log.get_daily_consumption(d) {
-            Ok(v) => v as jdouble,
-            Err(_) => -1.0,
-        }
+        log.get_daily_consumption(d).unwrap_or(-1.0)
     } else { -1.0 }
 }
 
@@ -549,10 +562,7 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_get_1daily_1consum
 pub extern "system" fn Java_com_brewlog_android_BrewLogNative_get_1weekly_1consumption(mut env: JNIEnv, _cls: JClass, week_start_date: JString) -> jdouble {
     if let Some(log) = LOG.get() {
         let d: String = env.get_string(&week_start_date).unwrap().into();
-        match log.get_weekly_consumption(d) {
-            Ok(v) => v as jdouble,
-            Err(_) => -1.0,
-        }
+        log.get_weekly_consumption(d).unwrap_or(-1.0)
     } else { -1.0 }
 }
 
@@ -561,9 +571,9 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_set_1consumption_1
     let msg = if let Some(log) = LOG.get() {
         let s: String = env.get_string(&start_date).unwrap().into();
         let e: String = env.get_string(&end_date).unwrap().into();
-        match log.set_consumption_goal(daily_target as f64, weekly_target as f64, s, e) {
+        match log.set_consumption_goal(daily_target, weekly_target, s, e) {
             Ok(_) => "OK".to_string(),
-            Err(e) => format!("Error: {}", e),
+            Err(e) => format!("Error: {e}"),
         }
     } else { "Error: Log not initialized".to_string() };
     env.new_string(msg).unwrap().into_raw()
@@ -575,8 +585,8 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_get_1beer_1entries
         let s: String = env.get_string(&start_date).unwrap().into();
         let e: String = env.get_string(&end_date).unwrap().into();
         match log.get_beer_entries(s, e) {
-            Ok(entries) => serde_json::to_string(&entries).unwrap_or_else(|e| format!("Error: {}", e)),
-            Err(e) => format!("Error: {}", e),
+            Ok(entries) => serde_json::to_string(&entries).unwrap_or_else(|e| format!("Error: {e}")),
+            Err(e) => format!("Error: {e}"),
         }
     } else { "Error: Log not initialized".to_string() };
     env.new_string(msg).unwrap().into_raw()
@@ -588,7 +598,7 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_delete_1beer_1entr
         let id_s: String = env.get_string(&id).unwrap().into();
         match log.delete_beer_entry(id_s) {
             Ok(()) => "OK".to_string(),
-            Err(e) => format!("Error: {}", e),
+            Err(e) => format!("Error: {e}"),
         }
     } else { "Error: Log not initialized".to_string() };
     env.new_string(msg).unwrap().into_raw()
@@ -600,9 +610,9 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_update_1beer_1entr
         let id_s: String = env.get_string(&id).unwrap().into();
         let name_s: String = env.get_string(&name).unwrap().into();
         let notes_s: String = env.get_string(&notes).unwrap().into();
-        match log.update_beer_entry(id_s, name_s, alcohol_percentage as f64, volume_ml as f64, notes_s) {
+        match log.update_beer_entry(id_s, name_s, alcohol_percentage, volume_ml, notes_s) {
             Ok(()) => "OK".to_string(),
-            Err(e) => format!("Error: {}", e),
+            Err(e) => format!("Error: {e}"),
         }
     } else { "Error: Log not initialized".to_string() };
     env.new_string(msg).unwrap().into_raw()
@@ -615,7 +625,7 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_update_1beer_1entr
         let date_s: String = env.get_string(&date).unwrap().into();
         match log.update_beer_entry_date(id_s, date_s) {
             Ok(()) => "OK".to_string(),
-            Err(e) => format!("Error: {}", e),
+            Err(e) => format!("Error: {e}"),
         }
     } else { "Error: Log not initialized".to_string() };
     env.new_string(msg).unwrap().into_raw()
@@ -628,9 +638,9 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_add_1beer_1entry_1
         let name_s: String = env.get_string(&name).unwrap().into();
         let date_s: String = env.get_string(&date).unwrap().into();
         let notes_s: String = env.get_string(&notes).unwrap().into();
-        match log.add_beer_entry_full(Some(id_s), name_s, alcohol_percentage as f64, volume_ml as f64, date_s, notes_s) {
+        match log.add_beer_entry_full(Some(id_s), name_s, alcohol_percentage, volume_ml, date_s, notes_s) {
             Ok(()) => "OK".to_string(),
-            Err(e) => format!("Error: {}", e),
+            Err(e) => format!("Error: {e}"),
         }
     } else { "Error: Log not initialized".to_string() };
     env.new_string(msg).unwrap().into_raw()
@@ -641,7 +651,7 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_delete_1all_1data(
     let msg = if let Some(log) = LOG.get() {
         match log.clear_all_data() {
             Ok(()) => "OK".to_string(),
-            Err(e) => format!("Error: {}", e),
+            Err(e) => format!("Error: {e}"),
         }
     } else { "Error: Log not initialized".to_string() };
     env.new_string(msg).unwrap().into_raw()
