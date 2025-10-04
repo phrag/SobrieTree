@@ -64,6 +64,19 @@
 
             <!-- Beer Glass sits at top now -->
 
+            <!-- Initial Setup CTA (shown until onboarding complete) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_initial_setup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="Initial Setup"
+                app:icon="@android:drawable/ic_menu_edit"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                style="@style/Widget.BrewLog.Button.Outlined"
+                android:visibility="gone" />
+
             <!-- Beer Glass Progress -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
