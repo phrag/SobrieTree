@@ -51,6 +51,13 @@ class MainActivity : AppCompatActivity() {
             showSetGoalsDialog()
             intent.removeExtra("open_setup_dialog")
         }
+
+        // Initial Setup CTA visibility
+        val onboardingDone = getSharedPreferences(prefsName, MODE_PRIVATE).getBoolean("onboarding_complete", false)
+        findViewById<View>(R.id.btn_initial_setup).apply {
+            visibility = if (onboardingDone) View.GONE else View.VISIBLE
+            setOnClickListener { showSetGoalsDialog() }
+        }
     }
 
     private fun setupRecyclerView() {
@@ -88,6 +95,10 @@ class MainActivity : AppCompatActivity() {
                     R.id.nav_home -> true
                     R.id.nav_progress -> {
                         startActivity(android.content.Intent(this@MainActivity, ProgressActivity::class.java))
+                        true
+                    }
+                    R.id.nav_calendar -> {
+                        startActivity(android.content.Intent(this@MainActivity, CalendarActivity::class.java))
                         true
                     }
                     else -> false
@@ -682,6 +693,13 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
             loadData()
+
+            // Mark onboarding as complete after first successful setup
+            val prefsDone = getSharedPreferences(prefsName, MODE_PRIVATE)
+            if (!prefsDone.getBoolean("onboarding_complete", false)) {
+                prefsDone.edit().putBoolean("onboarding_complete", true).apply()
+                findViewById<View>(R.id.btn_initial_setup)?.visibility = View.GONE
+            }
         }
         dialog.show()
     }
@@ -742,6 +760,53 @@ class MainActivity : AppCompatActivity() {
             today.monthValue - 1,
             today.dayOfMonth
         ).show()
+    }
+
+    private fun showFilterMenu() {
+        val choices = arrayOf("Today", "Yesterday", "Last 7 days", "Last 30 days", "Custom date", "Custom range")
+        AlertDialog.Builder(this)
+            .setTitle("Filter entries")
+            .setItems(choices) { d, which ->
+                val today = LocalDate.now()
+                when (which) {
+                    0 -> { selectedStartDate = today; selectedEndDate = today; loadDataWithRange() }
+                    1 -> { val y = today.minusDays(1); selectedStartDate = y; selectedEndDate = y; loadDataWithRange() }
+                    2 -> { selectedStartDate = today.minusDays(6); selectedEndDate = today; loadDataWithRange() }
+                    3 -> { selectedStartDate = today.minusDays(29); selectedEndDate = today; loadDataWithRange() }
+                    4 -> showDatePicker { date -> selectedStartDate = date; selectedEndDate = date; loadDataWithRange() }
+                    5 -> showDatePicker { start -> showDatePicker { end -> selectedStartDate = start; selectedEndDate = end; loadDataWithRange() } }
+                }
+                d.dismiss()
+            }
+            .show()
+    }
+
+    private fun loadDataWithRange() {
+        brewLog?.let {
+            try {
+                val start = selectedStartDate ?: LocalDate.now().minusDays(6)
+                val end = selectedEndDate ?: LocalDate.now()
+                val json = try { BrewLogNative.get_beer_entries_json(start.toString(), end.toString()) } catch (_: Throwable) { "[]" }
+                val entries = try {
+                    val arr = JSONArray(json)
+                    List(arr.length()) { i ->
+                        val o = arr.getJSONObject(i)
+                        BeerEntry(
+                            id = o.optString("id"),
+                            name = o.optString("name"),
+                            alcoholPercentage = o.optDouble("alcohol_percentage", o.optDouble("alcoholPercentage", 0.0)),
+                            volumeMl = o.optDouble("volume_ml", o.optDouble("volumeMl", 0.0)),
+                            date = o.optString("date"),
+                            notes = o.optString("notes", "")
+                        )
+                    }
+                } catch (_: Throwable) { emptyList() }
+                adapter.submitList(entries)
+                findViewById<View>(R.id.empty_state).visibility = if (entries.isEmpty()) View.VISIBLE else View.GONE
+            } catch (_: Exception) {
+                Toast.makeText(this, "Failed to apply filter", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun addBeerEntry(name: String, alcoholPercentage: Double, volumeMl: Double, notes: String) {
@@ -853,6 +918,10 @@ class MainActivity : AppCompatActivity() {
                 showSetGoalsDialog()
                 true
             }
+            R.id.action_filter -> {
+                showFilterMenu()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -932,6 +1001,7 @@ class MainActivity : AppCompatActivity() {
         val eodEdit = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_end_of_day)
         val exportBtn = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_export)
         val importBtn = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_import)
+        val deleteAllBtn = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_delete_all)
 
         beerSizeEdit.setText(defaultSize.toString())
         beerStrengthEdit.setText(defaultStrength.toString())
@@ -1039,6 +1109,35 @@ class MainActivity : AppCompatActivity() {
             } catch (_: Exception) {
                 Toast.makeText(this, "Import failed", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        deleteAllBtn.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Delete All Data")
+                .setMessage("This will permanently remove all entries and goals on this device. This cannot be undone.")
+                .setPositiveButton("Delete") { d, _ ->
+                    try {
+                        val res = BrewLogNative.delete_all_data()
+                        if (!res.startsWith("OK")) {
+                            Toast.makeText(this, "Failed to delete data", Toast.LENGTH_SHORT).show()
+                        } else {
+                            // Clear prefs storing goals/baseline and presets
+                            getSharedPreferences(prefsName, MODE_PRIVATE).edit()
+                                .remove("goal_daily_ml")
+                                .remove("goal_weekly_ml")
+                                .remove("baseline_daily_ml")
+                                .remove("drink_presets")
+                                .apply()
+                            Toast.makeText(this, "All data deleted", Toast.LENGTH_SHORT).show()
+                            loadData()
+                        }
+                    } catch (_: Exception) {
+                        Toast.makeText(this, "Failed to delete data", Toast.LENGTH_SHORT).show()
+                    }
+                    d.dismiss()
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
         }
     }
 
