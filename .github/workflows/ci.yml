@@ -80,17 +80,13 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Make gradlew executable
-        working-directory: android
-        run: chmod +x gradlew
-
       - name: Build Android (assembleDebug)
         working-directory: android
-        run: ./gradlew --no-daemon assembleDebug
+        run: bash ./gradlew --no-daemon assembleDebug
 
       - name: Run Android unit tests
         working-directory: android
-        run: ./gradlew --no-daemon testDebugUnitTest
+        run: bash ./gradlew --no-daemon testDebugUnitTest
 
       - name: Run Rust tests
         working-directory: rust
@@ -105,7 +101,7 @@ jobs:
 
       - name: Android Lint
         working-directory: android
-        run: ./gradlew --no-daemon lintDebug
+        run: bash ./gradlew --no-daemon lintDebug
 
       - name: Upload APK artifact
         if: success()
