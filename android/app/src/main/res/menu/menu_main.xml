@@ -10,4 +10,9 @@
         android:title="Set Goals"
         android:icon="@android:drawable/ic_menu_edit"
         android:showAsAction="never" />
+    <item
+        android:id="@+id/action_filter"
+        android:title="Filter"
+        android:icon="@android:drawable/ic_menu_month"
+        android:showAsAction="always" />
 </menu> 
