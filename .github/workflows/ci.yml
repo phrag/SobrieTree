@@ -28,10 +28,17 @@ jobs:
           # Minimal components to build; add as needed
           packages: |
             platform-tools
-            platforms;android-34
-            build-tools;34.0.0
-            ndk;${{ env.ANDROID_NDK_VERSION }}
-            cmake;3.22.1
+
+      - name: Install SDK packages
+        run: |
+          TOOLDIR="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin"
+          if [ ! -x "$TOOLDIR/sdkmanager" ]; then TOOLDIR="$ANDROID_SDK_ROOT/cmdline-tools/16.0/bin"; fi
+          echo "y" | "$TOOLDIR/sdkmanager" --licenses > /dev/null
+          "$TOOLDIR/sdkmanager" \
+            "platforms;android-34" \
+            "build-tools;34.0.0" \
+            "ndk;${{ env.ANDROID_NDK_VERSION }}" \
+            "cmake;3.22.1"
 
       - name: Set ANDROID_NDK_HOME
         run: echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/${{ env.ANDROID_NDK_VERSION }}" >> $GITHUB_ENV
