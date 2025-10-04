@@ -81,12 +81,10 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build Android (assembleDebug)
-        working-directory: android
-        run: bash ./gradlew --no-daemon assembleDebug
+        run: bash android/gradlew --no-daemon -p android assembleDebug
 
       - name: Run Android unit tests
-        working-directory: android
-        run: bash ./gradlew --no-daemon testDebugUnitTest
+        run: bash android/gradlew --no-daemon -p android testDebugUnitTest
 
       - name: Run Rust tests
         working-directory: rust
@@ -100,8 +98,7 @@ jobs:
           cargo clippy --all-targets --all-features -- -D warnings
 
       - name: Android Lint
-        working-directory: android
-        run: bash ./gradlew --no-daemon lintDebug
+        run: bash android/gradlew --no-daemon -p android lintDebug
 
       - name: Upload APK artifact
         if: success()
