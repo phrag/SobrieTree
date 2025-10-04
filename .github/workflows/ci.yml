@@ -80,17 +80,17 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Make gradlew executable
+        working-directory: android
+        run: chmod +x gradlew
+
       - name: Build Android (assembleDebug)
-        uses: gradle/actions/gradle-command@v3
-        with:
-          build-root-directory: android
-          arguments: assembleDebug --no-daemon
+        working-directory: android
+        run: ./gradlew --no-daemon assembleDebug
 
       - name: Run Android unit tests
-        uses: gradle/actions/gradle-command@v3
-        with:
-          build-root-directory: android
-          arguments: testDebugUnitTest --no-daemon
+        working-directory: android
+        run: ./gradlew --no-daemon testDebugUnitTest
 
       - name: Run Rust tests
         working-directory: rust
@@ -104,10 +104,8 @@ jobs:
           cargo clippy --all-targets --all-features -- -D warnings
 
       - name: Android Lint
-        uses: gradle/actions/gradle-command@v3
-        with:
-          build-root-directory: android
-          arguments: lintDebug --no-daemon
+        working-directory: android
+        run: ./gradlew --no-daemon lintDebug
 
       - name: Upload APK artifact
         if: success()
