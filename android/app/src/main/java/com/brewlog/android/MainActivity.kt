@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupClickListeners() {
-        findViewById<View>(R.id.fab_add).setOnClickListener { showQuickAddSheet() }
+        // Quick add sheet can also be opened by tapping header Quick Add chips
 
         // Quick-add by tapping the beer glass: adds last drink preset
         findViewById<BeerGlassView>(R.id.beer_glass).setOnClickListener {
@@ -218,17 +218,7 @@ class MainActivity : AppCompatActivity() {
                     text = "${weekDrinks.toInt()} / ${weekGoalDrinks.toInt()} drinks"
                 }
 
-                // Monthly: map monthly goal as 4× weekly goal for now (or 30/7)
-                val monthlyGoalMl = weeklyGoalMl * (30.0 / 7.0)
-                val monthlyRatio = if (monthlyGoalMl > 0) (monthConsumption / monthlyGoalMl).coerceIn(0.0, 1.0) else 0.0
-                findViewById<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.monthly_goal_progress)?.apply {
-                    progress = (monthlyRatio * 100).toInt()
-                }
-                findViewById<android.widget.TextView>(R.id.monthly_glass_progress)?.apply {
-                    val monthDrinks = if (drinkVolume > 0) (monthConsumption / drinkVolume) else 0.0
-                    val monthGoalDrinks = if (drinkVolume > 0) (monthlyGoalMl / drinkVolume) else 0.0
-                    text = "${monthDrinks.toInt()} / ${monthGoalDrinks.toInt()} drinks"
-                }
+                // Monthly metrics are shown on the Progress screen only
 
                 // Color progress bars by desirable (goal) vs baseline thresholds
                 fun pickColor(current: Double, desirable: Double, baseline: Double): Int {
@@ -244,7 +234,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 val baselineDailyMl = getSharedPreferences(prefsName, MODE_PRIVATE).getFloat("baseline_daily_ml", 0f).toDouble()
                 val baselineWeeklyMl = baselineDailyMl * 7.0
-                val baselineMonthlyMl = baselineDailyMl * 30.0
+                val baselineMonthlyMl = baselineDailyMl * 30.0 // used on Progress screen
 
                 findViewById<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.daily_goal_progress)?.apply {
                     val color = pickColor(todayConsumption, dailyGoalMl, baselineDailyMl)
@@ -254,10 +244,7 @@ class MainActivity : AppCompatActivity() {
                     val color = pickColor(weekConsumption, weeklyGoalMl, baselineWeeklyMl)
                     setIndicatorColor(color)
                 }
-                findViewById<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.monthly_goal_progress)?.apply {
-                    val color = pickColor(monthConsumption, monthlyGoalMl, baselineMonthlyMl)
-                    setIndicatorColor(color)
-                }
+                // No monthly progress bar on home tile
 
                 // Warn when near weekly max (>= 80%) and celebrate when within goals at end of day
                 val weeklyPct = if (weeklyGoalMl > 0) weekConsumption / weeklyGoalMl else 0.0
@@ -268,14 +255,7 @@ class MainActivity : AppCompatActivity() {
                     try { findViewById<BeerGlassView>(R.id.beer_glass)?.celebrate() } catch (_: Exception) {}
                 }
 
-                // Reduction labels
-                fun formatPct(p: Double) = "${String.format("%.1f", p)}%"
-                val dailyReduction = if (baselineDailyMl > 0) ((baselineDailyMl - todayConsumption) / baselineDailyMl) * 100 else 0.0
-                val weeklyReduction = if (baselineWeeklyMl > 0) ((baselineWeeklyMl - weekConsumption) / baselineWeeklyMl) * 100 else 0.0
-                val monthlyReduction = if (baselineMonthlyMl > 0) ((baselineMonthlyMl - monthConsumption) / baselineMonthlyMl) * 100 else 0.0
-                findViewById<android.widget.TextView>(R.id.daily_reduction_label)?.text = "Reduction: ${formatPct(dailyReduction)}"
-                findViewById<android.widget.TextView>(R.id.weekly_reduction_label)?.text = "Reduction: ${formatPct(weeklyReduction)}"
-                findViewById<android.widget.TextView>(R.id.monthly_reduction_label)?.text = "Reduction: ${formatPct(monthlyReduction)}"
+                // Simplified top tile: reductions removed
 
                 // Populate Quick Add chips from presets (prioritize favorite, last-added)
                 val chipGroup = findViewById<com.google.android.material.chip.ChipGroup>(R.id.quick_add_group)
@@ -302,6 +282,24 @@ class MainActivity : AppCompatActivity() {
                     }
                     chipGroup.addView(chip)
                 }
+
+                // Drinks manager tile actions
+                findViewById<View>(R.id.btn_manage_drinks_tile)?.setOnClickListener {
+                    showDrinkManagerDialog { selected ->
+                        addBeerEntry(selected.name, selected.strength.toDouble(), selected.volume.toDouble(), "")
+                    }
+                }
+                findViewById<View>(R.id.btn_add_drink_tile)?.setOnClickListener {
+                    showAddBeerDialog()
+                }
+
+                // Drinks left indicators (day/week)
+                val remainingTodayDrinks = if (drinkVolume > 0) ((dailyGoalMl - todayConsumption) / drinkVolume).coerceAtLeast(0.0) else 0.0
+                val remainingWeekDrinks = if (drinkVolume > 0) ((weeklyGoalMl - weekConsumption) / drinkVolume).coerceAtLeast(0.0) else 0.0
+                findViewById<android.widget.TextView>(R.id.tv_daily_drinks_left)?.text =
+                    "${remainingTodayDrinks.toInt()} left today"
+                findViewById<android.widget.TextView>(R.id.tv_weekly_drinks_left)?.text =
+                    "${remainingWeekDrinks.toInt()} left this week"
 
                 // If user has no presets yet, nudge a favorite-setup sheet
                 if (presets.isEmpty()) {

@@ -117,17 +117,23 @@
                             android:id="@+id/beer_glass_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Daily Goal"
+                            android:text="Daily goal"
                             android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                             android:textColor="@color/text_secondary" />
 
                         <TextView
                             android:id="@+id/beer_glass_progress"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="0 / 0 ml"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                            android:layout_marginTop="6dp"
+                            android:layout_weight="1"
+                            android:text="0 / 0 drinks"
+                            android:maxLines="1"
+                            app:autoSizeTextType="uniform"
+                            app:autoSizeMinTextSize="12sp"
+                            app:autoSizeMaxTextSize="18sp"
+                            app:autoSizeStepGranularity="1sp"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Body"
                             android:textColor="@color/text_primary" />
 
                         <com.google.android.material.progressindicator.LinearProgressIndicator
@@ -141,29 +147,37 @@
                             app:trackThickness="8dp" />
 
                         <TextView
-                            android:id="@+id/daily_reduction_label"
+                            android:id="@+id/tv_daily_drinks_left"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:text="Reduction: —"
+                            android:text="— left today"
                             android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                             android:textColor="@color/text_secondary" />
+
+                        
 
                         <TextView
                             android:id="@+id/weekly_glass_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:text="Weekly Goal"
+                            android:layout_marginTop="14dp"
+                            android:text="Weekly goal"
                             android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                             android:textColor="@color/text_secondary" />
 
                         <TextView
                             android:id="@+id/weekly_glass_progress"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_weight="1"
                             android:text="0 / 0 drinks"
+                            android:maxLines="1"
+                            app:autoSizeTextType="uniform"
+                            app:autoSizeMinTextSize="12sp"
+                            app:autoSizeMaxTextSize="16sp"
+                            app:autoSizeStepGranularity="1sp"
                             android:textAppearance="@style/TextAppearance.BrewLog.Body"
                             android:textColor="@color/text_primary" />
 
@@ -178,50 +192,17 @@
                             app:trackThickness="8dp" />
 
                         <TextView
-                            android:id="@+id/weekly_reduction_label"
+                            android:id="@+id/tv_weekly_drinks_left"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:text="Reduction: —"
+                            android:text="— left this week"
                             android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                             android:textColor="@color/text_secondary" />
 
-                        <TextView
-                            android:id="@+id/monthly_glass_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:text="Monthly Goal"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Caption"
-                            android:textColor="@color/text_secondary" />
+                        
 
-                        <TextView
-                            android:id="@+id/monthly_glass_progress"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:text="0 / 0 drinks"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Body"
-                            android:textColor="@color/text_primary" />
-
-                        <com.google.android.material.progressindicator.LinearProgressIndicator
-                            android:id="@+id/monthly_goal_progress"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            app:indicatorColor="@color/green_500"
-                            app:trackColor="@color/blue_50"
-                            app:indicatorDirectionLinear="leftToRight"
-                            app:trackThickness="8dp" />
-
-                        <TextView
-                            android:id="@+id/monthly_reduction_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:text="Reduction: —"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Caption"
-                            android:textColor="@color/text_secondary" />
+                        
 
                     </LinearLayout>
 
@@ -233,7 +214,7 @@
 
             <!-- Action Buttons: moved Set Goals to menu -->
 
-            <!-- Quick Add Presets -->
+            <!-- Drinks Manager Tile -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -250,38 +231,70 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_marginEnd="12dp"
-                            android:src="@android:drawable/ic_input_add"
-                            app:tint="@color/blue_500" />
+                        android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Quick Add"
+                            android:text="Drinks"
                             android:textAppearance="@style/TextAppearance.BrewLog.Title"
                             android:textColor="@color/text_primary" />
 
-                    </LinearLayout>
-
-                    <HorizontalScrollView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fillViewport="false"
-                        android:scrollbars="none">
-                        <com.google.android.material.chip.ChipGroup
-                            android:id="@+id/quick_add_group"
+                        <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:isScrollContainer="false"
-                            app:singleLine="true"
-                            app:singleSelection="false" />
-                    </HorizontalScrollView>
+                            android:layout_marginTop="2dp"
+                            android:text="Favorites for one‑tap adding"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                            android:textColor="@color/text_secondary" />
+
+                        <HorizontalScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fillViewport="false"
+                            android:scrollbars="none"
+                            android:layout_marginTop="8dp">
+                            <com.google.android.material.chip.ChipGroup
+                                android:id="@+id/quick_add_group"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:isScrollContainer="false"
+                                app:singleLine="true"
+                                app:singleSelection="false" />
+                        </HorizontalScrollView>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="vertical">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_add_drink_tile"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:minHeight="48dp"
+                                android:minWidth="0dp"
+                                android:maxLines="1"
+                                android:ellipsize="end"
+                                android:textAllCaps="false"
+                                android:text="Add drink"
+                                style="@style/Widget.BrewLog.Button" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_manage_drinks_tile"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:minHeight="48dp"
+                                android:layout_marginTop="8dp"
+                                android:minWidth="0dp"
+                                android:maxLines="1"
+                                android:ellipsize="end"
+                                android:textAllCaps="false"
+                                android:text="Manage"
+                                style="@style/Widget.BrewLog.Button.Outlined" />
+                        </LinearLayout>
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -351,16 +364,7 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="24dp"
-        android:contentDescription="@string/add_beer"
-        app:backgroundTint="@color/blue_500"
-        app:srcCompat="@android:drawable/ic_input_add"
-        app:tint="@color/white" />
+    
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"

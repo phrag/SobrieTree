@@ -32,7 +32,7 @@ class ProgressActivity : AppCompatActivity() {
 		val baselineDaily = prefs.getFloat("baseline_daily_ml", 0f).toDouble()
 		val baselineWeekly = baselineDaily * 7.0
 		val reductionDaily = if (baselineDaily > 0) ((baselineDaily - todayMl) / baselineDaily) * 100 else 0.0
-		val reductionWeekly = if (baselineWeekly > 0) ((baselineWeekly - weekMl) / baselineWeekly) * 100 else 0.0
+        val reductionWeekly = if (baselineWeekly > 0) ((baselineWeekly - weekMl) / baselineWeekly) * 100 else 0.0
 		findViewById<android.widget.TextView>(R.id.tv_reduction_percentage).text = "${String.format("%.1f", reductionDaily)}%"
 		findViewById<android.widget.TextView>(R.id.tv_baseline_daily).text = "${drinksOf(baselineDaily)} drinks/day"
 		findViewById<android.widget.TextView>(R.id.tv_current_daily).text = "${drinksOf(todayMl)} drinks/day"

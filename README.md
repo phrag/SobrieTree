@@ -2,12 +2,15 @@
 
 A simple, private beer consumption tracker for Android.
 
-![Home screen](screenshots/home.png)
-
 - Set daily/weekly goals in drinks (based on your default drink size)
 - See a fun Beer Glass that fills as you log drinks
-- One‑tap Quick Add and tap‑the‑glass to repeat the last drink
-- A Progress screen shows Today/This Week and your reduction vs. baseline
+- One‑tap Quick Add and a dedicated Drinks manager to add or edit presets
+- Initial Setup button on first launch to set goals and baseline quickly
+- Calendar view to track, view, and edit past days
+- Configurable end‑of‑day cut‑off (default 3 AM)
+- Export/import your data to JSON; Delete All Data from settings
+- Progress screen shows Today/This Week and reduction vs. baseline
+- Native Rust + SQLite backend via JNI for on‑device storage
 - Works fully offline. No account, no cloud, no analytics, no ads
 
 ### Privacy & Security
@@ -46,10 +49,6 @@ Your data, your control:
 ### Screenshots
 
 ![Home](screenshots/home.png)
-
-![Beer Glass](screenshots/home_after_beerglass.png)
-
-![Progress](screenshots/progress_screen.png)
 
 ---
 
