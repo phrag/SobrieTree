@@ -14,27 +14,35 @@ class ProgressActivity : AppCompatActivity() {
 		toolbar.setNavigationOnClickListener { finish() }
 
 		val brewLog = BrewLogProvider.instance
-		val metrics = brewLog.getProgressMetrics()
 		val today = brewLog.nowEffectiveDate()
 		val weekStart = today.minusDays(6)
-		val todayMl = brewLog.getDailyConsumption(today)
-		val weekMl = brewLog.getWeeklyConsumption(weekStart)
 		val prefs = getSharedPreferences("brewlog_prefs", MODE_PRIVATE)
 		val sizeMl = prefs.getInt("default_beer_size", 500).toDouble().coerceAtLeast(1.0)
 		fun drinksOf(ml: Double) = (ml / sizeMl).toInt()
+
+		val todayMlNative = try { BrewLogNative.get_daily_consumption(today.toString()) } catch (_: Throwable) { -1.0 }
+		val weekMlNative = try { BrewLogNative.get_weekly_consumption(weekStart.toString()) } catch (_: Throwable) { -1.0 }
+		val todayMl = if (todayMlNative >= 0) todayMlNative else 0.0
+		val weekMl = if (weekMlNative >= 0) weekMlNative else 0.0
+
 		findViewById<android.widget.TextView>(R.id.today_consumption).text = "${drinksOf(todayMl)} drinks"
 		findViewById<android.widget.TextView>(R.id.week_consumption).text = "${drinksOf(weekMl)} drinks"
 
-		if (metrics != null) {
-			// Convert ml to drinks using default size
-			val prefs = getSharedPreferences("brewlog_prefs", MODE_PRIVATE)
-			val defaultSizeMl = prefs.getInt("default_beer_size", 500).toDouble().coerceAtLeast(1.0)
-			fun drinksOf(ml: Double) = (ml / defaultSizeMl).toInt()
-			findViewById<android.widget.TextView>(R.id.tv_reduction_percentage).text = "${String.format("%.1f", metrics.reductionPercentageDaily)}%"
-			findViewById<android.widget.TextView>(R.id.tv_baseline_daily).text = "${drinksOf(metrics.baselineDailyAverage)} drinks/day"
-			findViewById<android.widget.TextView>(R.id.tv_current_daily).text = "${drinksOf(metrics.currentDailyAverage)} drinks/day"
-			findViewById<android.widget.TextView>(R.id.tv_baseline_weekly).text = "${drinksOf(metrics.baselineWeeklyAverage)} drinks/week"
-			findViewById<android.widget.TextView>(R.id.tv_current_weekly).text = "${drinksOf(metrics.currentWeeklyAverage)} drinks/week"
+		// Baseline and reduction
+		val baselineDaily = prefs.getFloat("baseline_daily_ml", 0f).toDouble()
+		val baselineWeekly = baselineDaily * 7.0
+		val reductionDaily = if (baselineDaily > 0) ((baselineDaily - todayMl) / baselineDaily) * 100 else 0.0
+		val reductionWeekly = if (baselineWeekly > 0) ((baselineWeekly - weekMl) / baselineWeekly) * 100 else 0.0
+		findViewById<android.widget.TextView>(R.id.tv_reduction_percentage).text = "${String.format("%.1f", reductionDaily)}%"
+		findViewById<android.widget.TextView>(R.id.tv_baseline_daily).text = "${drinksOf(baselineDaily)} drinks/day"
+		findViewById<android.widget.TextView>(R.id.tv_current_daily).text = "${drinksOf(todayMl)} drinks/day"
+		findViewById<android.widget.TextView>(R.id.tv_baseline_weekly).text = "${drinksOf(baselineWeekly)} drinks/week"
+		findViewById<android.widget.TextView>(R.id.tv_current_weekly).text = "${drinksOf(weekMl)} drinks/week"
+		// Days since baseline
+		val baselineDateStr = prefs.getString("baseline_set_date", null)
+		if (baselineDateStr != null) {
+			val days = java.time.LocalDate.parse(baselineDateStr).until(today).days
+			findViewById<android.widget.TextView>(R.id.tv_days_since_baseline).text = "$days days since baseline"
 		}
 
 		// Buttons to set baseline/goals

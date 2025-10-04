@@ -688,6 +688,7 @@ class MainActivity : AppCompatActivity() {
                 .putFloat("goal_daily_ml", mlDailyGoal.toFloat())
                 .putFloat("goal_weekly_ml", mlWeeklyGoal.toFloat())
                 .putFloat("baseline_daily_ml", mlDailyBaseline.toFloat())
+                .putString("baseline_set_date", today.toString())
                 .apply()
 
             Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
