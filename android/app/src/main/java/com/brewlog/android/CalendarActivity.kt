@@ -32,13 +32,14 @@ class CalendarActivity : AppCompatActivity() {
         setDate(today)
 
         findViewById<android.widget.TextView>(R.id.tv_selected_date).text = today.toString()
-        findViewById<android.view.View>(R.id.btn_add_entry_for_day).setOnClickListener {
-            showQuickAddForDate(today)
-        }
+        var currentDate = today
+        findViewById<android.view.View>(R.id.btn_add_entry_for_day).setOnClickListener { showQuickAddForDate(currentDate) }
+        findViewById<android.view.View>(R.id.btn_set_total_for_day).setOnClickListener { showSetTotalDialog(currentDate) }
 
         findViewById<CalendarView>(R.id.calendar_view).setOnDateChangeListener { _, year, month, dayOfMonth ->
             val selected = LocalDate.of(year, month + 1, dayOfMonth)
             findViewById<android.widget.TextView>(R.id.tv_selected_date).text = selected.toString()
+            currentDate = selected
             setDate(selected)
         }
 
@@ -127,6 +128,55 @@ class CalendarActivity : AppCompatActivity() {
             }
             .setNegativeButton("Cancel", null)
             .show()
+    }
+
+    private fun showSetTotalDialog(date: LocalDate) {
+        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
+        val defaultSizeMl = prefs.getInt("default_beer_size", 500)
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+        val input = android.widget.EditText(this)
+        input.inputType = android.text.InputType.TYPE_CLASS_NUMBER
+        input.hint = "Total drinks for ${date}"
+        dialog.setTitle("Set total for day")
+            .setView(input)
+            .setPositiveButton("Save") { d, _ ->
+                val numDrinks = input.text.toString().toIntOrNull() ?: 0
+                setTotalForDay(date, numDrinks * defaultSizeMl)
+                d.dismiss()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun setTotalForDay(date: LocalDate, targetMl: Int) {
+        try {
+            val json = BrewLogNative.get_beer_entries_json(date.toString(), date.toString())
+            val arr = JSONArray(json)
+            var currentMl = 0.0
+            val entries = mutableListOf<BeerEntry>()
+            for (i in 0 until arr.length()) {
+                val o = arr.getJSONObject(i)
+                val e = BeerEntry(
+                    id = o.optString("id"),
+                    name = o.optString("name"),
+                    alcoholPercentage = o.optDouble("alcohol_percentage", o.optDouble("alcoholPercentage", 0.0)),
+                    volumeMl = o.optDouble("volume_ml", o.optDouble("volumeMl", 0.0)),
+                    date = o.optString("date"),
+                    notes = o.optString("notes", "")
+                )
+                entries.add(e)
+                currentMl += e.volumeMl
+            }
+            val diff = targetMl - currentMl
+            if (diff <= 0) {
+                setDate(date)
+                return
+            }
+            // Add one synthetic entry to reach total
+            val id = java.util.UUID.randomUUID().toString()
+            val res = BrewLogNative.add_beer_entry_full_jni(id, "Adjustment", 0.0, diff, date.toString(), "auto")
+            if (res.startsWith("OK")) setDate(date)
+        } catch (_: Exception) {}
     }
 }
 

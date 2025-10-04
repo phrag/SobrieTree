@@ -24,7 +24,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:paddingBottom="80dp">
 
         <CalendarView
             android:id="@+id/calendar_view"
@@ -54,12 +55,29 @@
                 android:nestedScrollingEnabled="true"
                 />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_add_entry_for_day"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Add entry to this day"
-                style="@style/Widget.BrewLog.Button" />
+                android:orientation="horizontal"
+                android:layout_marginBottom="80dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_add_entry_for_day"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Add entry"
+                    style="@style/Widget.BrewLog.Button" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_set_total_for_day"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:text="Set total"
+                    style="@style/Widget.BrewLog.Button.Outlined" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
