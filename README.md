@@ -125,4 +125,4 @@ brewlog/
   - Ensure `android/local.properties` points to your SDK or export `ANDROID_SDK_ROOT`
 
 ### License
-MIT — see `LICENSE`. 
+GPL3 — see `LICENSE`. 
