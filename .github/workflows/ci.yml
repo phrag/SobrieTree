@@ -81,10 +81,18 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build Android (assembleDebug)
-        run: bash android/gradlew --no-daemon -p android assembleDebug
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: 8.7
+          build-root-directory: android
+          arguments: assembleDebug --no-daemon
 
       - name: Run Android unit tests
-        run: bash android/gradlew --no-daemon -p android testDebugUnitTest
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: 8.7
+          build-root-directory: android
+          arguments: testDebugUnitTest --no-daemon
 
       - name: Run Rust tests
         working-directory: rust
@@ -98,7 +106,11 @@ jobs:
           cargo clippy --all-targets --all-features -- -D warnings
 
       - name: Android Lint
-        run: bash android/gradlew --no-daemon -p android lintDebug
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: 8.7
+          build-root-directory: android
+          arguments: lintDebug --no-daemon
 
       - name: Upload APK artifact
         if: success()
