@@ -474,7 +474,10 @@ pub extern "C" fn delete_beer_entry_jni(id: *const c_char) -> *mut c_char {
     unsafe {
         let Some(log) = LOG.get() else { return CString::new("Error: Log not initialized").unwrap().into_raw(); };
         let id_str = CStr::from_ptr(id).to_string_lossy().into_owned();
-        match log.delete_beer_entry(id_str) { Ok(()) => CString::new("OK").unwrap().into_raw(), Err(e) => CString::new(format!("Error: {}", e)).unwrap().into_raw() }
+        match log.delete_beer_entry(id_str) {
+            Ok(()) => CString::new("OK").unwrap().into_raw(),
+            Err(e) => CString::new(format!("Error: {}", e)).unwrap().into_raw(),
+        }
     }
 }
 
@@ -491,7 +494,10 @@ pub extern "C" fn update_beer_entry_jni(
         let id_str = CStr::from_ptr(id).to_string_lossy().into_owned();
         let name_str = CStr::from_ptr(name).to_string_lossy().into_owned();
         let notes_str = CStr::from_ptr(notes).to_string_lossy().into_owned();
-        match log.update_beer_entry(id_str, name_str, alcohol_percentage, volume_ml, notes_str) { Ok(()) => CString::new("OK").unwrap().into_raw(), Err(e) => CString::new(format!("Error: {}", e)).unwrap().into_raw() }
+        match log.update_beer_entry(id_str, name_str, alcohol_percentage, volume_ml, notes_str) {
+            Ok(()) => CString::new("OK").unwrap().into_raw(),
+            Err(e) => CString::new(format!("Error: {}", e)).unwrap().into_raw(),
+        }
     }
 }
 
@@ -532,7 +538,10 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_add_1beer_1entry(m
 pub extern "system" fn Java_com_brewlog_android_BrewLogNative_get_1daily_1consumption(mut env: JNIEnv, _cls: JClass, date: JString) -> jdouble {
     if let Some(log) = LOG.get() {
         let d: String = env.get_string(&date).unwrap().into();
-        match log.get_daily_consumption(d) { Ok(v) => v as jdouble, Err(_) => -1.0 }
+        match log.get_daily_consumption(d) {
+            Ok(v) => v as jdouble,
+            Err(_) => -1.0,
+        }
     } else { -1.0 }
 }
 
@@ -540,7 +549,10 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_get_1daily_1consum
 pub extern "system" fn Java_com_brewlog_android_BrewLogNative_get_1weekly_1consumption(mut env: JNIEnv, _cls: JClass, week_start_date: JString) -> jdouble {
     if let Some(log) = LOG.get() {
         let d: String = env.get_string(&week_start_date).unwrap().into();
-        match log.get_weekly_consumption(d) { Ok(v) => v as jdouble, Err(_) => -1.0 }
+        match log.get_weekly_consumption(d) {
+            Ok(v) => v as jdouble,
+            Err(_) => -1.0,
+        }
     } else { -1.0 }
 }
 
@@ -574,7 +586,10 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_get_1beer_1entries
 pub extern "system" fn Java_com_brewlog_android_BrewLogNative_delete_1beer_1entry_1jni(mut env: JNIEnv, _cls: JClass, id: JString) -> jni_jstring {
     let msg = if let Some(log) = LOG.get() {
         let id_s: String = env.get_string(&id).unwrap().into();
-        match log.delete_beer_entry(id_s) { Ok(()) => "OK".to_string(), Err(e) => format!("Error: {}", e) }
+        match log.delete_beer_entry(id_s) {
+            Ok(()) => "OK".to_string(),
+            Err(e) => format!("Error: {}", e),
+        }
     } else { "Error: Log not initialized".to_string() };
     env.new_string(msg).unwrap().into_raw()
 }
@@ -585,7 +600,10 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_update_1beer_1entr
         let id_s: String = env.get_string(&id).unwrap().into();
         let name_s: String = env.get_string(&name).unwrap().into();
         let notes_s: String = env.get_string(&notes).unwrap().into();
-        match log.update_beer_entry(id_s, name_s, alcohol_percentage as f64, volume_ml as f64, notes_s) { Ok(()) => "OK".to_string(), Err(e) => format!("Error: {}", e) }
+        match log.update_beer_entry(id_s, name_s, alcohol_percentage as f64, volume_ml as f64, notes_s) {
+            Ok(()) => "OK".to_string(),
+            Err(e) => format!("Error: {}", e),
+        }
     } else { "Error: Log not initialized".to_string() };
     env.new_string(msg).unwrap().into_raw()
 }
@@ -595,7 +613,10 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_update_1beer_1entr
     let msg = if let Some(log) = LOG.get() {
         let id_s: String = env.get_string(&id).unwrap().into();
         let date_s: String = env.get_string(&date).unwrap().into();
-        match log.update_beer_entry_date(id_s, date_s) { Ok(()) => "OK".to_string(), Err(e) => format!("Error: {}", e) }
+        match log.update_beer_entry_date(id_s, date_s) {
+            Ok(()) => "OK".to_string(),
+            Err(e) => format!("Error: {}", e),
+        }
     } else { "Error: Log not initialized".to_string() };
     env.new_string(msg).unwrap().into_raw()
 }
@@ -607,7 +628,10 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_add_1beer_1entry_1
         let name_s: String = env.get_string(&name).unwrap().into();
         let date_s: String = env.get_string(&date).unwrap().into();
         let notes_s: String = env.get_string(&notes).unwrap().into();
-        match log.add_beer_entry_full(Some(id_s), name_s, alcohol_percentage as f64, volume_ml as f64, date_s, notes_s) { Ok(()) => "OK".to_string(), Err(e) => format!("Error: {}", e) }
+        match log.add_beer_entry_full(Some(id_s), name_s, alcohol_percentage as f64, volume_ml as f64, date_s, notes_s) {
+            Ok(()) => "OK".to_string(),
+            Err(e) => format!("Error: {}", e),
+        }
     } else { "Error: Log not initialized".to_string() };
     env.new_string(msg).unwrap().into_raw()
 }
@@ -615,7 +639,10 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_add_1beer_1entry_1
 #[no_mangle]
 pub extern "system" fn Java_com_brewlog_android_BrewLogNative_delete_1all_1data(env: JNIEnv, _cls: JClass) -> jni_jstring {
     let msg = if let Some(log) = LOG.get() {
-        match log.clear_all_data() { Ok(()) => "OK".to_string(), Err(e) => format!("Error: {}", e) }
+        match log.clear_all_data() {
+            Ok(()) => "OK".to_string(),
+            Err(e) => format!("Error: {}", e),
+        }
     } else { "Error: Log not initialized".to_string() };
     env.new_string(msg).unwrap().into_raw()
 }
