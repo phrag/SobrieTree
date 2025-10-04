@@ -59,6 +59,10 @@ class ProgressActivity : AppCompatActivity() {
 						true
 					}
 					R.id.nav_progress -> true
+					R.id.nav_calendar -> {
+						startActivity(android.content.Intent(this@ProgressActivity, CalendarActivity::class.java))
+						true
+					}
 					else -> false
 				}
 			}
