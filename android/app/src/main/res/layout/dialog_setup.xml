@@ -81,6 +81,15 @@
             android:textColorHint="@color/text_hint" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <TextView
+        android:id="@+id/tv_guideline_note"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text=""
+        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+        android:textColor="@color/text_secondary" />
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layout_daily_baseline_drinks"
         android:layout_width="match_parent"

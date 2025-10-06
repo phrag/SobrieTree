@@ -10,7 +10,18 @@ echo "Waiting for emulator to be ready..."
 ~/Library/Android/sdk/platform-tools/adb wait-for-device
 
 echo "Installing application..."
-~/Library/Android/sdk/platform-tools/adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+# Uninstall to avoid signature mismatch, then install the latest built APK
+~/Library/Android/sdk/platform-tools/adb uninstall com.brewlog.android || true
+# Prefer versioned APK produced by build.sh, fall back to debug
+APK_PATH="BrewLog-0.0.3-dev.apk"
+if [ ! -f "$APK_PATH" ]; then
+  APK_PATH="BrewLog-0.0.2.apk"
+fi
+if [ -f "$APK_PATH" ]; then
+  ~/Library/Android/sdk/platform-tools/adb install "$APK_PATH"
+else
+  ~/Library/Android/sdk/platform-tools/adb install android/app/build/outputs/apk/debug/app-debug.apk
+fi
 
 echo "Launching application..."
 ~/Library/Android/sdk/platform-tools/adb shell am start -n com.brewlog.android/.MainActivity
