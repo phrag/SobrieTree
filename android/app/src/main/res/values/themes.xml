@@ -94,6 +94,23 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="TextAppearance.BrewLog.Body2" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <!-- TextInputLayout style -->
+    <style name="Widget.BrewLog.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundMode">filled</item>
+        <item name="boxBackgroundColor">@color/input_background</item>
+        <item name="boxCornerRadiusBottomEnd">12dp</item>
+        <item name="boxCornerRadiusBottomStart">12dp</item>
+        <item name="boxCornerRadiusTopEnd">12dp</item>
+        <item name="boxCornerRadiusTopStart">12dp</item>
+        <item name="boxStrokeColor">@color/blue_500</item>
+        <item name="hintTextColor">@color/blue_500</item>
+    </style>
+
     <!-- Custom Input Field Styles -->
     <style name="Widget.BrewLog.TextInputLayout.OutlinedBox" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="boxBackgroundMode">filled</item>
