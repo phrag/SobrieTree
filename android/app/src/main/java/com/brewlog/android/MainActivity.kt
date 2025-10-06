@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.DayOfWeek
 import android.widget.ArrayAdapter
 import org.json.JSONArray
 import org.json.JSONObject
@@ -28,6 +29,14 @@ class MainActivity : AppCompatActivity() {
     private var selectedStartDate: LocalDate? = null
     private var selectedEndDate: LocalDate? = null
     private val prefsName = "brewlog_prefs"
+
+    private fun getWeekStart(today: LocalDate): LocalDate {
+        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
+        val startOfWeek = prefs.getInt("start_of_week", 1) // Default to Monday (1)
+        val targetDayOfWeek = DayOfWeek.of(startOfWeek)
+        val daysToSubtract = (today.dayOfWeek.value - targetDayOfWeek.value + 7) % 7
+        return today.minusDays(daysToSubtract.toLong())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +60,10 @@ class MainActivity : AppCompatActivity() {
             showSetGoalsDialog()
             intent.removeExtra("open_setup_dialog")
         }
+        if (intent?.getBooleanExtra("open_settings", false) == true) {
+            startActivity(Intent(this, SettingsActivity::class.java))
+            intent.removeExtra("open_settings")
+        }
 
         // Initial Setup CTA visibility
         val onboardingDone = getSharedPreferences(prefsName, MODE_PRIVATE).getBoolean("onboarding_complete", false)
@@ -58,6 +71,11 @@ class MainActivity : AppCompatActivity() {
             visibility = if (onboardingDone) View.GONE else View.VISIBLE
             setOnClickListener { showSetGoalsDialog() }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        try { loadData() } catch (_: Exception) {}
     }
 
     private fun setupRecyclerView() {
@@ -89,6 +107,8 @@ class MainActivity : AppCompatActivity() {
 
         // Bottom nav
         findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottom_nav).apply {
+            menu.clear()
+            inflateMenu(R.menu.menu_bottom)
             selectedItemId = R.id.nav_home
             setOnItemSelectedListener { item ->
                 when (item.itemId) {
@@ -99,6 +119,10 @@ class MainActivity : AppCompatActivity() {
                     }
                     R.id.nav_calendar -> {
                         startActivity(android.content.Intent(this@MainActivity, CalendarActivity::class.java))
+                        true
+                    }
+                    R.id.nav_settings -> {
+                        startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
                         true
                     }
                     else -> false
@@ -146,7 +170,7 @@ class MainActivity : AppCompatActivity() {
         brewLog?.let { log ->
             try {
                 val today = log.nowEffectiveDate()
-                val weekStart = today.minusDays(6)
+                val weekStart = getWeekStart(today)
                 val monthStart = today.minusDays(29)
 
                 val todayConsumption = try {
@@ -190,31 +214,37 @@ class MainActivity : AppCompatActivity() {
                 // Update beer glass progress (daily consumption vs daily goal)
                 val beerGlass = findViewById<BeerGlassView>(R.id.beer_glass)
                 val beerGlassText = findViewById<android.widget.TextView>(R.id.beer_glass_progress)
-                val dailyGoalMl = log.getDailyGoal().takeIf { it >= 0 } ?: 0.0
-                val ratio = if (dailyGoalMl > 0) (todayConsumption / dailyGoalMl).coerceIn(0.0, 1.0) else 0.0
-                beerGlass.setProgress(ratio)
+                val dailyGoalMlRaw = log.getDailyGoal().takeIf { it >= 0 } ?: 0.0
 
                 // Show in drinks instead of ml
                 val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
                 val drinks = getDrinkPresets(prefs)
                 val defaultDrink = drinks.firstOrNull { it.favorite } ?: drinks.firstOrNull()
                 val drinkVolume = defaultDrink?.volume?.toDouble() ?: 500.0
+                // Use baseline as fallback target when no explicit goal set
+                val baselineDailyMl = getSharedPreferences(prefsName, MODE_PRIVATE).getFloat("baseline_daily_ml", 0f).toDouble()
+                val baselineWeeklyMl = baselineDailyMl * 7.0
+                val effectiveDailyGoalMl = if (dailyGoalMlRaw > 0.0) dailyGoalMlRaw else baselineDailyMl
+                val ratio = if (effectiveDailyGoalMl > 0) (todayConsumption / effectiveDailyGoalMl).coerceIn(0.0, 1.0) else 0.0
+                beerGlass.setProgress(ratio)
+
                 val todayDrinks = if (drinkVolume > 0) (todayConsumption / drinkVolume) else 0.0
-                val goalDrinks = if (drinkVolume > 0) (dailyGoalMl / drinkVolume) else 0.0
+                val goalDrinks = if (drinkVolume > 0) (effectiveDailyGoalMl / drinkVolume) else 0.0
                 beerGlassText.text = "${todayDrinks.toInt()} / ${goalDrinks.toInt()} drinks"
                 findViewById<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.daily_goal_progress).apply {
                     progress = (ratio * 100).toInt()
                 }
 
                 // Weekly progress bar and label
-                val weeklyGoalMl = log.getWeeklyGoal().takeIf { it >= 0 } ?: 0.0
-                val weeklyRatio = if (weeklyGoalMl > 0) (weekConsumption / weeklyGoalMl).coerceIn(0.0, 1.0) else 0.0
+                val weeklyGoalMlRaw = log.getWeeklyGoal().takeIf { it >= 0 } ?: 0.0
+                val effectiveWeeklyGoalMl = if (weeklyGoalMlRaw > 0.0) weeklyGoalMlRaw else baselineWeeklyMl
+                val weeklyRatio = if (effectiveWeeklyGoalMl > 0) (weekConsumption / effectiveWeeklyGoalMl).coerceIn(0.0, 1.0) else 0.0
                 findViewById<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.weekly_goal_progress)?.apply {
                     progress = (weeklyRatio * 100).toInt()
                 }
                 findViewById<android.widget.TextView>(R.id.weekly_glass_progress)?.apply {
                     val weekDrinks = if (drinkVolume > 0) (weekConsumption / drinkVolume) else 0.0
-                    val weekGoalDrinks = if (drinkVolume > 0) (weeklyGoalMl / drinkVolume) else 0.0
+                    val weekGoalDrinks = if (drinkVolume > 0) (effectiveWeeklyGoalMl / drinkVolume) else 0.0
                     text = "${weekDrinks.toInt()} / ${weekGoalDrinks.toInt()} drinks"
                 }
 
@@ -232,30 +262,36 @@ class MainActivity : AppCompatActivity() {
                         else -> red
                     }
                 }
-                val baselineDailyMl = getSharedPreferences(prefsName, MODE_PRIVATE).getFloat("baseline_daily_ml", 0f).toDouble()
-                val baselineWeeklyMl = baselineDailyMl * 7.0
                 val baselineMonthlyMl = baselineDailyMl * 30.0 // used on Progress screen
 
                 findViewById<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.daily_goal_progress)?.apply {
-                    val color = pickColor(todayConsumption, dailyGoalMl, baselineDailyMl)
+                    val color = pickColor(todayConsumption, effectiveDailyGoalMl, baselineDailyMl)
                     setIndicatorColor(color)
                 }
                 findViewById<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.weekly_goal_progress)?.apply {
-                    val color = pickColor(weekConsumption, weeklyGoalMl, baselineWeeklyMl)
+                    val color = pickColor(weekConsumption, effectiveWeeklyGoalMl, baselineWeeklyMl)
                     setIndicatorColor(color)
                 }
                 // No monthly progress bar on home tile
 
                 // Warn when near weekly max (>= 80%) and celebrate when within goals at end of day
-                val weeklyPct = if (weeklyGoalMl > 0) weekConsumption / weeklyGoalMl else 0.0
+                val weeklyPct = if (effectiveWeeklyGoalMl > 0) weekConsumption / effectiveWeeklyGoalMl else 0.0
                 if (weeklyPct >= 0.8 && weeklyPct < 1.0) {
                     Toast.makeText(this, "Warning: close to weekly goal", Toast.LENGTH_SHORT).show()
                 }
-                if (ratio in 0.99..1.0 || (dailyGoalMl > 0 && todayConsumption <= dailyGoalMl && todayConsumption > 0)) {
+                if (ratio in 0.99..1.0 || (effectiveDailyGoalMl > 0 && todayConsumption <= effectiveDailyGoalMl && todayConsumption > 0)) {
                     try { findViewById<BeerGlassView>(R.id.beer_glass)?.celebrate() } catch (_: Exception) {}
                 }
 
-                // Simplified top tile: reductions removed
+                // Calculate reduction percentages for home screen
+                val reductionDaily = if (baselineDailyMl > 0) ((baselineDailyMl - todayConsumption) / baselineDailyMl) * 100 else 0.0
+                val reductionWeekly = if (baselineWeeklyMl > 0) ((baselineWeeklyMl - weekConsumption) / baselineWeeklyMl) * 100 else 0.0
+                val reductionMonthly = if (baselineMonthlyMl > 0) ((baselineMonthlyMl - monthConsumption) / baselineMonthlyMl) * 100 else 0.0
+                
+                // Update reduction displays on home screen
+                findViewById<android.widget.TextView>(R.id.tv_daily_reduction_home)?.text = "${String.format("%.1f", reductionDaily)}%"
+                findViewById<android.widget.TextView>(R.id.tv_weekly_reduction_home)?.text = "${String.format("%.1f", reductionWeekly)}%"
+                findViewById<android.widget.TextView>(R.id.tv_monthly_reduction_home)?.text = "${String.format("%.1f", reductionMonthly)}%"
 
                 // Populate Quick Add chips from presets (prioritize favorite, last-added)
                 val chipGroup = findViewById<com.google.android.material.chip.ChipGroup>(R.id.quick_add_group)
@@ -294,8 +330,8 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 // Drinks left indicators (day/week)
-                val remainingTodayDrinks = if (drinkVolume > 0) ((dailyGoalMl - todayConsumption) / drinkVolume).coerceAtLeast(0.0) else 0.0
-                val remainingWeekDrinks = if (drinkVolume > 0) ((weeklyGoalMl - weekConsumption) / drinkVolume).coerceAtLeast(0.0) else 0.0
+                val remainingTodayDrinks = if (drinkVolume > 0) ((effectiveDailyGoalMl - todayConsumption) / drinkVolume).coerceAtLeast(0.0) else 0.0
+                val remainingWeekDrinks = if (drinkVolume > 0) ((effectiveWeeklyGoalMl - weekConsumption) / drinkVolume).coerceAtLeast(0.0) else 0.0
                 findViewById<android.widget.TextView>(R.id.tv_daily_drinks_left)?.text =
                     "${remainingTodayDrinks.toInt()} left today"
                 findViewById<android.widget.TextView>(R.id.tv_weekly_drinks_left)?.text =
@@ -616,13 +652,29 @@ class MainActivity : AppCompatActivity() {
         val currentDailyMl = brewLog?.getDailyGoal() ?: 0.0
         val currentWeeklyMl = brewLog?.getWeeklyGoal() ?: 0.0
         val vol = if (defaultSizeMl > 0) defaultSizeMl.toDouble() else 500.0
-        dailyGoalDrinks.setText(if (currentDailyMl > 0) (currentDailyMl / vol).toInt().toString() else "0")
-        weeklyGoalDrinks.setText(if (currentWeeklyMl > 0) (currentWeeklyMl / vol).toInt().toString() else "0")
+        // German low-risk guideline anchor: ~12 g pure alcohol/day for women, ~24 g for men (approx.)
+        // Convert grams alcohol to drinks by: grams = vol_ml * abv * 0.8 / 100; here we approximate with user's default drink size and typical 5% beer.
+        val assumedAbv = prefs.getFloat("default_beer_strength", 5.0f).toDouble().coerceAtLeast(1.0)
+        val gramsPerDrink = vol * (assumedAbv / 100.0) * 0.8
+        val guidelineDailyDrinks = if (gramsPerDrink > 0) (24.0 / gramsPerDrink) else 2.0 // default to ~2 drinks/day if unknown
+        val defaultDailyDrinks = guidelineDailyDrinks.coerceIn(1.0, 5.0)
+        val defaultWeeklyDrinks = (defaultDailyDrinks * 7).toInt()
+        dailyGoalDrinks.setText(
+            if (currentDailyMl > 0) (currentDailyMl / vol).toInt().toString() else defaultDailyDrinks.toInt().toString()
+        )
+        weeklyGoalDrinks.setText(
+            if (currentWeeklyMl > 0) (currentWeeklyMl / vol).toInt().toString() else defaultWeeklyDrinks.toString()
+        )
 
         // Prefill baseline in drinks
         val baseline = brewLog?.getCurrentBaseline()
         dailyBaselineDrinks.setText(if ((baseline?.averageDailyConsumption ?: 0.0) > 0) ((baseline!!.averageDailyConsumption) / vol).toInt().toString() else "0")
         weeklyBaselineDrinks.setText(if ((baseline?.averageWeeklyConsumption ?: 0.0) > 0) ((baseline!!.averageWeeklyConsumption) / vol).toInt().toString() else "0")
+
+        // Show guideline note
+        dialogView.findViewById<android.widget.TextView>(R.id.tv_guideline_note)?.text =
+            "Guideline: set goals around low-risk intake. Defaults use your drink size (" +
+                    "${vol.toInt()}ml @ ${assumedAbv}% )."
 
         fun recalcWeeklyFromDaily(source: com.google.android.material.textfield.TextInputEditText, target: com.google.android.material.textfield.TextInputEditText) {
             val d = source.text.toString().toDoubleOrNull() ?: 0.0
@@ -861,25 +913,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun deleteBeerEntry(entry: BeerEntry) {
-        AlertDialog.Builder(this)
-            .setTitle("Delete Entry")
-            .setMessage("Are you sure you want to delete this beer entry?")
-            .setPositiveButton("Delete") { _, _ ->
-                brewLog?.let { log ->
-                    try {
-                        val r = try { BrewLogNative.delete_beer_entry_jni(entry.id) } catch (_: Throwable) { "" }
-                        if (!r.startsWith("OK")) {
-                            log.deleteBeerEntry(entry.id)
-                        }
-                        Toast.makeText(this, "Beer entry deleted successfully", Toast.LENGTH_SHORT).show()
-                        loadData()
-                    } catch (e: Exception) {
-                        Toast.makeText(this, "Failed to delete beer entry", Toast.LENGTH_SHORT).show()
-                    }
+        brewLog?.let { log ->
+            try {
+                val r = try { BrewLogNative.delete_beer_entry_jni(entry.id) } catch (_: Throwable) { "" }
+                if (!r.startsWith("OK")) {
+                    log.deleteBeerEntry(entry.id)
                 }
+                Toast.makeText(this, "Beer entry deleted successfully", Toast.LENGTH_SHORT).show()
+                loadData()
+            } catch (e: Exception) {
+                Toast.makeText(this, "Failed to delete beer entry", Toast.LENGTH_SHORT).show()
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+        }
     }
 
     private fun resetBaseline() {
@@ -901,7 +946,7 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_settings -> {
-                showSettingsDialog()
+                startActivity(Intent(this, SettingsActivity::class.java))
                 true
             }
             R.id.action_set_goals -> {
@@ -975,6 +1020,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Settings now handled by SettingsActivity
     private fun showSettingsDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_settings, null)
         val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
@@ -992,6 +1038,9 @@ class MainActivity : AppCompatActivity() {
         val exportBtn = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_export)
         val importBtn = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_import)
         val deleteAllBtn = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_delete_all)
+        val infoGuidelines = dialogView.findViewById<android.widget.TextView>(R.id.tv_info_guidelines)
+        val redoSetupBtn = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_redo_initial_setup)
+        val versionText = dialogView.findViewById<android.widget.TextView>(R.id.tv_version)
 
         beerSizeEdit.setText(defaultSize.toString())
         beerStrengthEdit.setText(defaultStrength.toString())
@@ -999,6 +1048,23 @@ class MainActivity : AppCompatActivity() {
         // Restore secure toggle
         secureSwitch.isChecked = getSharedPreferences(prefsName, MODE_PRIVATE).getBoolean("flag_secure", true)
         eodEdit.setText(endOfDay.toString())
+        try {
+            val pInfo = packageManager.getPackageInfo(packageName, 0)
+            versionText?.text = "Version: ${pInfo.versionName}"
+        } catch (_: Exception) { }
+
+        // Show low-risk guideline info based on current defaults
+        try {
+            val gramsPerDrink = (defaultSize.toDouble() * (defaultStrength.toDouble() / 100.0) * 0.8)
+            if (gramsPerDrink > 0) {
+                val approxDailyFemale = (12.0 / gramsPerDrink).coerceAtLeast(0.0)
+                val approxDailyMale = (24.0 / gramsPerDrink).coerceAtLeast(0.0)
+                infoGuidelines?.text =
+                    "Guideline (approx.): ${approxDailyFemale.toInt()} drink/day (lower) to ${approxDailyMale.toInt()} drinks/day (upper). Consider 2 alcohol‑free days/week.\nSource: national low‑risk guidance."
+            } else {
+                infoGuidelines?.text = "Guideline: keep daily goals modest and include alcohol‑free days each week."
+            }
+        } catch (_: Exception) { }
 
         val dialog = AlertDialog.Builder(this)
             .setTitle(null)
@@ -1128,6 +1194,12 @@ class MainActivity : AppCompatActivity() {
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
+        }
+
+        // Redo Initial Setup -> open the setup dialog
+        redoSetupBtn?.setOnClickListener {
+            dialog.dismiss()
+            showSetupDialog()
         }
     }
 

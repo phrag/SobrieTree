@@ -44,12 +44,15 @@ class CalendarActivity : AppCompatActivity() {
         }
 
         findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottom_nav).apply {
+            menu.clear()
+            inflateMenu(R.menu.menu_bottom)
             selectedItemId = R.id.nav_calendar
             setOnItemSelectedListener { item ->
                 when (item.itemId) {
                     R.id.nav_home -> { startActivity(android.content.Intent(this@CalendarActivity, MainActivity::class.java)); true }
                     R.id.nav_progress -> { startActivity(android.content.Intent(this@CalendarActivity, ProgressActivity::class.java)); true }
                     R.id.nav_calendar -> true
+                    R.id.nav_settings -> { startActivity(android.content.Intent(this@CalendarActivity, SettingsActivity::class.java)); true }
                     else -> false
                 }
             }
@@ -118,21 +121,14 @@ class CalendarActivity : AppCompatActivity() {
     }
 
     private fun deleteInline(entry: BeerEntry) {
-        androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("Delete Entry")
-            .setMessage("Delete this entry?")
-            .setPositiveButton("Delete") { d, _ ->
-                val r = BrewLogNative.delete_beer_entry_jni(entry.id)
-                if (r.startsWith("OK")) setDate(LocalDate.parse(entry.date))
-                d.dismiss()
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
+        val r = BrewLogNative.delete_beer_entry_jni(entry.id)
+        if (r.startsWith("OK")) setDate(LocalDate.parse(entry.date))
     }
 
     private fun showSetTotalDialog(date: LocalDate) {
         val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
         val defaultSizeMl = prefs.getInt("default_beer_size", 500)
+        val defaultAlcoholPercentage = prefs.getFloat("default_beer_strength", 5.0f)
         val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
         val input = android.widget.EditText(this)
         input.inputType = android.text.InputType.TYPE_CLASS_NUMBER
@@ -141,14 +137,14 @@ class CalendarActivity : AppCompatActivity() {
             .setView(input)
             .setPositiveButton("Save") { d, _ ->
                 val numDrinks = input.text.toString().toIntOrNull() ?: 0
-                setTotalForDay(date, numDrinks * defaultSizeMl)
+                setTotalForDay(date, numDrinks * defaultSizeMl, defaultAlcoholPercentage.toDouble())
                 d.dismiss()
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
-    private fun setTotalForDay(date: LocalDate, targetMl: Int) {
+    private fun setTotalForDay(date: LocalDate, targetMl: Int, alcoholPercentage: Double = 0.0) {
         try {
             val json = BrewLogNative.get_beer_entries_json(date.toString(), date.toString())
             val arr = JSONArray(json)
@@ -172,9 +168,9 @@ class CalendarActivity : AppCompatActivity() {
                 setDate(date)
                 return
             }
-            // Add one synthetic entry to reach total
+            // Add one synthetic entry to reach total using the provided alcohol percentage
             val id = java.util.UUID.randomUUID().toString()
-            val res = BrewLogNative.add_beer_entry_full_jni(id, "Adjustment", 0.0, diff, date.toString(), "auto")
+            val res = BrewLogNative.add_beer_entry_full_jni(id, "Adjustment", alcoholPercentage, diff, date.toString(), "auto")
             if (res.startsWith("OK")) setDate(date)
         } catch (_: Exception) {}
     }
