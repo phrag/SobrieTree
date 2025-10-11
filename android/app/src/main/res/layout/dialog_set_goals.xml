@@ -81,7 +81,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Tip: Many health guidelines recommend no more than 2 standard drinks (about 500ml beer) per day."
+                android:text="💡 Tip: Set goals around low-risk intake. Include 2+ alcohol-free days per week. Your beer glass will start full and empty as you approach your goal!"
                 android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                 android:textColor="@color/blue_700" />
 

@@ -13,9 +13,9 @@ echo "Installing application..."
 # Uninstall to avoid signature mismatch, then install the latest built APK
 ~/Library/Android/sdk/platform-tools/adb uninstall com.brewlog.android || true
 # Prefer versioned APK produced by build.sh, fall back to debug
-APK_PATH="BrewLog-0.0.3-dev.apk"
+APK_PATH="BrewLog-0.0.3.apk"
 if [ ! -f "$APK_PATH" ]; then
-  APK_PATH="BrewLog-0.0.2.apk"
+  APK_PATH="BrewLog-0.0.3-dev.apk"
 fi
 if [ -f "$APK_PATH" ]; then
   ~/Library/Android/sdk/platform-tools/adb install "$APK_PATH"

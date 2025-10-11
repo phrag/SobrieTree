@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/marker_background"
+    android:padding="8dp"
+    android:minWidth="60dp"
+    android:maxWidth="120dp">
+
+    <TextView
+        android:id="@+id/marker_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0 drinks"
+        android:textColor="@color/white"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:lineSpacingExtra="1dp"
+        android:maxLines="2"
+        android:ellipsize="end" />
+
+</LinearLayout>

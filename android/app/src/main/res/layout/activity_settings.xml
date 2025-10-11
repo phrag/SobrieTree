@@ -311,7 +311,7 @@
                         android:id="@+id/tv_info_guidelines"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Guideline: keep daily goals modest and include alcohol‑free days each week."
+                        android:text="Tap to view personalized health guidelines based on your drink preferences."
                         android:textAppearance="@style/TextAppearance.BrewLog.Body2"
                         android:textColor="@color/text_secondary"
                         android:clickable="true"

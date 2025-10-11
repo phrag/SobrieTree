@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private var brewLog: BrewLog? = null
     private var selectedStartDate: LocalDate? = null
     private var selectedEndDate: LocalDate? = null
+    private var hasShownFavoriteSetup = false
     private val prefsName = "brewlog_prefs"
 
     private fun getWeekStart(today: LocalDate): LocalDate {
@@ -65,11 +66,27 @@ class MainActivity : AppCompatActivity() {
             intent.removeExtra("open_settings")
         }
 
-        // Initial Setup CTA visibility
+        // Initial Setup CTA visibility and flow
         val onboardingDone = getSharedPreferences(prefsName, MODE_PRIVATE).getBoolean("onboarding_complete", false)
+        val hasDrinkPresets = getDrinkPresets(getSharedPreferences(prefsName, MODE_PRIVATE)).isNotEmpty()
+        val hasData = brewLog?.getAllEntries()?.isNotEmpty() ?: false
+        
         findViewById<View>(R.id.btn_initial_setup).apply {
             visibility = if (onboardingDone) View.GONE else View.VISIBLE
-            setOnClickListener { showSetGoalsDialog() }
+            setOnClickListener { 
+                if (!hasDrinkPresets) {
+                    // First time setup: show favorite drink setup first
+                    showInitialSetupFlow()
+                } else {
+                    // Has favorite drink but no goals: show goals setup
+                    showSetGoalsDialog()
+                }
+            }
+        }
+        
+        // Auto-trigger initial setup flow for fresh installs
+        if (!onboardingDone && !hasDrinkPresets && !hasData) {
+            showInitialSetupFlow()
         }
     }
 
@@ -186,7 +203,11 @@ class MainActivity : AppCompatActivity() {
                 } catch (_: Throwable) {
                     log.getWeeklyConsumption(weekStart)
                 }
-                val monthConsumption = log.getMonthlyConsumption(monthStart)
+                // Calculate monthly consumption using the same method as progress screen
+                val monthConsumption = try {
+                    val totals = getDailyTotals(monthStart, today)
+                    totals.values.sum()
+                } catch (_: Throwable) { 0.0 }
 
                 val json = try { BrewLogNative.get_beer_entries_json(weekStart.toString(), today.toString()) } catch (_: Throwable) { "" }
                 val entries = if (json.startsWith("[")) {
@@ -224,23 +245,27 @@ class MainActivity : AppCompatActivity() {
                 // Use baseline as fallback target when no explicit goal set
                 val baselineDailyMl = getSharedPreferences(prefsName, MODE_PRIVATE).getFloat("baseline_daily_ml", 0f).toDouble()
                 val baselineWeeklyMl = baselineDailyMl * 7.0
+                val baselineMonthlyMl = baselineDailyMl * 30.0
                 val effectiveDailyGoalMl = if (dailyGoalMlRaw > 0.0) dailyGoalMlRaw else baselineDailyMl
                 val ratio = if (effectiveDailyGoalMl > 0) (todayConsumption / effectiveDailyGoalMl).coerceIn(0.0, 1.0) else 0.0
-                beerGlass.setProgress(ratio)
+                // Invert the ratio so glass starts full and empties as consumption increases
+                val invertedRatio = 1.0 - ratio
+                beerGlass.setProgress(invertedRatio)
 
                 val todayDrinks = if (drinkVolume > 0) (todayConsumption / drinkVolume) else 0.0
                 val goalDrinks = if (drinkVolume > 0) (effectiveDailyGoalMl / drinkVolume) else 0.0
                 beerGlassText.text = "${todayDrinks.toInt()} / ${goalDrinks.toInt()} drinks"
                 findViewById<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.daily_goal_progress).apply {
-                    progress = (ratio * 100).toInt()
+                    progress = (invertedRatio * 100).toInt()
                 }
 
                 // Weekly progress bar and label
                 val weeklyGoalMlRaw = log.getWeeklyGoal().takeIf { it >= 0 } ?: 0.0
                 val effectiveWeeklyGoalMl = if (weeklyGoalMlRaw > 0.0) weeklyGoalMlRaw else baselineWeeklyMl
                 val weeklyRatio = if (effectiveWeeklyGoalMl > 0) (weekConsumption / effectiveWeeklyGoalMl).coerceIn(0.0, 1.0) else 0.0
+                val invertedWeeklyRatio = 1.0 - weeklyRatio
                 findViewById<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.weekly_goal_progress)?.apply {
-                    progress = (weeklyRatio * 100).toInt()
+                    progress = (invertedWeeklyRatio * 100).toInt()
                 }
                 findViewById<android.widget.TextView>(R.id.weekly_glass_progress)?.apply {
                     val weekDrinks = if (drinkVolume > 0) (weekConsumption / drinkVolume) else 0.0
@@ -262,7 +287,6 @@ class MainActivity : AppCompatActivity() {
                         else -> red
                     }
                 }
-                val baselineMonthlyMl = baselineDailyMl * 30.0 // used on Progress screen
 
                 findViewById<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.daily_goal_progress)?.apply {
                     val color = pickColor(todayConsumption, effectiveDailyGoalMl, baselineDailyMl)
@@ -276,7 +300,7 @@ class MainActivity : AppCompatActivity() {
 
                 // Warn when near weekly max (>= 80%) and celebrate when within goals at end of day
                 val weeklyPct = if (effectiveWeeklyGoalMl > 0) weekConsumption / effectiveWeeklyGoalMl else 0.0
-                if (weeklyPct >= 0.8 && weeklyPct < 1.0) {
+                if (weeklyPct >= 0.8 && weeklyPct < 1.0 && weekConsumption > 0) {
                     Toast.makeText(this, "Warning: close to weekly goal", Toast.LENGTH_SHORT).show()
                 }
                 if (ratio in 0.99..1.0 || (effectiveDailyGoalMl > 0 && todayConsumption <= effectiveDailyGoalMl && todayConsumption > 0)) {
@@ -284,14 +308,34 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 // Calculate reduction percentages for home screen
+                // Positive = reduction from baseline, Negative = increase from baseline
                 val reductionDaily = if (baselineDailyMl > 0) ((baselineDailyMl - todayConsumption) / baselineDailyMl) * 100 else 0.0
                 val reductionWeekly = if (baselineWeeklyMl > 0) ((baselineWeeklyMl - weekConsumption) / baselineWeeklyMl) * 100 else 0.0
                 val reductionMonthly = if (baselineMonthlyMl > 0) ((baselineMonthlyMl - monthConsumption) / baselineMonthlyMl) * 100 else 0.0
                 
-                // Update reduction displays on home screen
-                findViewById<android.widget.TextView>(R.id.tv_daily_reduction_home)?.text = "${String.format("%.1f", reductionDaily)}%"
-                findViewById<android.widget.TextView>(R.id.tv_weekly_reduction_home)?.text = "${String.format("%.1f", reductionWeekly)}%"
-                findViewById<android.widget.TextView>(R.id.tv_monthly_reduction_home)?.text = "${String.format("%.1f", reductionMonthly)}%"
+                // Update reduction displays on home screen with color coding
+                val dailyReductionView = findViewById<android.widget.TextView>(R.id.tv_daily_reduction_home)
+                val weeklyReductionView = findViewById<android.widget.TextView>(R.id.tv_weekly_reduction_home)
+                val monthlyReductionView = findViewById<android.widget.TextView>(R.id.tv_monthly_reduction_home)
+                
+                // Debug logging
+                android.util.Log.d("MainActivity", "Reduction values - Daily: $reductionDaily, Weekly: $reductionWeekly, Monthly: $reductionMonthly")
+                android.util.Log.d("MainActivity", "Baseline values - Daily: $baselineDailyMl, Weekly: $baselineWeeklyMl, Monthly: $baselineMonthlyMl")
+                android.util.Log.d("MainActivity", "Consumption values - Today: $todayConsumption, Week: $weekConsumption, Month: $monthConsumption")
+                android.util.Log.d("MainActivity", "Views found - Daily: ${dailyReductionView != null}, Weekly: ${weeklyReductionView != null}, Monthly: ${monthlyReductionView != null}")
+                
+                dailyReductionView?.apply {
+                    text = "${String.format("%.1f", reductionDaily)}%"
+                    setTextColor(if (reductionDaily < 0) android.graphics.Color.RED else android.graphics.Color.parseColor("#4CAF50"))
+                }
+                weeklyReductionView?.apply {
+                    text = "${String.format("%.1f", reductionWeekly)}%"
+                    setTextColor(if (reductionWeekly < 0) android.graphics.Color.RED else android.graphics.Color.parseColor("#4CAF50"))
+                }
+                monthlyReductionView?.apply {
+                    text = "${String.format("%.1f", reductionMonthly)}%"
+                    setTextColor(if (reductionMonthly < 0) android.graphics.Color.RED else android.graphics.Color.parseColor("#4CAF50"))
+                }
 
                 // Populate Quick Add chips from presets (prioritize favorite, last-added)
                 val chipGroup = findViewById<com.google.android.material.chip.ChipGroup>(R.id.quick_add_group)
@@ -329,18 +373,24 @@ class MainActivity : AppCompatActivity() {
                     showAddBeerDialog()
                 }
 
-                // Drinks left indicators (day/week)
-                val remainingTodayDrinks = if (drinkVolume > 0) ((effectiveDailyGoalMl - todayConsumption) / drinkVolume).coerceAtLeast(0.0) else 0.0
-                val remainingWeekDrinks = if (drinkVolume > 0) ((effectiveWeeklyGoalMl - weekConsumption) / drinkVolume).coerceAtLeast(0.0) else 0.0
-                findViewById<android.widget.TextView>(R.id.tv_daily_drinks_left)?.text =
-                    "${remainingTodayDrinks.toInt()} left today"
-                findViewById<android.widget.TextView>(R.id.tv_weekly_drinks_left)?.text =
-                    "${remainingWeekDrinks.toInt()} left this week"
-
-                // If user has no presets yet, nudge a favorite-setup sheet
-                if (presets.isEmpty()) {
-                    showFavoriteSetupSheet()
+                // Manage Goals & Baseline button
+                findViewById<View>(R.id.btn_manage_goals_baseline)?.setOnClickListener {
+                    showManageGoalsBaselineDialog()
                 }
+
+                // Drinks consumed and left indicators (day/week)
+                val consumedTodayDrinks = if (drinkVolume > 0) (todayConsumption / drinkVolume) else 0.0
+                val remainingTodayDrinks = if (drinkVolume > 0) ((effectiveDailyGoalMl - todayConsumption) / drinkVolume).coerceAtLeast(0.0) else 0.0
+                val consumedWeekDrinks = if (drinkVolume > 0) (weekConsumption / drinkVolume) else 0.0
+                val remainingWeekDrinks = if (drinkVolume > 0) ((effectiveWeeklyGoalMl - weekConsumption) / drinkVolume).coerceAtLeast(0.0) else 0.0
+                
+                findViewById<android.widget.TextView>(R.id.tv_daily_drinks_left)?.text =
+                    "${consumedTodayDrinks.toInt()} drank, ${remainingTodayDrinks.toInt()} left today"
+                findViewById<android.widget.TextView>(R.id.tv_weekly_drinks_left)?.text =
+                    "${consumedWeekDrinks.toInt()} drank, ${remainingWeekDrinks.toInt()} left this week"
+
+                // Favorite drink setup is now handled only in the initial setup flow
+                // No need to trigger it separately here
 
                 // Removed initial tip dialog to avoid obscuring buttons on small screens
 
@@ -350,7 +400,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showFavoriteSetupSheet() {
+    private fun showInitialSetupFlow() {
+        // Show welcome dialog first
+        showWelcomeDialog()
+    }
+    
+    private fun showWelcomeDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_welcome_setup, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+            
+        dialogView.findViewById<View>(R.id.btn_get_started).setOnClickListener {
+            dialog.dismiss()
+            showSetGoalsDialog(true) // Start with goals setup first
+        }
+        
+        dialog.show()
+    }
+
+    private fun showFavoriteSetupSheet(isInitialSetup: Boolean = false) {
+        if (hasShownFavoriteSetup && !isInitialSetup) {
+            return
+        }
+        hasShownFavoriteSetup = true
+        
         val sheet = layoutInflater.inflate(R.layout.bottom_sheet_favorite_setup, null)
         val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(this)
         dialog.setContentView(sheet)
@@ -378,11 +453,25 @@ class MainActivity : AppCompatActivity() {
             } else {
                 loadData()
             }
+            hasShownFavoriteSetup = false
             dialog.dismiss()
+            
+            // If this is part of initial setup, mark onboarding as complete since this is the last step
+            if (isInitialSetup) {
+                val prefsDone = getSharedPreferences(prefsName, MODE_PRIVATE)
+                prefsDone.edit().putBoolean("onboarding_complete", true).apply()
+                findViewById<View>(R.id.btn_initial_setup)?.visibility = View.GONE
+                loadData() // Refresh the UI
+            }
         }
 
         sheet.findViewById<View>(R.id.btn_save_and_add).setOnClickListener { saveFavorite(true) }
         sheet.findViewById<View>(R.id.btn_save_only).setOnClickListener { saveFavorite(false) }
+        
+        dialog.setOnDismissListener {
+            hasShownFavoriteSetup = false
+        }
+        
         dialog.show()
     }
 
@@ -621,15 +710,35 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun showSetGoalsDialog() {
-        showSetupDialog()
+    private fun showSetGoalsDialog(isInitialSetup: Boolean = false) {
+        showSetupDialog(isInitialSetup)
     }
 
     private fun showBaselineDialog() {
         showSetupDialog()
     }
 
-    private fun showSetupDialog() {
+    private fun showManageGoalsBaselineDialog() {
+        val options = arrayOf("Set Goals & Baseline", "Reset Baseline")
+        AlertDialog.Builder(this)
+            .setTitle("Manage Goals & Baseline")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> showSetGoalsDialog() // Set Goals & Baseline
+                    1 -> {
+                        AlertDialog.Builder(this)
+                            .setTitle("Reset Baseline")
+                            .setMessage("This will clear your current baseline. You can set a new one afterwards.")
+                            .setPositiveButton("Reset") { _, _ -> resetBaseline() }
+                            .setNegativeButton("Cancel", null)
+                            .show()
+                    }
+                }
+            }
+            .show()
+    }
+
+    private fun showSetupDialog(isInitialSetup: Boolean = false) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_setup, null)
         val defaultDrinkEdit = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_default_drink_ml)
         val dailyGoalDrinks = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_goal_daily_drinks)
@@ -672,9 +781,11 @@ class MainActivity : AppCompatActivity() {
         weeklyBaselineDrinks.setText(if ((baseline?.averageWeeklyConsumption ?: 0.0) > 0) ((baseline!!.averageWeeklyConsumption) / vol).toInt().toString() else "0")
 
         // Show guideline note
+        val dailyFemale = (12.0 / gramsPerDrink).coerceAtLeast(0.0).toInt()
+        val dailyMale = (24.0 / gramsPerDrink).coerceAtLeast(0.0).toInt()
         dialogView.findViewById<android.widget.TextView>(R.id.tv_guideline_note)?.text =
-            "Guideline: set goals around low-risk intake. Defaults use your drink size (" +
-                    "${vol.toInt()}ml @ ${assumedAbv}% )."
+            "💡 Low-risk guidelines: ${dailyFemale}-${dailyMale} drinks/day (${vol.toInt()}ml @ ${assumedAbv}%). " +
+            "Include 2+ alcohol-free days/week. Your beer glass will start full and empty as you approach your goal!"
 
         fun recalcWeeklyFromDaily(source: com.google.android.material.textfield.TextInputEditText, target: com.google.android.material.textfield.TextInputEditText) {
             val d = source.text.toString().toDoubleOrNull() ?: 0.0
@@ -736,11 +847,16 @@ class MainActivity : AppCompatActivity() {
             dialog.dismiss()
             loadData()
 
-            // Mark onboarding as complete after first successful setup
-            val prefsDone = getSharedPreferences(prefsName, MODE_PRIVATE)
-            if (!prefsDone.getBoolean("onboarding_complete", false)) {
-                prefsDone.edit().putBoolean("onboarding_complete", true).apply()
-                findViewById<View>(R.id.btn_initial_setup)?.visibility = View.GONE
+            // If this is part of initial setup, proceed to favorite drink setup
+            if (isInitialSetup) {
+                showFavoriteSetupSheet(true)
+            } else {
+                // Mark onboarding as complete after first successful setup
+                val prefsDone = getSharedPreferences(prefsName, MODE_PRIVATE)
+                if (!prefsDone.getBoolean("onboarding_complete", false)) {
+                    prefsDone.edit().putBoolean("onboarding_complete", true).apply()
+                    findViewById<View>(R.id.btn_initial_setup)?.visibility = View.GONE
+                }
             }
         }
         dialog.show()
@@ -783,8 +899,8 @@ class MainActivity : AppCompatActivity() {
             .create()
 
         dialogView.findViewById<View>(R.id.btn_reset_baseline).setOnClickListener {
-            resetBaseline()
             dialog.dismiss()
+            showManageGoalsBaselineDialog()
         }
         dialogView.findViewById<View>(R.id.btn_close).setOnClickListener { dialog.dismiss() }
         dialog.show()
@@ -1053,16 +1169,44 @@ class MainActivity : AppCompatActivity() {
             versionText?.text = "Version: ${pInfo.versionName}"
         } catch (_: Exception) { }
 
-        // Show low-risk guideline info based on current defaults
+        // Show comprehensive health guidelines based on current defaults
         try {
             val gramsPerDrink = (defaultSize.toDouble() * (defaultStrength.toDouble() / 100.0) * 0.8)
             if (gramsPerDrink > 0) {
                 val approxDailyFemale = (12.0 / gramsPerDrink).coerceAtLeast(0.0)
                 val approxDailyMale = (24.0 / gramsPerDrink).coerceAtLeast(0.0)
-                infoGuidelines?.text =
-                    "Guideline (approx.): ${approxDailyFemale.toInt()} drink/day (lower) to ${approxDailyMale.toInt()} drinks/day (upper). Consider 2 alcohol‑free days/week.\nSource: national low‑risk guidance."
+                val weeklyFemale = (approxDailyFemale * 7).toInt()
+                val weeklyMale = (approxDailyMale * 7).toInt()
+                
+                infoGuidelines?.text = buildString {
+                    appendLine("🍺 Low-Risk Guidelines (${defaultSize}ml @ ${defaultStrength}% ABV)")
+                    appendLine()
+                    appendLine("Daily: ${approxDailyFemale.toInt()}-${approxDailyMale.toInt()} drinks")
+                    appendLine("Weekly: ${weeklyFemale}-${weeklyMale} drinks")
+                    appendLine()
+                    appendLine("💡 Tips:")
+                    appendLine("• Include 2+ alcohol-free days/week")
+                    appendLine("• Space drinks over time, not all at once")
+                    appendLine("• Eat before and while drinking")
+                    appendLine("• Stay hydrated with water")
+                    appendLine()
+                    appendLine("📊 Your glass empties as you approach your goal!")
+                    appendLine("Source: National health guidelines")
+                }
             } else {
-                infoGuidelines?.text = "Guideline: keep daily goals modest and include alcohol‑free days each week."
+                infoGuidelines?.text = buildString {
+                    appendLine("🍺 Low-Risk Guidelines")
+                    appendLine()
+                    appendLine("💡 General Tips:")
+                    appendLine("• Keep daily goals modest")
+                    appendLine("• Include 2+ alcohol-free days/week")
+                    appendLine("• Space drinks over time")
+                    appendLine("• Eat before and while drinking")
+                    appendLine("• Stay hydrated with water")
+                    appendLine()
+                    appendLine("📊 Your glass empties as you approach your goal!")
+                    appendLine("Set your drink preferences for personalized guidelines.")
+                }
             }
         } catch (_: Exception) { }
 
@@ -1104,7 +1248,7 @@ class MainActivity : AppCompatActivity() {
                         .putFloat("default_beer_strength", strength!!)
                         .putInt("end_of_day_hour", eod!!)
                         .apply()
-                    brewLog?.setEndOfDayHour(eod!!)
+                    brewLog?.setEndOfDayHour(eod)
 
                     if (themeSwitch.isChecked) {
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -1144,7 +1288,6 @@ class MainActivity : AppCompatActivity() {
         }
         importBtn.setOnClickListener {
             try {
-                val openDoc = androidx.activity.result.contract.ActivityResultContracts.GetContent()
                 // Fallback simple prompt: paste JSON
                 val input = android.widget.EditText(this)
                 input.hint = "Paste exported JSON"
@@ -1301,5 +1444,30 @@ class MainActivity : AppCompatActivity() {
                 d.dismiss()
             }
             .show()
+    }
+
+    private fun getDailyTotals(start: LocalDate, end: LocalDate): Map<LocalDate, Double> {
+        return try {
+            val json = BrewLogNative.get_beer_entries_json(start.toString(), end.toString())
+            val arr = JSONArray(json)
+            val map = java.util.HashMap<LocalDate, Double>()
+            var i = 0
+            while (i < arr.length()) {
+                val o = arr.getJSONObject(i)
+                val date = LocalDate.parse(o.optString("date"))
+                val vol = o.optDouble("volume_ml", 0.0)
+                val alcoholPercentage = o.optDouble("alcohol_percentage", 0.0)
+                
+                // Only count entries with alcohol percentage > 0 (same logic as main consumption)
+                if (alcoholPercentage > 0) {
+                    val current = map[date] ?: 0.0
+                    map[date] = current + vol
+                }
+                i++
+            }
+            map
+        } catch (e: Throwable) {
+            emptyMap()
+        }
     }
 } 

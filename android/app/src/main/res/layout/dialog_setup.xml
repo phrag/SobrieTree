@@ -17,6 +17,14 @@
         android:layout_height="wrap_content"
         android:text="Set Goals &amp; Baseline"
         android:textAppearance="@style/TextAppearance.BrewLog.Headline"
+        android:layout_marginBottom="8dp" />
+        
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Configure your daily and weekly consumption goals, and set your baseline for tracking progress."
+        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+        android:textColor="@color/text_secondary"
         android:layout_marginBottom="16dp" />
 
     <com.google.android.material.textfield.TextInputLayout
