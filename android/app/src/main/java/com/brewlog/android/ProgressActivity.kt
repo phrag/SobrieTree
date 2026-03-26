@@ -49,6 +49,24 @@ class ProgressActivity : AppCompatActivity() {
         val weekStart = getWeekStart(today)
         val prefs = getSharedPreferences("brewlog_prefs", MODE_PRIVATE)
         val sizeMl = prefs.getInt("default_beer_size", 500).toDouble().coerceAtLeast(1.0)
+        val isStopMode = prefs.getString("goal_mode", "reduce") == "stop"
+
+        // Update labels based on goal mode
+        findViewById<android.widget.TextView>(R.id.tv_progress_subtitle)?.setText(
+            if (isStopMode) R.string.progress_header_subtitle_stop else R.string.progress_header_subtitle_reduce
+        )
+        findViewById<android.widget.TextView>(R.id.tv_label_daily_reduction)?.setText(
+            if (isStopMode) R.string.home_reduction_caption_daily_stop else R.string.home_reduction_caption_daily_reduce
+        )
+        findViewById<android.widget.TextView>(R.id.tv_label_weekly_reduction)?.setText(
+            if (isStopMode) R.string.home_reduction_caption_weekly_stop else R.string.home_reduction_caption_weekly_reduce
+        )
+        findViewById<android.widget.TextView>(R.id.tv_label_monthly_reduction)?.setText(
+            if (isStopMode) R.string.home_reduction_caption_monthly_stop else R.string.home_reduction_caption_monthly_reduce
+        )
+        findViewById<android.widget.TextView>(R.id.tv_insights_alcohol_free_label)?.setText(
+            if (isStopMode) R.string.insights_sober_days_label else R.string.insights_alcohol_free_label
+        )
 
         val todayMl = try {
             val v = BrewLogNative.get_daily_consumption(today.toString())
@@ -244,7 +262,7 @@ class ProgressActivity : AppCompatActivity() {
         setBarChartData(weekData, weekLabels, goalDailyDrinks, baselineDailyDrinks, "Drinks")
 
         // Weekly Insights
-        updateWeeklyInsights(weekStart, today, sizeMl)
+        updateWeeklyInsights(weekStart, today, sizeMl, isStopMode)
 
         // Day chip - show today's total only (no fake hourly data)
         findViewById<com.google.android.material.chip.Chip>(R.id.chip_day)?.setOnClickListener {
@@ -333,7 +351,7 @@ class ProgressActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateWeeklyInsights(weekStart: LocalDate, today: LocalDate, sizeMl: Double) {
+    private fun updateWeeklyInsights(weekStart: LocalDate, today: LocalDate, sizeMl: Double, isStopMode: Boolean = false) {
         val lastWeekStart = weekStart.minusWeeks(1)
         val lastWeekEnd = weekStart.minusDays(1)
 
@@ -394,7 +412,7 @@ class ProgressActivity : AppCompatActivity() {
 
         // Generate supportive insight message
         val insightMessage = generateInsightMessage(
-            thisWeekDrinks, lastWeekDrinks, alcoholFreeDays, daysInWeekSoFar
+            thisWeekDrinks, lastWeekDrinks, alcoholFreeDays, daysInWeekSoFar, isStopMode
         )
 
         // Update UI
@@ -415,30 +433,34 @@ class ProgressActivity : AppCompatActivity() {
         thisWeekDrinks: Int,
         lastWeekDrinks: Int,
         alcoholFreeDays: Int,
-        daysTracked: Int
+        daysTracked: Int,
+        isStopMode: Boolean = false
     ): String {
+        val freeLabel = if (isStopMode) "sober" else "alcohol-free"
         return when {
             daysTracked <= 1 -> "Keep tracking to see your patterns."
-            
-            alcoholFreeDays >= daysTracked -> 
-                "An alcohol-free week so far. Your body thanks you."
-            
-            alcoholFreeDays >= 4 -> 
-                "Great balance this week with $alcoholFreeDays alcohol-free days."
-            
-            thisWeekDrinks < lastWeekDrinks && lastWeekDrinks > 0 -> 
-                "You're drinking less than last week. Small changes add up."
-            
-            thisWeekDrinks == 0 -> 
+
+            alcoholFreeDays >= daysTracked ->
+                if (isStopMode) "A fully sober week so far. You're doing it."
+                else "An alcohol-free week so far. Your body thanks you."
+
+            alcoholFreeDays >= 4 ->
+                "Great balance this week with $alcoholFreeDays $freeLabel days."
+
+            thisWeekDrinks < lastWeekDrinks && lastWeekDrinks > 0 ->
+                if (isStopMode) "Less drinking than last week. Every step toward sobriety counts."
+                else "You're drinking less than last week. Small changes add up."
+
+            thisWeekDrinks == 0 ->
                 "Starting fresh this week. Every day is a choice."
-            
-            alcoholFreeDays >= 2 -> 
-                "You've had $alcoholFreeDays alcohol-free days. Rest days matter."
-            
-            alcoholFreeDays == 1 -> 
-                "One alcohol-free day this week. Consider adding another."
-            
-            else -> 
+
+            alcoholFreeDays >= 2 ->
+                "You've had $alcoholFreeDays $freeLabel days. Rest days matter."
+
+            alcoholFreeDays == 1 ->
+                "One $freeLabel day this week. Consider adding another."
+
+            else ->
                 "Awareness is the first step. Keep tracking your patterns."
         }
     }

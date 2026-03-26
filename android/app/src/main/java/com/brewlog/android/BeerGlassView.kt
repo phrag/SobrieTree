@@ -1,5 +1,6 @@
 package com.brewlog.android
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -9,8 +10,8 @@ import android.graphics.RadialGradient
 import android.graphics.Shader
 import android.util.AttributeSet
 import android.view.View
+import android.view.animation.DecelerateInterpolator
 import androidx.core.content.ContextCompat
-import kotlin.math.sin
 
 class BeerGlassView @JvmOverloads constructor(
 	context: Context,
@@ -18,68 +19,66 @@ class BeerGlassView @JvmOverloads constructor(
 	defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-	private var progressRatio: Float = 0f // 0.0 to 1.0
+	private var progressRatio: Float = 0f
+	private var displayRatio: Float = 0f
+	private var progressAnimator: ValueAnimator? = null
 
-	// Celebration animation state
 	private var isCelebrating: Boolean = false
 	private var celebrationStartMs: Long = 0L
-	private val celebrationDurationMs: Long = 1500L
+	private val celebrationDurationMs: Long = 1200L
 	private val bubbles: MutableList<Bubble> = mutableListOf()
 	private val sparkles: MutableList<Sparkle> = mutableListOf()
 
-	// Overflow animation when ratio > 1.0
 	private var isOverflowing: Boolean = false
 	private var overflowStartMs: Long = 0L
 	private val overflowDurationMs: Long = 1200L
 	private val droplets: MutableList<Droplet> = mutableListOf()
 
-	// Ambient bubble animation (always on when there's liquid)
-	private val ambientBubbles: MutableList<Bubble> = mutableListOf()
-	private var lastBubbleSpawnMs: Long = 0L
-
-	// Wave animation phase
+	// Wave animation
 	private var wavePhase: Float = 0f
+	private val waveSpeed: Float = 0.06f
+
+	private val dp = resources.displayMetrics.density
+
+	// Beer amber/gold colors
+	private val beerAmberLight = 0xFFFFC107.toInt()
+	private val beerAmberMid = 0xFFFF9800.toInt()
+	private val beerAmberDark = 0xFFF57C00.toInt()
 
 	private val outlinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 		style = Paint.Style.STROKE
-		strokeWidth = resources.displayMetrics.density * 2.5f
-		color = 0xFF8B7355.toInt() // warm brown glass rim
-	}
-
-	private val glassPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-		style = Paint.Style.FILL
-		color = 0x15FFFFFF // subtle glass tint
+		strokeWidth = dp * 2.5f
+		color = ContextCompat.getColor(context, R.color.text_secondary)
 	}
 
 	private val beerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 		style = Paint.Style.FILL
-		color = ContextCompat.getColor(context, R.color.beer_amber)
 	}
 
 	private val highlightPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 		style = Paint.Style.FILL
-		color = 0x44FFFFFF
+		color = 0x22FFFFFF
 	}
 
 	private val foamPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 		style = Paint.Style.FILL
-		color = 0xFFFFFAF0.toInt() // creamy foam color
+		color = 0xFFFFF8E1.toInt()
 	}
 
 	private val foamShadowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 		style = Paint.Style.FILL
-		color = 0x22000000
+		color = 0x11000000
 	}
 
 	private val bubblePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 		style = Paint.Style.FILL
-		color = 0x88FFFFFF.toInt()
+		color = 0x44FFFFFF
 	}
 
 	private val sparklePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 		style = Paint.Style.STROKE
-		strokeWidth = resources.displayMetrics.density * 1.4f
-		color = 0xCCFFFFFF.toInt()
+		strokeWidth = dp * 1.4f
+		color = 0xAAFFFFFF.toInt()
 	}
 
 	fun setProgress(ratio: Double) {
@@ -91,13 +90,24 @@ class BeerGlassView @JvmOverloads constructor(
 			else -> unclamped
 		}
 		progressRatio = clamped.toFloat()
+
+		progressAnimator?.cancel()
+		progressAnimator = ValueAnimator.ofFloat(displayRatio, progressRatio).apply {
+			duration = 600
+			interpolator = DecelerateInterpolator()
+			addUpdateListener { animation ->
+				displayRatio = animation.animatedValue as Float
+				invalidate()
+			}
+			start()
+		}
+
 		if (unclamped > 1.0 && !isOverflowing) {
 			isOverflowing = true
 			overflowStartMs = System.currentTimeMillis()
 			droplets.clear()
 			postInvalidateOnAnimation()
 		}
-		invalidate()
 	}
 
 	fun celebrate() {
@@ -105,7 +115,7 @@ class BeerGlassView @JvmOverloads constructor(
 		celebrationStartMs = System.currentTimeMillis()
 		bubbles.clear()
 		sparkles.clear()
-		repeat(8) { bubbles.add(Bubble.random(progressRatio)) }
+		repeat(10) { bubbles.add(Bubble.random(displayRatio)) }
 		repeat(6) { sparkles.add(Sparkle.random()) }
 		postInvalidateOnAnimation()
 	}
@@ -115,22 +125,18 @@ class BeerGlassView @JvmOverloads constructor(
 
 		val w = width.toFloat()
 		val h = height.toFloat()
-		val now = System.currentTimeMillis()
+		if (w <= 0 || h <= 0) return
 
-		// Update wave phase for liquid surface animation
-		wavePhase += 0.08f
-		if (wavePhase > 6.28f) wavePhase -= 6.28f
-
-		// Define a pint glass shape (wider at top, narrower at bottom)
-		val padding = w * 0.08f
+		// Pint glass dimensions: wider at top, narrower at bottom
+		val padding = w * 0.12f
 		val topWidth = w - padding * 2f
-		val bottomWidth = topWidth * 0.85f
+		val bottomWidth = topWidth * 0.72f
 		val glassHeight = h * 0.88f
 		val glassTop = h * 0.06f
 		val glassBottom = glassTop + glassHeight
 
-		val leftTop = padding
-		val rightTop = padding + topWidth
+		val leftTop = (w - topWidth) / 2f
+		val rightTop = leftTop + topWidth
 		val leftBottom = (w - bottomWidth) / 2f
 		val rightBottom = leftBottom + bottomWidth
 
@@ -142,120 +148,92 @@ class BeerGlassView @JvmOverloads constructor(
 			close()
 		}
 
-		// Draw glass background (subtle)
-		canvas.drawPath(glassPath, glassPaint)
-
-		// Draw beer fill based on progress
-		if (progressRatio > 0f) {
-			val fillHeight = glassHeight * progressRatio
+		if (displayRatio > 0f) {
+			val fillHeight = glassHeight * displayRatio
 			val fillTop = glassBottom - fillHeight
 
-			// Interpolate width between bottom and top at the fill line
-			val t = (fillTop - glassTop) / (glassBottom - glassTop)
+			// Width at fill line (interpolate between bottom and top)
+			val t = 1f - displayRatio
 			val widthAtFill = bottomWidth + (topWidth - bottomWidth) * (1f - t)
 			val leftAtFill = (w - widthAtFill) / 2f
 			val rightAtFill = leftAtFill + widthAtFill
 
-			// Create wavy top surface
-			val waveAmplitude = w * 0.008f
+			// Wave effect on the liquid surface
+			wavePhase += waveSpeed
+			val waveAmplitude = dp * 2f * displayRatio.coerceAtMost(0.5f) * 2f
+
 			val beerPath = Path().apply {
 				moveTo(leftBottom, glassBottom)
 				lineTo(rightBottom, glassBottom)
 				lineTo(rightAtFill, fillTop)
+
 				// Wavy top edge
-				val segments = 12
-				for (i in segments - 1 downTo 0) {
-					val segX = leftAtFill + (rightAtFill - leftAtFill) * i / segments
-					val waveOffset = sin(wavePhase + i * 0.5f) * waveAmplitude
-					lineTo(segX, fillTop + waveOffset)
+				val steps = 20
+				for (i in steps downTo 0) {
+					val frac = i.toFloat() / steps
+					val x = rightAtFill - (rightAtFill - leftAtFill) * (1f - frac)
+					val waveY = fillTop + Math.sin((frac * 3 * Math.PI + wavePhase).toDouble()).toFloat() * waveAmplitude
+					lineTo(x, waveY)
 				}
 				close()
 			}
 
-			// Beer gradient: golden amber at top, darker amber in middle, brown at bottom
+			// Amber gradient fill
 			beerPaint.shader = LinearGradient(
 				0f, fillTop, 0f, glassBottom,
-				intArrayOf(
-					ContextCompat.getColor(context, R.color.beer_gold),
-					ContextCompat.getColor(context, R.color.beer_amber),
-					ContextCompat.getColor(context, R.color.beer_brown)
-				),
+				intArrayOf(beerAmberLight, beerAmberMid, beerAmberDark),
 				floatArrayOf(0f, 0.5f, 1f),
 				Shader.TileMode.CLAMP
 			)
 			canvas.drawPath(beerPath, beerPaint)
 
-			// Glass highlight (condensation effect)
-			val highlightWidth = (rightAtFill - leftAtFill) * 0.1f
-			val highlightLeft = leftAtFill + highlightWidth * 0.5f
+			// Glass highlight (left side reflection)
+			val highlightWidth = (rightAtFill - leftAtFill) * 0.10f
+			val highlightLeft = leftAtFill + highlightWidth * 0.7f
+			val hlTop = fillTop + (glassBottom - fillTop) * 0.08f
+			val hlBottom = glassBottom - (glassBottom - fillTop) * 0.12f
 			val highlightPath = Path().apply {
-				moveTo(highlightLeft, fillTop + (glassBottom - fillTop) * 0.08f)
-				lineTo(highlightLeft + highlightWidth, fillTop + (glassBottom - fillTop) * 0.15f)
-				lineTo(highlightLeft + highlightWidth * 0.8f, glassBottom - (glassBottom - fillTop) * 0.15f)
-				lineTo(highlightLeft, glassBottom - (glassBottom - fillTop) * 0.1f)
+				moveTo(highlightLeft, hlTop)
+				lineTo(highlightLeft + highlightWidth, hlTop + (glassBottom - fillTop) * 0.04f)
+				lineTo(highlightLeft + highlightWidth, hlBottom)
+				lineTo(highlightLeft, hlBottom - (glassBottom - fillTop) * 0.03f)
 				close()
 			}
 			canvas.drawPath(highlightPath, highlightPaint)
 
-			// Second smaller highlight on the right
-			val highlightRight = rightAtFill - highlightWidth * 1.2f
-			val highlightPath2 = Path().apply {
-				moveTo(highlightRight, fillTop + (glassBottom - fillTop) * 0.25f)
-				lineTo(highlightRight + highlightWidth * 0.5f, fillTop + (glassBottom - fillTop) * 0.3f)
-				lineTo(highlightRight + highlightWidth * 0.4f, glassBottom - (glassBottom - fillTop) * 0.35f)
-				lineTo(highlightRight, glassBottom - (glassBottom - fillTop) * 0.3f)
-				close()
-			}
-			highlightPaint.alpha = 50
-			canvas.drawPath(highlightPath2, highlightPaint)
-			highlightPaint.alpha = 68 // restore
+			// Foam head
+			val foamHeight = (dp * 5f).coerceAtMost(h * 0.06f)
+			val foamRectTop = (fillTop - foamHeight * 0.3f).coerceAtLeast(glassTop)
+			canvas.drawRect(leftAtFill, foamRectTop, rightAtFill, fillTop + dp, foamPaint)
 
-			// Foam head at the top of the beer
-			val foamHeight = (resources.displayMetrics.density * 6).coerceAtMost(h * 0.06f)
-			val foamRectTop = (fillTop - foamHeight * 0.5f).coerceAtLeast(glassTop)
-
-			// Draw foam shadow first
-			canvas.drawRect(leftAtFill + 2, foamRectTop + 2, rightAtFill - 2, fillTop + 2, foamShadowPaint)
-
-			// Foam base layer
-			canvas.drawRect(leftAtFill, foamRectTop, rightAtFill, fillTop + foamHeight * 0.3f, foamPaint)
-
-			// Rounded foam blobs on top for more realistic look
-			val blobCount = 8
+			// Rounded foam blobs on top
+			val blobCount = 7
 			val span = rightAtFill - leftAtFill
 			for (i in 0 until blobCount) {
 				val cx = leftAtFill + span * (i + 0.5f) / blobCount
-				val rBase = span * 0.055f
-				val rVariation = sin(wavePhase * 0.5f + i * 0.8f) * rBase * 0.15f
-				val r = rBase + rVariation
-				canvas.drawCircle(cx, foamRectTop - r * 0.3f, r, foamPaint)
-			}
-			// Second row of smaller blobs
-			for (i in 0 until blobCount - 1) {
-				val cx = leftAtFill + span * (i + 1f) / blobCount
-				val r = span * 0.035f
-				canvas.drawCircle(cx, foamRectTop - span * 0.04f, r, foamPaint)
+				val r = span * 0.05f + (Math.sin((i * 1.7 + wavePhase * 0.3).toDouble()).toFloat() * span * 0.01f)
+				canvas.drawCircle(cx, foamRectTop, r, foamPaint)
 			}
 
-			// Ambient bubbles (always rising when there's beer)
-			updateAmbientBubbles(now)
+			// Foam shadow underneath blobs
+			canvas.drawRect(leftAtFill, foamRectTop + foamHeight * 0.15f, rightAtFill, foamRectTop + foamHeight * 0.3f, foamShadowPaint)
+
+			// Ambient bubbles rising through the beer
 			drawAmbientBubbles(canvas, leftAtFill, rightAtFill, fillTop, glassBottom)
 
-			// Celebration bubbles & sparkles
+			// Celebration effects
 			if (isCelebrating) {
 				updateAndDrawBubbles(canvas, leftAtFill, rightAtFill, fillTop, glassBottom)
 				drawSparkles(canvas, leftAtFill, rightAtFill, fillTop)
 			}
 
-			// Overflow animation above rim
+			// Overflow animation
 			if (isOverflowing) {
-				val elapsed = now - overflowStartMs
+				val elapsed = System.currentTimeMillis() - overflowStartMs
 				if (elapsed < overflowDurationMs) {
 					val over = (elapsed.toFloat() / overflowDurationMs).coerceIn(0f, 1f)
-					val crestHeight = foamHeight * (0.8f + 0.5f * (1f - over))
-					// foam crest above rim
+					val crestHeight = foamHeight * (0.6f + 0.6f * (1f - over))
 					canvas.drawRect(leftTop, glassTop - crestHeight, rightTop, glassTop, foamPaint)
-					// droplets falling
 					spawnDropletsIfNeeded()
 					drawDroplets(canvas, leftTop, rightTop, glassTop, glassBottom)
 					postInvalidateOnAnimation()
@@ -266,55 +244,46 @@ class BeerGlassView @JvmOverloads constructor(
 			}
 		}
 
-		// Glass outline on top
+		// Glass outline
 		canvas.drawPath(glassPath, outlinePaint)
 
-		// Draw glass rim highlight
-		val rimHighlight = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-			style = Paint.Style.STROKE
-			strokeWidth = resources.displayMetrics.density * 1f
-			color = 0x33FFFFFF
-		}
-		canvas.drawLine(leftTop + 2, glassTop + 1, rightTop - 2, glassTop + 1, rimHighlight)
-
 		// Continue animation frames
-		val needsAnimation = progressRatio > 0f || isCelebrating || isOverflowing
-		if (needsAnimation) {
-			if (isCelebrating) {
-				val elapsed = now - celebrationStartMs
-				if (elapsed >= celebrationDurationMs) {
-					isCelebrating = false
-					bubbles.clear()
-					sparkles.clear()
-				}
+		val needsRedraw = isCelebrating || displayRatio > 0.01f
+		if (isCelebrating) {
+			val elapsed = System.currentTimeMillis() - celebrationStartMs
+			if (elapsed < celebrationDurationMs) {
+				postInvalidateOnAnimation()
+			} else {
+				isCelebrating = false
+				bubbles.clear()
+				sparkles.clear()
 			}
+		}
+		if (displayRatio > 0.01f) {
 			postInvalidateOnAnimation()
 		}
 	}
 
-	private fun updateAmbientBubbles(now: Long) {
-		// Spawn new ambient bubbles periodically
-		if (now - lastBubbleSpawnMs > 400 && ambientBubbles.size < 6 && progressRatio > 0.1f) {
-			ambientBubbles.add(Bubble.ambient())
-			lastBubbleSpawnMs = now
+	private fun drawAmbientBubbles(
+		canvas: Canvas,
+		left: Float,
+		right: Float,
+		top: Float,
+		bottom: Float
+	) {
+		val time = System.currentTimeMillis()
+		val count = 4
+		for (i in 0 until count) {
+			val speed = 4000L + i * 1500L
+			val cycle = (time % speed).toFloat() / speed
+			val x = left + (right - left) * (0.2f + i * 0.18f)
+			val y = bottom - (bottom - top) * cycle
+			val r = dp * (1.2f + (i % 2) * 0.6f)
+			val alpha = ((1f - cycle) * 80).toInt().coerceIn(0, 255)
+			bubblePaint.alpha = alpha
+			canvas.drawCircle(x, y, r, bubblePaint)
 		}
-	}
-
-	private fun drawAmbientBubbles(canvas: Canvas, left: Float, right: Float, top: Float, bottom: Float) {
-		val iterator = ambientBubbles.iterator()
-		while (iterator.hasNext()) {
-			val b = iterator.next()
-			b.updateAmbient()
-			val x = left + (right - left) * b.x
-			val y = bottom - (bottom - top) * b.y
-			bubblePaint.alpha = (180 * b.alpha).toInt().coerceIn(0, 255)
-			val radius = b.radius * (right - left) * 0.02f
-			canvas.drawCircle(x, y, radius, bubblePaint)
-			// Small highlight on bubble
-			bubblePaint.alpha = (100 * b.alpha).toInt().coerceIn(0, 255)
-			canvas.drawCircle(x - radius * 0.3f, y - radius * 0.3f, radius * 0.3f, bubblePaint)
-			if (b.y >= 1f || b.alpha <= 0f) iterator.remove()
-		}
+		bubblePaint.alpha = 255
 	}
 
 	private fun updateAndDrawBubbles(
@@ -324,24 +293,20 @@ class BeerGlassView @JvmOverloads constructor(
 		top: Float,
 		bottom: Float
 	) {
-		// Spawn more bubbles during celebration
-		if (Math.random() < 0.35 && bubbles.size < 25) {
-			bubbles.add(Bubble.random(progressRatio))
+		if (Math.random() < 0.3 && bubbles.size < 24) {
+			bubbles.add(Bubble.random(displayRatio))
 		}
 		val iterator = bubbles.iterator()
 		while (iterator.hasNext()) {
 			val b = iterator.next()
 			b.update()
-			val x = left + (right - left) * b.x.coerceIn(0.05f, 0.95f)
+			val x = left + (right - left) * b.x
 			val y = bottom - (bottom - top) * b.y
-			val radius = b.radius * (right - left) * 0.025f
-			bubblePaint.alpha = (220 * b.alpha).toInt().coerceIn(0, 255)
-			canvas.drawCircle(x, y, radius, bubblePaint)
-			// Bubble highlight
-			bubblePaint.alpha = (120 * b.alpha).toInt().coerceIn(0, 255)
-			canvas.drawCircle(x - radius * 0.25f, y - radius * 0.25f, radius * 0.35f, bubblePaint)
+			bubblePaint.alpha = (255 * b.alpha).toInt().coerceIn(0, 255)
+			canvas.drawCircle(x, y, b.radius * (right - left) * 0.03f, bubblePaint)
 			if (b.alpha <= 0f || y <= top) iterator.remove()
 		}
+		bubblePaint.alpha = 255
 	}
 
 	private fun drawSparkles(canvas: Canvas, left: Float, right: Float, top: Float) {
@@ -350,21 +315,11 @@ class BeerGlassView @JvmOverloads constructor(
 			val s = iterator.next()
 			s.update()
 			val x = left + (right - left) * s.x
-			val y = top - (resources.displayMetrics.density * 4) + sin(s.phase) * 3f
+			val y = top + (dp * 8) + (Math.sin(s.phase.toDouble()).toFloat() * 2f)
 			sparklePaint.alpha = (255 * s.alpha).toInt().coerceIn(0, 255)
-			val size = (right - left) * 0.06f * s.scale
-			// 4-point star with slight rotation effect
-			val angle = s.phase * 0.5f
-			val cos = kotlin.math.cos(angle)
-			val sin = sin(angle)
-			// Rotated cross
-			canvas.drawLine(x - size * cos, y - size * sin, x + size * cos, y + size * sin, sparklePaint)
-			canvas.drawLine(x + size * sin, y - size * cos, x - size * sin, y + size * cos, sparklePaint)
-			// Additional smaller cross for 8-point effect
-			sparklePaint.alpha = (180 * s.alpha).toInt().coerceIn(0, 255)
-			val smallSize = size * 0.6f
-			canvas.drawLine(x - smallSize, y, x + smallSize, y, sparklePaint)
-			canvas.drawLine(x, y - smallSize, x, y + smallSize, sparklePaint)
+			val size = (right - left) * 0.05f * s.scale
+			canvas.drawLine(x - size, y, x + size, y, sparklePaint)
+			canvas.drawLine(x, y - size, x, y + size, sparklePaint)
 			if (s.alpha <= 0f) iterator.remove()
 		}
 	}
@@ -376,16 +331,25 @@ class BeerGlassView @JvmOverloads constructor(
 	}
 
 	private fun drawDroplets(canvas: Canvas, left: Float, right: Float, top: Float, bottom: Float) {
+		val beerDropPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+			style = Paint.Style.FILL
+			color = beerAmberMid
+		}
 		val it = droplets.iterator()
 		while (it.hasNext()) {
 			val d = it.next()
 			d.update()
 			val x = left + (right - left) * d.x
-			val y = top - (resources.displayMetrics.density * 6) + d.y
-			bubblePaint.alpha = (255 * d.alpha).toInt().coerceIn(0, 255)
-			canvas.drawCircle(x, y, (right - left) * 0.02f, bubblePaint)
+			val y = top - (dp * 6) + d.y
+			beerDropPaint.alpha = (255 * d.alpha).toInt().coerceIn(0, 255)
+			canvas.drawCircle(x, y, (right - left) * 0.02f, beerDropPaint)
 			if (y > bottom || d.alpha <= 0f) it.remove()
 		}
+	}
+
+	override fun onDetachedFromWindow() {
+		super.onDetachedFromWindow()
+		progressAnimator?.cancel()
 	}
 
 	private data class Bubble(
@@ -393,50 +357,22 @@ class BeerGlassView @JvmOverloads constructor(
 		var y: Float,
 		var radius: Float,
 		var vy: Float,
-		var alpha: Float,
-		var wobble: Float = 0f,
-		var wobbleSpeed: Float = 0.1f
+		var alpha: Float
 	) {
 		fun update() {
 			y += vy
-			alpha -= 0.03f
-			wobble += wobbleSpeed
-			x += sin(wobble) * 0.002f
-		}
-
-		fun updateAmbient() {
-			y += vy
-			wobble += wobbleSpeed
-			x += sin(wobble) * 0.003f
-			// Slow fade as bubble rises
-			if (y > 0.7f) {
-				alpha -= 0.02f
-			}
+			alpha -= 0.025f
 		}
 
 		companion object {
 			fun random(progressRatio: Float): Bubble {
 				val r = (0.6f + Math.random().toFloat() * 0.8f)
 				return Bubble(
-					x = 0.2f + Math.random().toFloat() * 0.6f,
+					x = 0.15f + Math.random().toFloat() * 0.7f,
 					y = 0.05f + Math.random().toFloat() * progressRatio.coerceAtLeast(0.05f),
 					radius = r,
-					vy = (0.008f + Math.random().toFloat() * 0.012f),
-					alpha = 0.9f,
-					wobble = Math.random().toFloat() * 6.28f,
-					wobbleSpeed = 0.08f + Math.random().toFloat() * 0.06f
-				)
-			}
-
-			fun ambient(): Bubble {
-				return Bubble(
-					x = 0.15f + Math.random().toFloat() * 0.7f,
-					y = 0.02f,
-					radius = 0.4f + Math.random().toFloat() * 0.5f,
-					vy = 0.004f + Math.random().toFloat() * 0.006f,
-					alpha = 0.8f,
-					wobble = Math.random().toFloat() * 6.28f,
-					wobbleSpeed = 0.05f + Math.random().toFloat() * 0.05f
+					vy = (0.005f + Math.random().toFloat() * 0.008f),
+					alpha = 0.9f
 				)
 			}
 		}
@@ -449,13 +385,13 @@ class BeerGlassView @JvmOverloads constructor(
 		var phase: Float
 	) {
 		fun update() {
-			alpha -= 0.04f
+			alpha -= 0.035f
 			phase += 0.2f
 		}
 
 		companion object {
 			fun random(): Sparkle = Sparkle(
-				x = Math.random().toFloat(),
+				x = 0.1f + Math.random().toFloat() * 0.8f,
 				alpha = 1f,
 				scale = 0.7f + Math.random().toFloat() * 0.6f,
 				phase = Math.random().toFloat() * 6.28f
@@ -476,7 +412,7 @@ class BeerGlassView @JvmOverloads constructor(
 
 		companion object {
 			fun random(): Droplet = Droplet(
-				x = Math.random().toFloat(),
+				x = 0.1f + Math.random().toFloat() * 0.8f,
 				y = 0f,
 				vy = (6f + Math.random().toFloat() * 10f),
 				alpha = 1f
@@ -484,5 +420,3 @@ class BeerGlassView @JvmOverloads constructor(
 		}
 	}
 }
-
-
