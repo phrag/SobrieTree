@@ -337,6 +337,38 @@ class MainActivity : AppCompatActivity() {
                     setTextColor(if (reductionMonthly < 0) android.graphics.Color.RED else android.graphics.Color.parseColor("#4CAF50"))
                 }
 
+                // Calculate streak and display motivational message
+                val streakDays = calculateStreakDays(baselineDailyMl)
+                val isOnStreak = streakDays > 0
+                val isUnderBaselineToday = todayConsumption <= baselineDailyMl
+                val goalModeString = prefs.getString("goal_mode", "reduce")
+                val goalMode = MotivationalMessages.parseGoalMode(goalModeString)
+                val motivationalMessage = MotivationalMessages.getMotivationalMessage(
+                    currentHour = java.time.LocalTime.now().hour,
+                    isWeekend = today.dayOfWeek == java.time.DayOfWeek.SATURDAY || 
+                               today.dayOfWeek == java.time.DayOfWeek.SUNDAY,
+                    isOnStreak = isOnStreak,
+                    streakDays = streakDays,
+                    isUnderBaseline = isUnderBaselineToday,
+                    reductionPercent = reductionDaily,
+                    goalMode = goalMode
+                )
+                findViewById<android.widget.TextView>(R.id.tv_motivational_message)?.text = motivationalMessage
+
+                // Get and display contextual tip
+                val contextualTip = ContextualTips.getTip(
+                    goalMode = goalMode,
+                    currentTime = java.time.LocalTime.now(),
+                    currentDate = today,
+                    justLogged = false,
+                    streakDays = streakDays,
+                    consumptionRatio = ratio
+                )
+                findViewById<android.widget.TextView>(R.id.tv_contextual_tip)?.apply {
+                    text = contextualTip.tip
+                    visibility = if (contextualTip.tip.isNotEmpty()) View.VISIBLE else View.GONE
+                }
+
                 // Populate Quick Add chips from presets (prioritize favorite, last-added)
                 val chipGroup = findViewById<com.google.android.material.chip.ChipGroup>(R.id.quick_add_group)
                 chipGroup.removeAllViews()
@@ -394,6 +426,9 @@ class MainActivity : AppCompatActivity() {
 
                 // Removed initial tip dialog to avoid obscuring buttons on small screens
 
+                // Update alcohol-free streak display
+                updateStreakDisplay()
+
             } catch (e: Exception) {
                 Toast.makeText(this, "Failed to load data", Toast.LENGTH_SHORT).show()
             }
@@ -411,10 +446,30 @@ class MainActivity : AppCompatActivity() {
             .setView(dialogView)
             .setCancelable(false)
             .create()
+        
+        val rbReduce = dialogView.findViewById<android.widget.RadioButton>(R.id.rb_reduce)
+        val rbStop = dialogView.findViewById<android.widget.RadioButton>(R.id.rb_stop)
             
         dialogView.findViewById<View>(R.id.btn_get_started).setOnClickListener {
+            // Save goal mode preference
+            val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
+            val goalMode = if (rbStop?.isChecked == true) "stop" else "reduce"
+            prefs.edit().putString("goal_mode", goalMode).apply()
+            
             dialog.dismiss()
-            showSetGoalsDialog(true) // Start with goals setup first
+            
+            if (goalMode == "stop") {
+                // For "stop" mode, set zero goals and skip to favorite drink setup
+                val today = LocalDate.now()
+                brewLog?.setConsumptionGoal(0.0, 0.0, today, today.plusWeeks(4))
+                prefs.edit()
+                    .putFloat("goal_daily_ml", 0f)
+                    .putFloat("goal_weekly_ml", 0f)
+                    .apply()
+                showFavoriteSetupSheet(true)
+            } else {
+                showSetGoalsDialog(true) // Start with goals setup first
+            }
         }
         
         dialog.show()
@@ -780,12 +835,12 @@ class MainActivity : AppCompatActivity() {
         dailyBaselineDrinks.setText(if ((baseline?.averageDailyConsumption ?: 0.0) > 0) ((baseline!!.averageDailyConsumption) / vol).toInt().toString() else "0")
         weeklyBaselineDrinks.setText(if ((baseline?.averageWeeklyConsumption ?: 0.0) > 0) ((baseline!!.averageWeeklyConsumption) / vol).toInt().toString() else "0")
 
-        // Show guideline note
+        // Show guideline note (evidence-based, no emoji)
         val dailyFemale = (12.0 / gramsPerDrink).coerceAtLeast(0.0).toInt()
         val dailyMale = (24.0 / gramsPerDrink).coerceAtLeast(0.0).toInt()
         dialogView.findViewById<android.widget.TextView>(R.id.tv_guideline_note)?.text =
-            "💡 Low-risk guidelines: ${dailyFemale}-${dailyMale} drinks/day (${vol.toInt()}ml @ ${assumedAbv}%). " +
-            "Include 2+ alcohol-free days/week. Your beer glass will start full and empty as you approach your goal!"
+            "Reference: ${dailyFemale}-${dailyMale} drinks/day based on your drink size (${vol.toInt()}ml @ ${assumedAbv}%). " +
+            "Health organizations recommend including alcohol-free days each week. Remember: the less you drink, the lower the health risks."
 
         fun recalcWeeklyFromDaily(source: com.google.android.material.textfield.TextInputEditText, target: com.google.android.material.textfield.TextInputEditText) {
             val d = source.text.toString().toDoubleOrNull() ?: 0.0
@@ -974,7 +1029,12 @@ class MainActivity : AppCompatActivity() {
                 if (!r.startsWith("OK")) {
                     log.addBeerEntry(name, alcoholPercentage, volumeMl, notes)
                 }
-                Toast.makeText(this, "Beer entry added successfully", Toast.LENGTH_SHORT).show()
+                // Get after-logging tip and combine with confirmation
+                val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
+                val goalModeString = prefs.getString("goal_mode", "reduce")
+                val goalMode = MotivationalMessages.parseGoalMode(goalModeString)
+                val afterTip = ContextualTips.getAfterLoggingTip(goalMode)
+                Toast.makeText(this, "Logged. $afterTip", Toast.LENGTH_LONG).show()
                 // Celebrate with animation and sound
                 try {
                     findViewById<BeerGlassView>(R.id.beer_glass)?.celebrate()
@@ -1020,7 +1080,7 @@ class MainActivity : AppCompatActivity() {
                 if (!r.startsWith("OK")) {
                     log.updateBeerEntry(id, name, alcoholPercentage, volumeMl, notes)
                 }
-                Toast.makeText(this, "Beer entry updated successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Entry updated", Toast.LENGTH_SHORT).show()
                 loadData()
             } catch (e: Exception) {
                 Toast.makeText(this, "Failed to update beer entry", Toast.LENGTH_SHORT).show()
@@ -1035,7 +1095,7 @@ class MainActivity : AppCompatActivity() {
                 if (!r.startsWith("OK")) {
                     log.deleteBeerEntry(entry.id)
                 }
-                Toast.makeText(this, "Beer entry deleted successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Entry removed", Toast.LENGTH_SHORT).show()
                 loadData()
             } catch (e: Exception) {
                 Toast.makeText(this, "Failed to delete beer entry", Toast.LENGTH_SHORT).show()
@@ -1469,5 +1529,160 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Throwable) {
             emptyMap()
         }
+    }
+
+    private fun calculateAlcoholFreeStreak(): Int {
+        val today = brewLog?.nowEffectiveDate() ?: LocalDate.now()
+        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
+        
+        // Get the date when tracking started (baseline was set)
+        val baselineSetDateStr = prefs.getString("baseline_set_date", null)
+        val trackingStartDate = if (baselineSetDateStr != null) {
+            try {
+                LocalDate.parse(baselineSetDateStr)
+            } catch (_: Exception) {
+                null
+            }
+        } else {
+            null
+        }
+        
+        // If no baseline set, user hasn't started tracking yet
+        if (trackingStartDate == null) {
+            return 0
+        }
+        
+        // Only look back to when tracking started, or 365 days, whichever is less
+        val lookbackDays = java.time.temporal.ChronoUnit.DAYS.between(trackingStartDate, today)
+            .coerceIn(0, 365)
+        val startDate = today.minusDays(lookbackDays)
+        
+        val dailyTotals = getDailyTotals(startDate, today)
+        
+        // If we have no entries at all, streak is days since tracking started
+        // But only if we're sure user has started (baseline set)
+        val hasAnyData = dailyTotals.isNotEmpty()
+        
+        var streak = 0
+        var checkDate = today
+        
+        while (checkDate >= startDate) {
+            val consumption = dailyTotals[checkDate] ?: 0.0
+            if (consumption == 0.0) {
+                streak++
+                checkDate = checkDate.minusDays(1)
+            } else {
+                break
+            }
+        }
+        
+        // If no data exists yet, cap the streak at the days since tracking started
+        // to avoid inflated numbers from "no data" days
+        if (!hasAnyData) {
+            streak = streak.coerceAtMost(lookbackDays.toInt())
+        }
+        
+        return streak
+    }
+
+    private fun getStreakMessage(streak: Int, longestStreak: Int, isStopMode: Boolean = false): String {
+        if (isStopMode) {
+            return when {
+                streak == 0 -> "Today is a new chance at sobriety."
+                streak == 1 -> "One sober day. This is where it begins."
+                streak in 2..3 -> "You're building a sober foundation."
+                streak in 4..6 -> "Almost a full sober week. Keep going."
+                streak == 7 -> "A full week sober. Your body is healing."
+                streak in 8..13 -> "Over a week sober. Real change is happening."
+                streak == 14 -> "Two weeks sober. Your mind is getting clearer."
+                streak in 15..29 -> "Your sobriety is becoming your new normal."
+                streak == 30 -> "A full month sober. This is a major milestone."
+                streak in 31..59 -> "Over a month sober. You're rewriting your story."
+                streak >= 60 && streak == longestStreak -> "New personal record. Sobriety looks good on you."
+                streak >= 60 -> "Exceptional commitment to your sober life."
+                else -> "Every sober day is a victory."
+            }
+        }
+        return when {
+            streak == 0 -> "Every alcohol-free day is a step toward better health."
+            streak == 1 -> "Great start. One day at a time."
+            streak in 2..3 -> "You're building momentum. Keep it going."
+            streak in 4..6 -> "Almost a full week. Your body is thanking you."
+            streak == 7 -> "A full week alcohol-free. That's a real achievement."
+            streak in 8..13 -> "Over a week strong. You're making a real difference."
+            streak == 14 -> "Two weeks. Your sleep and energy are likely improving."
+            streak in 15..29 -> "Impressive dedication. Keep up the great work."
+            streak == 30 -> "A full month. This is a significant milestone."
+            streak in 31..59 -> "Over a month. You should be proud of yourself."
+            streak >= 60 && streak == longestStreak -> "New personal best. You're doing something remarkable."
+            streak >= 60 -> "Exceptional commitment to your well-being."
+            else -> "Every alcohol-free day matters."
+        }
+    }
+
+    private fun updateStreakDisplay() {
+        val currentStreak = calculateAlcoholFreeStreak()
+        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
+        val isStopMode = prefs.getString("goal_mode", "reduce") == "stop"
+        
+        // Calculate max possible streak (days since tracking started)
+        val baselineSetDateStr = prefs.getString("baseline_set_date", null)
+        val maxPossibleStreak = if (baselineSetDateStr != null) {
+            try {
+                val trackingStart = LocalDate.parse(baselineSetDateStr)
+                val today = brewLog?.nowEffectiveDate() ?: LocalDate.now()
+                java.time.temporal.ChronoUnit.DAYS.between(trackingStart, today).toInt().coerceAtLeast(0)
+            } catch (_: Exception) {
+                currentStreak
+            }
+        } else {
+            currentStreak
+        }
+        
+        // Get stored longest streak, but cap it to max possible
+        var longestStreak = prefs.getInt("longest_streak", 0)
+        if (longestStreak > maxPossibleStreak + 1) {
+            // Stored value is inflated (likely from bug), reset it
+            longestStreak = currentStreak
+            prefs.edit().putInt("longest_streak", longestStreak).apply()
+        }
+        
+        // Update longest streak if current is higher
+        if (currentStreak > longestStreak) {
+            longestStreak = currentStreak
+            prefs.edit().putInt("longest_streak", longestStreak).apply()
+        }
+        
+        findViewById<android.widget.TextView>(R.id.tv_streak_count)?.text = currentStreak.toString()
+        findViewById<android.widget.TextView>(R.id.tv_streak_label)?.text = 
+            if (isStopMode) {
+                if (currentStreak == 1) "day sober" else "days sober"
+            } else {
+                if (currentStreak == 1) "day alcohol-free" else "days alcohol-free"
+            }
+        findViewById<android.widget.TextView>(R.id.tv_longest_streak)?.text = longestStreak.toString()
+        findViewById<android.widget.TextView>(R.id.tv_streak_message)?.text = getStreakMessage(currentStreak, longestStreak, isStopMode)
+    }
+
+    private fun calculateStreakDays(baselineDailyMl: Double): Int {
+        if (baselineDailyMl <= 0) return 0
+        
+        val today = brewLog?.nowEffectiveDate() ?: LocalDate.now()
+        var streakDays = 0
+        var checkDate = today.minusDays(1)
+        
+        val dailyTotals = getDailyTotals(today.minusDays(30), today)
+        
+        while (streakDays < 30) {
+            val dayConsumption = dailyTotals[checkDate] ?: 0.0
+            if (dayConsumption <= baselineDailyMl) {
+                streakDays++
+                checkDate = checkDate.minusDays(1)
+            } else {
+                break
+            }
+        }
+        
+        return streakDays
     }
 } 

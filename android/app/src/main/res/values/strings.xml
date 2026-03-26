@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">BrewLog</string>
-    <string name="add_beer">Add Beer</string>
-    <string name="beer_name">Beer Name</string>
+    <string name="add_drink">Add Drink</string>
+    <string name="drink_name">Drink Name</string>
     <string name="alcohol_percentage">Alcohol %</string>
     <string name="volume_ml">Volume (ml)</string>
     <string name="notes">Notes</string>
@@ -9,22 +9,47 @@
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
-    <string name="daily_goal">Daily Goal</string>
-    <string name="weekly_goal">Weekly Goal</string>
+    <string name="daily_goal">Daily Limit</string>
+    <string name="weekly_goal">Weekly Limit</string>
     <string name="set_goals">Set Goals</string>
-    <string name="baseline">Baseline</string>
-    <string name="progress">Progress</string>
+    <string name="baseline">Starting Point</string>
+    <string name="progress">Your Progress</string>
     <string name="today">Today</string>
     <string name="this_week">This Week</string>
-    <string name="total_consumption">Total Consumption</string>
-    <string name="average_daily">Average Daily</string>
-    <string name="average_weekly">Average Weekly</string>
-    <string name="reduction_percentage">Reduction %</string>
-    <string name="no_entries">No entries found</string>
+    <string name="total_consumption">Total</string>
+    <string name="average_daily">Daily Average</string>
+    <string name="average_weekly">Weekly Average</string>
+    <string name="reduction_percentage">Progress</string>
+    <string name="no_entries">No drinks logged yet. Every day without logging is a step forward.</string>
     <string name="error_occurred">An error occurred</string>
     <string name="invalid_input">Invalid input</string>
-    <string name="goal_set_successfully">Goal set successfully</string>
-    <string name="entry_added">Entry added successfully</string>
-    <string name="entry_updated">Entry updated successfully</string>
-    <string name="entry_deleted">Entry deleted successfully</string>
+    <string name="goal_set_successfully">Goals saved</string>
+    <string name="entry_added">Drink logged</string>
+    <string name="entry_updated">Entry updated</string>
+    <string name="entry_deleted">Entry removed</string>
+    
+    <!-- Goal modes -->
+    <string name="goal_mode_reduce">I want to drink less</string>
+    <string name="goal_mode_stop">I want to stop drinking</string>
+    
+    <!-- Supportive messages -->
+    <string name="welcome_title">Welcome to BrewLog</string>
+    <string name="welcome_subtitle">Your private companion for drinking less</string>
+    <string name="welcome_message">BrewLog helps you understand and reduce your alcohol intake at your own pace. Your data stays on your device — no accounts, no cloud, no judgment.</string>
+    <string name="setup_title">Set Your Goal</string>
+    <string name="setup_subtitle">Choose what feels right for you. You can change this anytime.</string>
+    <string name="progress_positive">Great progress! Keep going.</string>
+    <string name="progress_steady">Every step counts. Stay with it.</string>
+    <string name="progress_encouragement">Tomorrow is a new day.</string>
+    
+    <!-- About health -->
+    <string name="about_health_title">About Alcohol and Health</string>
+    <string name="about_health_disclaimer">This information is for educational purposes only and is not medical advice. If you have concerns about your drinking or experience withdrawal symptoms, please consult a healthcare professional.</string>
+    
+    <!-- Standard Drink Calculator -->
+    <string name="standard_drink_calculator">Standard Drink Calculator</string>
+    <string name="standard_drink_explanation">A standard drink is a measure of alcohol consumption based on pure alcohol content. Different countries use different definitions.</string>
+    <string name="calculate">Calculate</string>
+    <string name="result">Result</string>
+    <string name="standard_drink_reference">Reference: UK/WHO uses 10g of pure alcohol per standard drink. US uses 14g per standard drink. One UK unit = 8g of pure alcohol.</string>
 </resources> 

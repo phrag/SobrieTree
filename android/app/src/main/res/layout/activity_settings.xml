@@ -47,7 +47,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Default Beer Settings"
+                        android:text="Default Drink Settings"
                         android:textAppearance="@style/TextAppearance.BrewLog.Title"
                         android:textColor="@color/text_primary"
                         android:layout_marginBottom="16dp" />
@@ -57,7 +57,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        android:hint="Default Beer Size (ml)"
+                        android:hint="Default Drink Size (ml)"
                         style="@style/Widget.BrewLog.TextInputLayout">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -286,7 +286,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Guidelines -->
+            <!-- Health Information -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -302,21 +302,40 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Health Guidelines"
+                        android:text="Health Information"
                         android:textAppearance="@style/TextAppearance.BrewLog.Title"
                         android:textColor="@color/text_primary"
-                        android:layout_marginBottom="16dp" />
+                        android:layout_marginBottom="8dp" />
 
                     <TextView
                         android:id="@+id/tv_info_guidelines"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Tap to view personalized health guidelines based on your drink preferences."
+                        android:layout_marginBottom="16dp"
+                        android:text="Learn about alcohol and health with evidence-based information from global health organizations."
                         android:textAppearance="@style/TextAppearance.BrewLog.Body2"
-                        android:textColor="@color/text_secondary"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:background="?android:attr/selectableItemBackground" />
+                        android:textColor="@color/text_secondary" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_about_health"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:text="About Alcohol and Health"
+                        app:icon="@android:drawable/ic_menu_info_details"
+                        app:iconGravity="textStart"
+                        app:iconPadding="8dp"
+                        style="@style/Widget.BrewLog.Button.Outlined" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_drink_calculator"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/standard_drink_calculator"
+                        app:icon="@android:drawable/ic_menu_manage"
+                        app:iconGravity="textStart"
+                        app:iconPadding="8dp"
+                        style="@style/Widget.BrewLog.Button.Outlined" />
 
                 </LinearLayout>
 

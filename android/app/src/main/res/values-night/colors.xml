@@ -20,4 +20,28 @@
     <color name="text_secondary">@color/dark_text_secondary</color>
     <color name="text_hint">@color/dark_text_hint</color>
     <color name="text_on_surface">@color/dark_text_on_surface</color>
+
+    <!-- Green colors for encouragement card (darker, visible on dark background) -->
+    <color name="green_50">#1B3B1E</color>
+    <color name="green_700">#81C784</color>
+
+    <!-- Blue accent cards (darker, visible on dark background) -->
+    <color name="blue_50">#0D2137</color>
+
+    <!-- Warning card colors (amber/orange on dark) -->
+    <color name="warning_card_background">#3D2814</color>
+    <color name="warning_card_title">#FFB74D</color>
+    <color name="warning_card_text">#FFCC80</color>
+
+    <!-- Chart colors for dark mode -->
+    <color name="chart_bar">#64B5F6</color>
+    <color name="chart_bar_text">#90CAF9</color>
+    <color name="chart_goal_line">#81C784</color>
+    <color name="chart_baseline_line">#CE93D8</color>
+    <color name="chart_axis_text">#B0B0B0</color>
+    <color name="chart_grid">#3D3D3D</color>
+
+    <!-- Divider and border for dark mode -->
+    <color name="divider">#3D3D3D</color>
+    <color name="border">#37474F</color>
 </resources>

@@ -57,7 +57,27 @@
     <color name="blue_900">#0D47A1</color>
     
     <color name="primaryBlue">#2196F3</color>
+    <color name="green_50">#E8F5E9</color>
     <color name="green_500">#4CAF50</color>
+    <color name="green_700">#388E3C</color>
+
+    <!-- Insight Trend Colors (accessible) -->
+    <color name="insight_improvement">#1976D2</color>
+    <color name="insight_caution">#E65100</color>
+    <color name="insight_neutral">#757575</color>
+
+    <!-- Warning card colors (light mode) -->
+    <color name="warning_card_background">#FFF3E0</color>
+    <color name="warning_card_title">#E65100</color>
+    <color name="warning_card_text">#BF360C</color>
+
+    <!-- Chart colors for light mode -->
+    <color name="chart_bar">#42A5F5</color>
+    <color name="chart_bar_text">#1565C0</color>
+    <color name="chart_goal_line">#43A047</color>
+    <color name="chart_baseline_line">#7B1FA2</color>
+    <color name="chart_axis_text">#616161</color>
+    <color name="chart_grid">#E0E0E0</color>
 
     <!-- Dark palette fallbacks for lint (actual night values in values-night) -->
     <color name="dark_background">#121212</color>

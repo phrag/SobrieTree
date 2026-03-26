@@ -22,10 +22,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp"
-        android:text="Welcome to BrewLog!"
+        android:layout_marginBottom="8dp"
+        android:text="@string/welcome_title"
         android:textAppearance="@style/TextAppearance.BrewLog.Headline"
         android:textColor="@color/text_primary" />
+
+    <!-- Welcome Subtitle -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:text="@string/welcome_subtitle"
+        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+        android:textColor="@color/text_secondary" />
 
     <!-- Welcome Message -->
     <TextView
@@ -33,15 +43,94 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
         android:gravity="center"
-        android:text="Let's set up your drink tracking preferences to get you started with personalized goals and insights."
+        android:text="@string/welcome_message"
         android:textAppearance="@style/TextAppearance.BrewLog.Body"
+        android:textColor="@color/text_secondary" />
+
+    <!-- Goal Mode Selection -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:text="What's your goal?"
+        android:textAppearance="@style/TextAppearance.BrewLog.Title"
+        android:textColor="@color/text_primary" />
+
+    <RadioGroup
+        android:id="@+id/rg_goal_mode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/rb_reduce"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:text="@string/goal_mode_reduce"
+                android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                android:textColor="@color/text_primary"
+                android:checked="true" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="12dp"
+                android:text="Set limits, track progress, and gradually cut back. Good for building healthier habits over time."
+                android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                android:textColor="@color/text_secondary" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/rb_stop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:text="@string/goal_mode_stop"
+                android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                android:textColor="@color/text_primary" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="12dp"
+                android:text="Track alcohol-free days and sobriety streaks. For those committed to quitting entirely."
+                android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                android:textColor="@color/text_secondary" />
+
+        </LinearLayout>
+
+    </RadioGroup>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:text="You can change this anytime in Settings."
+        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
         android:textColor="@color/text_secondary" />
 
     <!-- Features List -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="24dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -55,14 +144,14 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginEnd="12dp"
-                android:src="@android:drawable/ic_menu_edit"
+                android:src="@android:drawable/ic_lock_lock"
                 app:tint="@color/blue_500" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Set your favorite drink for quick adding"
+                android:text="100% private — all data stays on your device"
                 android:textAppearance="@style/TextAppearance.BrewLog.Body"
                 android:textColor="@color/text_primary" />
 
@@ -79,14 +168,14 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginEnd="12dp"
-                android:src="@android:drawable/ic_menu_recent_history"
+                android:src="@android:drawable/ic_menu_myplaces"
                 app:tint="@color/blue_500" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Configure daily and weekly goals"
+                android:text="Set personal limits and track your progress"
                 android:textAppearance="@style/TextAppearance.BrewLog.Body"
                 android:textColor="@color/text_primary" />
 
@@ -102,14 +191,14 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginEnd="12dp"
-                android:src="@android:drawable/ic_menu_recent_history"
+                android:src="@android:drawable/ic_menu_info_details"
                 app:tint="@color/blue_500" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Track your progress with visual indicators"
+                android:text="Evidence-based health information included"
                 android:textAppearance="@style/TextAppearance.BrewLog.Body"
                 android:textColor="@color/text_primary" />
 
@@ -123,9 +212,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:text="Get Started"
-        app:icon="@android:drawable/ic_menu_edit"
-        app:iconGravity="textStart"
-        app:iconPadding="8dp"
         style="@style/Widget.BrewLog.Button" />
 
 </LinearLayout>
+

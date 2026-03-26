@@ -92,18 +92,8 @@ class SettingsActivity : AppCompatActivity() {
             versionText?.text = "Version: ${pInfo.versionName}"
         } catch (_: Exception) { }
         
-        // Show low-risk guideline info based on current defaults
-        try {
-            val gramsPerDrink = (defaultSize.toDouble() * (defaultStrength.toDouble() / 100.0) * 0.8)
-            if (gramsPerDrink > 0) {
-                val approxDailyFemale = (12.0 / gramsPerDrink).coerceAtLeast(0.0)
-                val approxDailyMale = (24.0 / gramsPerDrink).coerceAtLeast(0.0)
-                infoGuidelines?.text =
-                    "Guideline (approx.): ${approxDailyFemale.toInt()} drink/day (lower) to ${approxDailyMale.toInt()} drinks/day (upper). Consider 2 alcohol‑free days/week.\nSource: national low‑risk guidance."
-            } else {
-                infoGuidelines?.text = "Guideline: keep daily goals modest and include alcohol‑free days each week."
-            }
-        } catch (_: Exception) { }
+        // Show info text about the About Health section
+        infoGuidelines?.text = "View evidence-based information from WHO, NHS, and CDC about alcohol and health."
         
         // Save button
         val saveBtn = findViewById<MaterialButton>(R.id.btn_save_settings)
@@ -158,7 +148,7 @@ class SettingsActivity : AppCompatActivity() {
         deleteAllBtn.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Delete All Data")
-                .setMessage("This will permanently delete all your beer entries and settings. Are you sure?")
+                .setMessage("This will permanently delete all your drink entries and settings. Are you sure?")
                 .setPositiveButton("Delete") { _, _ ->
                     try {
                         BrewLogNative.delete_all_data()
@@ -184,9 +174,16 @@ class SettingsActivity : AppCompatActivity() {
             })
         }
         
-        // Guidelines click handler
-        infoGuidelines.setOnClickListener {
-            Toast.makeText(this, "Source: National health guidelines for low-risk alcohol consumption", Toast.LENGTH_LONG).show()
+        // About Health button handler
+        val aboutHealthBtn = findViewById<MaterialButton>(R.id.btn_about_health)
+        aboutHealthBtn.setOnClickListener {
+            startActivity(Intent(this, AboutHealthActivity::class.java))
+        }
+        
+        // Standard Drink Calculator button handler
+        val drinkCalculatorBtn = findViewById<MaterialButton>(R.id.btn_drink_calculator)
+        drinkCalculatorBtn.setOnClickListener {
+            showDrinkCalculatorDialog()
         }
         
         // Bottom nav
@@ -310,5 +307,68 @@ class SettingsActivity : AppCompatActivity() {
         } catch (e: Exception) {
             throw Exception("Failed to import data: ${e.message}")
         }
+    }
+    
+    private fun showDrinkCalculatorDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_drink_calculator, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+        
+        val etVolume = dialogView.findViewById<TextInputEditText>(R.id.et_calc_volume)
+        val etAbv = dialogView.findViewById<TextInputEditText>(R.id.et_calc_abv)
+        val btnCalculate = dialogView.findViewById<MaterialButton>(R.id.btn_calculate)
+        val btnClose = dialogView.findViewById<MaterialButton>(R.id.btn_close)
+        val cardResults = dialogView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.card_results)
+        val tvPureAlcohol = dialogView.findViewById<TextView>(R.id.tv_pure_alcohol)
+        val tvResultUk = dialogView.findViewById<TextView>(R.id.tv_result_uk)
+        val tvResultUs = dialogView.findViewById<TextView>(R.id.tv_result_us)
+        
+        // Pre-fill with default values from settings
+        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
+        etVolume.setText(prefs.getInt("default_beer_size", 500).toString())
+        etAbv.setText(prefs.getFloat("default_beer_strength", 5.0f).toString())
+        
+        btnCalculate.setOnClickListener {
+            try {
+                val volumeMl = etVolume.text.toString().toDoubleOrNull() ?: 0.0
+                val abvPercent = etAbv.text.toString().toDoubleOrNull() ?: 0.0
+                
+                if (volumeMl <= 0 || abvPercent <= 0) {
+                    Toast.makeText(this, getString(R.string.invalid_input), Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                
+                // Calculate pure alcohol in grams
+                // Formula: volume (ml) * ABV (as decimal) * 0.789 (density of ethanol g/ml)
+                val pureAlcoholGrams = volumeMl * (abvPercent / 100.0) * 0.789
+                
+                // Standard drinks: UK/WHO = 10g, US = 14g
+                val standardDrinksUk = pureAlcoholGrams / 10.0
+                val standardDrinksUs = pureAlcoholGrams / 14.0
+                
+                // UK units (8g per unit)
+                val ukUnits = pureAlcoholGrams / 8.0
+                
+                cardResults.visibility = android.view.View.VISIBLE
+                tvPureAlcohol.text = String.format("Pure alcohol: %.1fg", pureAlcoholGrams)
+                tvResultUk.text = String.format(
+                    "UK/WHO: %.1f standard drinks (%.1f UK units)",
+                    standardDrinksUk, ukUnits
+                )
+                tvResultUs.text = String.format(
+                    "US: %.1f standard drinks",
+                    standardDrinksUs
+                )
+            } catch (e: Exception) {
+                Toast.makeText(this, getString(R.string.invalid_input), Toast.LENGTH_SHORT).show()
+            }
+        }
+        
+        btnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        dialog.show()
     }
 }

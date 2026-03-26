@@ -82,12 +82,12 @@ class CalendarActivity : AppCompatActivity() {
         val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
         val presets = (MainActivity()).getDrinkPresets(prefs)
         if (presets.isEmpty()) {
-            android.widget.Toast.makeText(this, "Add a drink preset first", android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(this, "Set up a drink first in Settings", android.widget.Toast.LENGTH_SHORT).show()
             return
         }
         val names = presets.map { "${it.volume}ml ${it.name}" }.toTypedArray()
         androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("Add to ${date}")
+            .setTitle("Log drink for ${date}")
             .setItems(names) { d, which ->
                 val p = presets[which]
                 val id = java.util.UUID.randomUUID().toString()

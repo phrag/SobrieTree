@@ -71,7 +71,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="20dp"
+                        android:layout_marginBottom="8dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
@@ -87,11 +87,35 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Drinks Tracker"
+                            android:text="Your Progress"
                             android:textAppearance="@style/TextAppearance.BrewLog.Headline"
                             android:textColor="@color/text_primary" />
 
                     </LinearLayout>
+
+                    <!-- Motivational Message -->
+                    <TextView
+                        android:id="@+id/tv_motivational_message"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text=""
+                        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                        android:textColor="@color/text_secondary"
+                        android:textStyle="italic" />
+
+                    <!-- Contextual Tip -->
+                    <TextView
+                        android:id="@+id/tv_contextual_tip"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:text=""
+                        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                        android:textColor="@color/blue_700"
+                        android:background="@color/blue_50"
+                        android:padding="8dp"
+                        android:visibility="gone" />
 
                     <!-- Progress Content -->
                     <LinearLayout
@@ -125,7 +149,7 @@
                                     android:id="@+id/beer_glass_label"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Today's Progress"
+                                    android:text="Remaining Today"
                                     android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                                     android:textColor="@color/text_secondary" />
 
@@ -221,6 +245,127 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Alcohol-Free Streak Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_streak"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                style="@style/Widget.BrewLog.Card">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- Header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginEnd="12dp"
+                            android:background="@drawable/ic_circle_background"
+                            android:src="@android:drawable/ic_menu_today"
+                            app:tint="@color/blue_500" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Alcohol-Free Streak"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Headline"
+                            android:textColor="@color/text_primary" />
+
+                    </LinearLayout>
+
+                    <!-- Streak Content -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <!-- Current Streak -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/tv_streak_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textAppearance="@style/TextAppearance.BrewLog.Headline"
+                                android:textColor="@color/blue_700"
+                                android:textSize="36sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tv_streak_label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="days alcohol-free"
+                                android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                                android:textColor="@color/text_secondary" />
+
+                        </LinearLayout>
+
+                        <!-- Longest Streak -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/tv_longest_streak"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textAppearance="@style/TextAppearance.BrewLog.Headline"
+                                android:textColor="@color/blue_500"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="longest streak"
+                                android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                                android:textColor="@color/text_secondary" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Supportive Message -->
+                    <TextView
+                        android:id="@+id/tv_streak_message"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="Every alcohol-free day is a step toward better health."
+                        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                        android:textColor="@color/blue_700"
+                        android:gravity="center"
+                        android:background="@color/blue_50"
+                        android:padding="12dp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Reduction from Baseline -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
@@ -254,7 +399,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Reduction from Baseline"
+                            android:text="How You're Doing"
                             android:textAppearance="@style/TextAppearance.BrewLog.Headline"
                             android:textColor="@color/text_primary" />
 
@@ -388,7 +533,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Quick Actions"
+                            android:text="Log a Drink"
                             android:textAppearance="@style/TextAppearance.BrewLog.Headline"
                             android:textColor="@color/text_primary" />
 
