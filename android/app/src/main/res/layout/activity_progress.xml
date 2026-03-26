@@ -60,13 +60,28 @@
                             android:src="@android:drawable/ic_menu_recent_history"
                             app:tint="@color/blue_500" />
 
-                        <TextView
+                        <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Your Progress"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Headline"
-                            android:textColor="@color/text_primary" />
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Your Progress"
+                                android:textAppearance="@style/TextAppearance.BrewLog.Headline"
+                                android:textColor="@color/text_primary" />
+
+                            <TextView
+                                android:id="@+id/tv_progress_subtitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/progress_header_subtitle_reduce"
+                                android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                                android:textColor="@color/text_secondary" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
@@ -97,9 +112,10 @@
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/tv_label_daily_reduction"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Daily"
+                                android:text="@string/home_reduction_caption_daily_reduce"
                                 android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                                 android:textColor="@color/text_secondary" />
 
@@ -124,9 +140,10 @@
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/tv_label_weekly_reduction"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Weekly"
+                                android:text="@string/home_reduction_caption_weekly_reduce"
                                 android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                                 android:textColor="@color/text_secondary" />
 
@@ -151,9 +168,10 @@
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/tv_label_monthly_reduction"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Monthly"
+                                android:text="@string/home_reduction_caption_monthly_reduce"
                                 android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                                 android:textColor="@color/text_secondary" />
 
@@ -360,9 +378,10 @@
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/tv_insights_alcohol_free_label"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Alcohol-free days"
+                                android:text="@string/insights_alcohol_free_label"
                                 android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                                 android:textColor="@color/text_secondary"
                                 android:gravity="center" />

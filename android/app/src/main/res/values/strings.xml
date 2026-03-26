@@ -31,6 +31,26 @@
     <!-- Goal modes -->
     <string name="goal_mode_reduce">I want to drink less</string>
     <string name="goal_mode_stop">I want to stop drinking</string>
+
+    <!-- Goal-mode UI copy -->
+    <string name="home_streak_title_reduce">Alcohol-free streak</string>
+    <string name="home_streak_title_stop">Sober streak</string>
+    <string name="home_reduction_title_reduce">How you\'re doing</string>
+    <string name="home_reduction_title_stop">Your sobriety journey</string>
+    <string name="home_reduction_caption_daily_reduce">Daily</string>
+    <string name="home_reduction_caption_weekly_reduce">Weekly</string>
+    <string name="home_reduction_caption_monthly_reduce">Monthly</string>
+    <string name="home_reduction_caption_daily_stop">Today</string>
+    <string name="home_reduction_caption_weekly_stop">This week</string>
+    <string name="home_reduction_caption_monthly_stop">Last 30 days</string>
+    <string name="home_reduction_footnote_reduce">vs your starting point</string>
+    <string name="home_reduction_footnote_stop">vs your baseline pattern</string>
+    <string name="progress_header_subtitle_reduce">Reduction from baseline</string>
+    <string name="progress_header_subtitle_stop">Change vs your baseline</string>
+    <string name="insights_alcohol_free_label">Alcohol-free days</string>
+    <string name="insights_sober_days_label">Sober days</string>
+    <string name="home_glass_label_reduce">Remaining today</string>
+    <string name="home_glass_label_stop">Today</string>
     
     <!-- Supportive messages -->
     <string name="welcome_title">Welcome to BrewLog</string>

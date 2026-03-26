@@ -239,6 +239,31 @@ class MainActivity : AppCompatActivity() {
 
                 // Show in drinks instead of ml
                 val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
+                val goalMode = MotivationalMessages.parseGoalMode(prefs.getString("goal_mode", "reduce"))
+                val isStopMode = goalMode == GoalMode.STOP
+
+                findViewById<android.widget.TextView>(R.id.tv_streak_card_title)?.setText(
+                    if (isStopMode) R.string.home_streak_title_stop else R.string.home_streak_title_reduce
+                )
+                findViewById<android.widget.TextView>(R.id.tv_reduction_card_title)?.setText(
+                    if (isStopMode) R.string.home_reduction_title_stop else R.string.home_reduction_title_reduce
+                )
+                findViewById<android.widget.TextView>(R.id.tv_reduction_footnote)?.setText(
+                    if (isStopMode) R.string.home_reduction_footnote_stop else R.string.home_reduction_footnote_reduce
+                )
+                findViewById<android.widget.TextView>(R.id.tv_daily_reduction_label_home)?.setText(
+                    if (isStopMode) R.string.home_reduction_caption_daily_stop else R.string.home_reduction_caption_daily_reduce
+                )
+                findViewById<android.widget.TextView>(R.id.tv_weekly_reduction_label_home)?.setText(
+                    if (isStopMode) R.string.home_reduction_caption_weekly_stop else R.string.home_reduction_caption_weekly_reduce
+                )
+                findViewById<android.widget.TextView>(R.id.tv_monthly_reduction_label_home)?.setText(
+                    if (isStopMode) R.string.home_reduction_caption_monthly_stop else R.string.home_reduction_caption_monthly_reduce
+                )
+                findViewById<android.widget.TextView>(R.id.beer_glass_label)?.setText(
+                    if (isStopMode) R.string.home_glass_label_stop else R.string.home_glass_label_reduce
+                )
+
                 val drinks = getDrinkPresets(prefs)
                 val defaultDrink = drinks.firstOrNull { it.favorite } ?: drinks.firstOrNull()
                 val drinkVolume = defaultDrink?.volume?.toDouble() ?: 500.0
@@ -318,12 +343,6 @@ class MainActivity : AppCompatActivity() {
                 val weeklyReductionView = findViewById<android.widget.TextView>(R.id.tv_weekly_reduction_home)
                 val monthlyReductionView = findViewById<android.widget.TextView>(R.id.tv_monthly_reduction_home)
                 
-                // Debug logging
-                android.util.Log.d("MainActivity", "Reduction values - Daily: $reductionDaily, Weekly: $reductionWeekly, Monthly: $reductionMonthly")
-                android.util.Log.d("MainActivity", "Baseline values - Daily: $baselineDailyMl, Weekly: $baselineWeeklyMl, Monthly: $baselineMonthlyMl")
-                android.util.Log.d("MainActivity", "Consumption values - Today: $todayConsumption, Week: $weekConsumption, Month: $monthConsumption")
-                android.util.Log.d("MainActivity", "Views found - Daily: ${dailyReductionView != null}, Weekly: ${weeklyReductionView != null}, Monthly: ${monthlyReductionView != null}")
-                
                 dailyReductionView?.apply {
                     text = "${String.format("%.1f", reductionDaily)}%"
                     setTextColor(if (reductionDaily < 0) android.graphics.Color.RED else android.graphics.Color.parseColor("#4CAF50"))
@@ -341,12 +360,8 @@ class MainActivity : AppCompatActivity() {
                 val streakDays = calculateStreakDays(baselineDailyMl)
                 val isOnStreak = streakDays > 0
                 val isUnderBaselineToday = todayConsumption <= baselineDailyMl
-                val goalModeString = prefs.getString("goal_mode", "reduce")
-                val goalMode = MotivationalMessages.parseGoalMode(goalModeString)
                 val motivationalMessage = MotivationalMessages.getMotivationalMessage(
                     currentHour = java.time.LocalTime.now().hour,
-                    isWeekend = today.dayOfWeek == java.time.DayOfWeek.SATURDAY || 
-                               today.dayOfWeek == java.time.DayOfWeek.SUNDAY,
                     isOnStreak = isOnStreak,
                     streakDays = streakDays,
                     isUnderBaseline = isUnderBaselineToday,
