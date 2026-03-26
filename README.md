@@ -1,50 +1,59 @@
 # BrewLog
 
-A simple, private beer consumption tracker for Android.
+A private companion app for reducing or stopping alcohol consumption.
 
-- Set daily/weekly goals in drinks (based on your default drink size)
-- See a fun Beer Glass that fills as you log drinks
-- One‑tap Quick Add and a dedicated Drinks manager to add or edit presets
-- Initial Setup button on first launch to set goals and baseline quickly
-- Calendar view to track, view, and edit past days
-- Configurable end‑of‑day cut‑off (default 3 AM)
-- Export/import your data to JSON; Delete All Data from settings
-- Progress screen shows Today/This Week and reduction vs. baseline
-- Native Rust + SQLite backend via JNI for on‑device storage
+**Your journey, your pace.** BrewLog helps you understand and reduce your alcohol intake with evidence-based guidance and honest progress tracking.
+
+## Features
+
+- **Goal modes:** Choose to reduce drinking or stop completely
+- **Progress visualization:** See your remaining daily allowance at a glance
+- **Honest tracking:** Real data only, no fabricated charts or misleading visuals
+- **Evidence-based info:** Health information from WHO, NHS, and CDC (bundled, offline)
+- **Calendar view:** Track, review, and edit past days
+- **Bar charts:** Clear weekly/monthly trends with goal and baseline markers
+- **One-tap logging:** Quick Add chips for common drinks
+- **Export/import:** Back up your data as CSV; delete all data from settings
+- Native Rust + SQLite backend via JNI for on-device storage
 - Works fully offline. No account, no cloud, no analytics, no ads
 
-### Privacy & Security
-BrewLog is privacy‑focused by design:
-- No account or sign‑in
+### Privacy and Security
+
+BrewLog is privacy-focused by design:
+- No account or sign-in
 - No dangerous/runtime permissions requested (no contacts, location, camera, mic)
-- Network‑free by default: the app does not make any internet requests
+- Network-free by default: the app does not make any internet requests
 - All data stays on your device; nothing is uploaded or shared
-- No analytics, trackers, ads, or third‑party SDKs
+- No analytics, trackers, ads, or third-party SDKs
 - Works completely offline; no cloud services are required
 
 Your data, your control:
-- Entries live in the app’s private storage; uninstalling the app or clearing its data removes everything
-- Open‑source codebase — audit how data is handled
-- Battery‑friendly: no background sync, polling, or push connections
+- Entries live in the app's private storage; uninstalling the app or clearing its data removes everything
+- Open-source codebase - audit how data is handled
+- Battery-friendly: no background sync, polling, or push connections
 
 ## Quick Start
 
 1) Install the app
-- Download `BrewLog-debug.apk` and install on your phone
-- You may need to enable “Install unknown apps” in Android settings
+- Download `BrewLog-0.0.3.apk` and install on your phone
+- You may need to enable "Install unknown apps" in Android settings
 
-2) First‑time setup
-- Open the app → menu ▸ Set Goals & Baseline
-- Pick your default drink size (e.g., 500 ml)
-- Enter your Daily Goal (in drinks). Weekly auto‑fills as 7× daily
+2) First-time setup
+- Choose your goal: reduce drinking or stop completely
+- Set your daily/weekly limits and your current baseline
+- Add your typical drinks for quick logging
 
-3) Add a drink
-- Tap a Quick Add chip, or tap the Beer Glass to repeat the last drink
-- The Beer Glass shows daily progress (e.g., “2 / 5 drinks”)
+3) Track your intake
+- Tap a Quick Add chip to log a drink
+- The glass shows your remaining daily allowance
 
 4) View Progress
-- Bottom navigation ▸ Progress
-- See Today and This Week in drinks, plus reduction vs. baseline
+- Bottom navigation -> Progress
+- See your weekly bar chart with goal and baseline markers
+
+5) Learn more
+- Settings -> About Alcohol and Health
+- Evidence-based information from WHO, NHS, and CDC
 
 ### Screenshots
 
@@ -58,17 +67,17 @@ Your data, your control:
 - JDK 17+
 - Android Studio (SDK + NDK + CMake)
 - Rust toolchain
-- cargo‑ndk (`cargo install cargo-ndk`)
+- cargo-ndk (`cargo install cargo-ndk`)
 
-### One‑command build
+### One-command build
 From the repository root:
 ```bash
-./build.sh              # builds Rust with cargo‑ndk, builds the APK, copies it to ./BrewLog-debug.apk
+./build.sh              # builds Rust with cargo-ndk, builds the APK, copies it to ./BrewLog-0.0.3.apk
 PRUNE=1 ./build.sh      # optional: also cargo clean + prune stale jniLibs
 ```
 Notes:
-- The script prefers cargo‑ndk; if absent it falls back to plain cargo (requires NDK toolchains on PATH)
-- Output APK: `BrewLog-debug.apk` at the repo root
+- The script prefers cargo-ndk; if absent it falls back to plain cargo (requires NDK toolchains on PATH)
+- Output APK: `BrewLog-0.0.3.apk` at the repo root
 
 ### Manual build (if you prefer)
 ```bash
@@ -97,27 +106,27 @@ cd android
 ./gradlew assembleRelease
 open app/build/outputs/apk/release
 ```
-(The output name is configured in the module’s `build.gradle`.)
+(The output name is configured in the module's `build.gradle`.)
 
 ### Project Structure
 ```
 brewlog/
 ├── android/                    # Android app (Kotlin)
 │   ├── app/src/main/java/com/brewlog/android/
-│   │   ├── MainActivity.kt     # Home + Beer Glass + Quick Add
-│   │   ├── ProgressActivity.kt # Progress metrics
-│   │   ├── BeerGlassView.kt    # Custom view & animation
-│   │   └── BrewLog.kt          # In‑memory model & metrics
-│   └── app/src/main/jniLibs/   # Native libs (arm64‑v8a)
-├── rust/                       # Rust core (optional)
-│   ├── src/lib.rs              # JNI‑ready core API
+│   │   ├── MainActivity.kt     # Home + progress glass + Quick Add
+│   │   ├── ProgressActivity.kt # Bar charts and progress metrics
+│   │   ├── AboutHealthActivity.kt # WHO/NHS/CDC health information
+│   │   └── BrewLog.kt          # In-memory model and metrics
+│   └── app/src/main/jniLibs/   # Native libs (arm64-v8a)
+├── rust/                       # Rust core
+│   ├── src/lib.rs              # JNI-ready core API
 │   └── Cargo.toml
 ├── build.sh                    # Unified build (Rust + Android), copies APK to repo root
 └── README.md
 ```
 
 ### Troubleshooting
-- aarch64‑linux‑android‑clang not found
+- aarch64-linux-android-clang not found
   - Ensure the NDK is installed and `ANDROID_NDK_HOME` is set; add toolchain bin to `PATH` (see Manual build)
 - Lint/AGP warnings
   - Project uses Android Gradle Plugin 8.5.x and Gradle 8.7
@@ -125,4 +134,4 @@ brewlog/
   - Ensure `android/local.properties` points to your SDK or export `ANDROID_SDK_ROOT`
 
 ### License
-MIT — see `LICENSE`. 
+MIT - see `LICENSE`.

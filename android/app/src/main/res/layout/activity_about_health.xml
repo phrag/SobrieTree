@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@style/Theme.BrewLog">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/blue_500"
+        android:elevation="0dp"
+        android:theme="@style/Theme.BrewLog">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/blue_500"
+            app:navigationIcon="@android:drawable/ic_menu_close_clear_cancel"
+            app:navigationIconTint="@color/white"
+            app:title="@string/about_health_title"
+            app:titleTextAppearance="@style/TextAppearance.BrewLog.Title"
+            app:titleTextColor="@color/white" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Disclaimer Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/blue_50"
+                style="@style/Widget.BrewLog.Card">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="12dp"
+                        android:src="@android:drawable/ic_dialog_info"
+                        app:tint="@color/blue_700" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/about_health_disclaimer"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                        android:textColor="@color/blue_700" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Key Points -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="What the research says"
+                android:textAppearance="@style/TextAppearance.BrewLog.Headline"
+                android:textColor="@color/text_primary" />
+
+            <!-- WHO Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                style="@style/Widget.BrewLog.Card">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="World Health Organization"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="There is no risk-free form of alcohol consumption. Even low levels of alcohol use carry some health risks. The less you drink, the safer it is."
+                        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                        android:textColor="@color/text_secondary" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Alcohol is classified as a Group 1 carcinogen (same category as tobacco) and is linked to at least seven types of cancer."
+                        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                        android:textColor="@color/text_secondary" />
+
+                    <TextView
+                        android:id="@+id/link_who"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Source: WHO Alcohol Fact Sheet"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                        android:textColor="@color/blue_500" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- NHS UK Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                style="@style/Widget.BrewLog.Card">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="UK NHS Guidelines"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="There is no completely safe level of drinking. If you do drink, it is recommended to drink no more than 14 units per week, spread across 3 or more days."
+                        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                        android:textColor="@color/text_secondary" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="14 units is roughly 6 pints of average-strength beer or 6 medium glasses of wine per week."
+                        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                        android:textColor="@color/text_secondary" />
+
+                    <TextView
+                        android:id="@+id/link_nhs"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Source: NHS Better Health"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                        android:textColor="@color/blue_500" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- CDC Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                style="@style/Widget.BrewLog.Card">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="US CDC Guidelines"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="If you choose to drink, moderate alcohol use is defined as 2 drinks or less per day for men and 1 drink or less per day for women."
+                        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                        android:textColor="@color/text_secondary" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Even moderate drinking may increase your risk of death and chronic disease compared to not drinking. If you don't drink, don't start."
+                        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                        android:textColor="@color/text_secondary" />
+
+                    <TextView
+                        android:id="@+id/link_cdc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Source: CDC Alcohol Use"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                        android:textColor="@color/blue_500" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Benefits of Drinking Less -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="12dp"
+                android:text="Benefits of drinking less"
+                android:textAppearance="@style/TextAppearance.BrewLog.Headline"
+                android:textColor="@color/text_primary" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                style="@style/Widget.BrewLog.Card">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Short-term benefits:"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="• Feeling better in the mornings\n• More energy throughout the day\n• Better sleep quality\n• Clearer thinking\n• Saving money"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                        android:textColor="@color/text_secondary"
+                        android:lineSpacingExtra="4dp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="Long-term benefits:"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="• Lower blood pressure\n• Reduced risk of heart disease\n• Lower cancer risk\n• Better mood and mental health\n• Healthier weight"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                        android:textColor="@color/text_secondary"
+                        android:lineSpacingExtra="4dp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Withdrawal Warning -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="@color/warning_card_background"
+                style="@style/Widget.BrewLog.Card">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginEnd="12dp"
+                            android:src="@android:drawable/ic_dialog_alert"
+                            app:tint="@color/warning_card_title" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Important safety note"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                            android:textColor="@color/warning_card_title" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="If you drink heavily or regularly and experience physical withdrawal symptoms (like shaking, sweating, or feeling anxious until you have your first drink), please seek medical advice before stopping suddenly. It can be dangerous to stop drinking too quickly without proper support."
+                        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                        android:textColor="@color/warning_card_text" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Encouragement -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/green_50"
+                style="@style/Widget.BrewLog.Card">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Every step counts"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                        android:textColor="@color/green_700" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Reducing alcohol is a journey, not a race. Small changes add up over time. If you have a setback, don't give up — tomorrow is a new opportunity. You're already taking a positive step by being here."
+                        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                        android:textColor="@color/green_700" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

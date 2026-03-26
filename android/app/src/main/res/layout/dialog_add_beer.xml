@@ -28,7 +28,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/add_beer"
+            android:text="@string/add_drink"
             android:textAppearance="@style/TextAppearance.BrewLog.Headline"
             android:textColor="@color/text_primary" />
 
@@ -53,7 +53,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:hint="@string/beer_name"
+        android:hint="@string/drink_name"
         style="?attr/textInputStyle"
         app:boxBackgroundMode="filled"
         app:boxBackgroundColor="@color/input_background"

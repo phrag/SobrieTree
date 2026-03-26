@@ -33,6 +33,10 @@
             android:name=".SettingsActivity"
             android:exported="false"
             android:theme="@style/Theme.BrewLog" />
+        <activity
+            android:name=".AboutHealthActivity"
+            android:exported="false"
+            android:theme="@style/Theme.BrewLog" />
     </application>
 
 </manifest> 
