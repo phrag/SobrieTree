@@ -276,10 +276,11 @@
                             app:tint="@color/blue_500" />
 
                         <TextView
+                            android:id="@+id/tv_streak_card_title"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Alcohol-Free Streak"
+                            android:text="@string/home_streak_title_reduce"
                             android:textAppearance="@style/TextAppearance.BrewLog.Headline"
                             android:textColor="@color/text_primary" />
 
@@ -396,14 +397,24 @@
                             app:tint="@color/blue_500" />
 
                         <TextView
+                            android:id="@+id/tv_reduction_card_title"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="How You're Doing"
+                            android:text="@string/home_reduction_title_reduce"
                             android:textAppearance="@style/TextAppearance.BrewLog.Headline"
                             android:textColor="@color/text_primary" />
 
                     </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_reduction_footnote"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:text="@string/home_reduction_footnote_reduce"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                        android:textColor="@color/text_secondary" />
 
                     <!-- Reduction Values -->
                     <LinearLayout
@@ -432,9 +443,10 @@
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/tv_daily_reduction_label_home"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Daily"
+                                android:text="@string/home_reduction_caption_daily_reduce"
                                 android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                                 android:textColor="@color/text_secondary" />
 
@@ -459,9 +471,10 @@
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/tv_weekly_reduction_label_home"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Weekly"
+                                android:text="@string/home_reduction_caption_weekly_reduce"
                                 android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                                 android:textColor="@color/text_secondary" />
 
@@ -486,9 +499,10 @@
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/tv_monthly_reduction_label_home"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Monthly"
+                                android:text="@string/home_reduction_caption_monthly_reduce"
                                 android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                                 android:textColor="@color/text_secondary" />
 

@@ -272,7 +272,6 @@ object MotivationalMessages {
 
     fun getMotivationalMessage(
         currentHour: Int = LocalTime.now().hour,
-        isWeekend: Boolean = false,
         isOnStreak: Boolean = false,
         streakDays: Int = 0,
         isUnderBaseline: Boolean = true,
@@ -281,11 +280,7 @@ object MotivationalMessages {
     ): String {
         val context = MessageContext(
             currentTime = LocalTime.of(currentHour, 0),
-            currentDate = if (isWeekend) {
-                LocalDate.now().with(DayOfWeek.SATURDAY)
-            } else {
-                LocalDate.now().with(DayOfWeek.MONDAY)
-            },
+            currentDate = LocalDate.now(),
             isOnStreak = isOnStreak,
             streakDays = streakDays,
             isUnderBaseline = isUnderBaseline,
