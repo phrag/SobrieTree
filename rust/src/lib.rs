@@ -764,12 +764,13 @@ mod tests {
             5.0,
             330.0,
             "Test notes".to_string(),
-        ).unwrap();
-        
+        )
+        .unwrap();
+
         let today = chrono::Utc::now().date_naive().to_string();
         let consumption = log.get_daily_consumption(today);
-        
+
         assert!(consumption.is_ok());
         assert_eq!(consumption.unwrap(), 330.0);
     }
-} 
+}
