@@ -224,14 +224,18 @@ impl BrewLog {
 
     pub fn calculate_baseline(&self, start_date: String, end_date: String) -> Result<Baseline, BrewLogError> {
         let entries = self.get_beer_entries(start_date.clone(), end_date.clone())?;
-        
+
         if entries.is_empty() {
             return Err(BrewLogError::NotFound("No entries found for baseline calculation".to_string()));
         }
 
+        let start = NaiveDate::parse_from_str(&start_date, "%Y-%m-%d")
+            .map_err(|_| BrewLogError::InvalidInput("Invalid start date format".to_string()))?;
+        let end = NaiveDate::parse_from_str(&end_date, "%Y-%m-%d")
+            .map_err(|_| BrewLogError::InvalidInput("Invalid end date format".to_string()))?;
+        let days = ((end - start).num_days() + 1).max(1) as f64;
+
         let total_volume: f64 = entries.iter().map(|e| e.volume_ml).sum();
-        let days = entries.len() as f64; // Simplified - in reality you'd calculate actual days
-        
         let average_daily = total_volume / days;
         let average_weekly = average_daily * 7.0;
 
@@ -244,20 +248,28 @@ impl BrewLog {
 
     pub fn get_progress_stats(&self, period_start: String, period_end: String) -> Result<ProgressStats, BrewLogError> {
         let current_entries = self.get_beer_entries(period_start.clone(), period_end.clone())?;
-        
+
         if current_entries.is_empty() {
             return Err(BrewLogError::NotFound("No entries found for progress calculation".to_string()));
         }
 
+        let start = NaiveDate::parse_from_str(&period_start, "%Y-%m-%d")
+            .map_err(|_| BrewLogError::InvalidInput("Invalid start date format".to_string()))?;
+        let end = NaiveDate::parse_from_str(&period_end, "%Y-%m-%d")
+            .map_err(|_| BrewLogError::InvalidInput("Invalid end date format".to_string()))?;
+        let days = ((end - start).num_days() + 1).max(1) as f64;
+
         let total_volume: f64 = current_entries.iter().map(|e| e.volume_ml).sum();
-        let days = current_entries.len() as f64; // Simplified calculation
-        
         let current_daily_average = total_volume / days;
         let current_weekly_average = current_daily_average * 7.0;
 
-        // For now, we'll use a simple reduction calculation
-        // In a real app, you'd compare against the baseline
-        let reduction_percentage = 0.0; // Placeholder
+        // Compare against stored goal to compute reduction percentage
+        let reduction_percentage = match self.get_current_goal() {
+            Ok(goal) if goal.daily_target > 0.0 => {
+                ((goal.daily_target - current_daily_average) / goal.daily_target) * 100.0
+            }
+            _ => 0.0,
+        };
 
         Ok(ProgressStats {
             current_daily_average,
@@ -283,6 +295,22 @@ impl BrewLog {
         let entries = self.get_beer_entries(week_start_date, end_date.to_string())?;
         let total_volume: f64 = entries.iter().map(|e| e.volume_ml).sum();
         Ok(total_volume)
+    }
+
+    pub fn get_hourly_consumption(&self, date: String) -> Result<Vec<(i64, f64)>, BrewLogError> {
+        let conn = self.db.lock().unwrap();
+        let mut stmt = conn.prepare(
+            "SELECT CAST(strftime('%H', created_at) AS INTEGER) as hour,
+                    SUM(volume_ml) as total_volume
+             FROM beer_entries
+             WHERE date = ?1
+             GROUP BY hour
+             ORDER BY hour",
+        )?;
+        let results = stmt
+            .query_map([&date], |row| Ok((row.get::<_, i64>(0)?, row.get::<_, f64>(1)?)))?
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(results)
     }
 
     pub fn delete_beer_entry(&self, id: String) -> Result<(), BrewLogError> {
@@ -567,6 +595,23 @@ pub extern "system" fn Java_com_brewlog_android_BrewLogNative_get_1weekly_1consu
 }
 
 #[no_mangle]
+pub extern "system" fn Java_com_brewlog_android_BrewLogNative_get_1hourly_1consumption_1json(mut env: JNIEnv, _cls: JClass, date: JString) -> jni_jstring {
+    let msg = if let Some(log) = LOG.get() {
+        let d: String = env.get_string(&date).unwrap().into();
+        match log.get_hourly_consumption(d) {
+            Ok(hourly) => {
+                let arr: Vec<_> = hourly.iter().map(|(h, v)| {
+                    format!("{{\"hour\":{h},\"volume_ml\":{v}}}")
+                }).collect();
+                format!("[{}]", arr.join(","))
+            }
+            Err(e) => format!("Error: {e}"),
+        }
+    } else { "Error: Log not initialized".to_string() };
+    env.new_string(msg).unwrap().into_raw()
+}
+
+#[no_mangle]
 pub extern "system" fn Java_com_brewlog_android_BrewLogNative_set_1consumption_1goal(mut env: JNIEnv, _cls: JClass, daily_target: jdouble, weekly_target: jdouble, start_date: JString, end_date: JString) -> jni_jstring {
     let msg = if let Some(log) = LOG.get() {
         let s: String = env.get_string(&start_date).unwrap().into();
@@ -757,7 +802,7 @@ mod tests {
     #[test]
     fn test_daily_consumption() {
         let log = BrewLog::new().unwrap();
-        
+
         // Add a test entry
         log.add_beer_entry(
             "Test Beer".to_string(),
@@ -765,11 +810,103 @@ mod tests {
             330.0,
             "Test notes".to_string(),
         ).unwrap();
-        
+
         let today = chrono::Utc::now().date_naive().to_string();
         let consumption = log.get_daily_consumption(today);
-        
+
         assert!(consumption.is_ok());
         assert_eq!(consumption.unwrap(), 330.0);
     }
-} 
+
+    #[test]
+    fn test_calculate_baseline_uses_date_range() {
+        let log = BrewLog::new().unwrap();
+        let today = chrono::Utc::now().date_naive();
+        // Add one entry for today
+        log.add_beer_entry("Beer".to_string(), 5.0, 500.0, "".to_string()).unwrap();
+
+        // Baseline over 7 days should give average of 500/7, not 500/1
+        let start = (today - chrono::Duration::days(6)).to_string();
+        let end = today.to_string();
+        let baseline = log.calculate_baseline(start, end).unwrap();
+        let expected_daily = 500.0 / 7.0;
+        assert!((baseline.average_daily_consumption - expected_daily).abs() < 0.001);
+        assert!((baseline.average_weekly_consumption - expected_daily * 7.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_get_progress_stats_uses_date_range() {
+        let log = BrewLog::new().unwrap();
+        let today = chrono::Utc::now().date_naive();
+        log.add_beer_entry("Beer".to_string(), 5.0, 350.0, "".to_string()).unwrap();
+
+        // Stats over 7 days should divide by 7, not by 1
+        let start = (today - chrono::Duration::days(6)).to_string();
+        let end = today.to_string();
+        let stats = log.get_progress_stats(start, end).unwrap();
+        let expected_daily = 350.0 / 7.0;
+        assert!((stats.current_daily_average - expected_daily).abs() < 0.001);
+        assert!((stats.current_weekly_average - expected_daily * 7.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_get_progress_stats_reduction_with_goal() {
+        let log = BrewLog::new().unwrap();
+        let today = chrono::Utc::now().date_naive();
+        // Set a daily goal of 500 ml
+        log.set_consumption_goal(500.0, 3500.0, today.to_string(), (today + chrono::Duration::days(30)).to_string()).unwrap();
+        // Add 250 ml today (50% of goal)
+        log.add_beer_entry("Beer".to_string(), 5.0, 250.0, "".to_string()).unwrap();
+
+        let stats = log.get_progress_stats(today.to_string(), today.to_string()).unwrap();
+        // reduction = (500 - 250) / 500 * 100 = 50%
+        assert!((stats.reduction_percentage - 50.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_get_hourly_consumption() {
+        let log = BrewLog::new().unwrap();
+        let today = chrono::Utc::now().date_naive().to_string();
+        log.add_beer_entry("Beer".to_string(), 5.0, 330.0, "".to_string()).unwrap();
+
+        let hourly = log.get_hourly_consumption(today).unwrap();
+        // Should have at least one hour with data
+        assert!(!hourly.is_empty());
+        let total: f64 = hourly.iter().map(|(_, v)| v).sum();
+        assert!((total - 330.0).abs() < 0.001);
+        // Hours must be in range 0-23
+        for (hour, _) in &hourly {
+            assert!(*hour >= 0 && *hour <= 23);
+        }
+    }
+
+    #[test]
+    fn test_delete_and_update_entry() {
+        let log = BrewLog::new().unwrap();
+        log.add_beer_entry("Original".to_string(), 4.0, 400.0, "".to_string()).unwrap();
+        let today = chrono::Utc::now().date_naive().to_string();
+        let entries = log.get_beer_entries(today.clone(), today.clone()).unwrap();
+        assert_eq!(entries.len(), 1);
+        let id = entries[0].id.clone();
+
+        // Update
+        log.update_beer_entry(id.clone(), "Updated".to_string(), 5.0, 500.0, "note".to_string()).unwrap();
+        let updated = log.get_beer_entries(today.clone(), today.clone()).unwrap();
+        assert_eq!(updated[0].name, "Updated");
+        assert_eq!(updated[0].volume_ml, 500.0);
+
+        // Delete
+        log.delete_beer_entry(id).unwrap();
+        let after_delete = log.get_beer_entries(today.clone(), today).unwrap();
+        assert!(after_delete.is_empty());
+    }
+
+    #[test]
+    fn test_weekly_consumption() {
+        let log = BrewLog::new().unwrap();
+        log.add_beer_entry("Beer".to_string(), 5.0, 500.0, "".to_string()).unwrap();
+        let today = chrono::Utc::now().date_naive().to_string();
+        let weekly = log.get_weekly_consumption(today).unwrap();
+        assert_eq!(weekly, 500.0);
+    }
+}
