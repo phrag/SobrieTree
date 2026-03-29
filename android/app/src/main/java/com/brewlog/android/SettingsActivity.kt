@@ -255,7 +255,7 @@ class SettingsActivity : AppCompatActivity() {
                 val entry = entries.getJSONObject(i)
                 val date = entry.optString("date", "")
                 val name = entry.optString("name", "").replace(",", ";") // Replace commas to avoid CSV issues
-                val alcohol = entry.optDouble("alcoholPercentage", 0.0)
+                val alcohol = entry.optDouble("alcohol_percentage", 0.0)
                 val volume = entry.optDouble("volume_ml", 0.0) // Fixed field name
                 val notes = entry.optString("notes", "").replace(",", ";").replace("\n", " ") // Clean notes
                 

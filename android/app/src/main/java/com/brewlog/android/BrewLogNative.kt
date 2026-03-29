@@ -17,6 +17,7 @@ object BrewLogNative {
     external fun update_beer_entry_date_jni(id: String, date: String): String
     external fun add_beer_entry_full_jni(id: String, name: String, alcohol_percentage: Double, volume_ml: Double, date: String, notes: String): String
     external fun delete_all_data(): String
+    external fun get_hourly_consumption_json(date: String): String
 }
 
 

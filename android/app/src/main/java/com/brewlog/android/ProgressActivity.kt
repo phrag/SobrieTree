@@ -347,32 +347,31 @@ class ProgressActivity : AppCompatActivity() {
 
 		// Add click listeners for Day/Week/Month filter chips
 		findViewById<com.google.android.material.chip.Chip>(R.id.chip_day)?.setOnClickListener {
-			// Day view - show hourly data for today
+			// Day view - show real hourly data for today from the database
 			isDayView = true
-			
-			// Generate hourly data for today (0-23 hours)
-			val hourlyData = (0..23).map { hour ->
-				// For now, we'll use sample data since we don't have hourly consumption data
-				// In a real implementation, you'd query hourly consumption from the database
-				val sampleConsumption = when (hour) {
-					in 6..8 -> 0.5f // Morning
-					in 12..14 -> 1.0f // Lunch
-					in 17..19 -> 1.5f // Evening
-					in 20..22 -> 2.0f // Night
-					else -> 0.0f // Other hours
+
+			val hourlyJson = try {
+				BrewLogNative.get_hourly_consumption_json(today.toString())
+			} catch (_: Throwable) { "[]" }
+
+			val hourlyMap = mutableMapOf<Int, Float>()
+			try {
+				val arr = org.json.JSONArray(hourlyJson)
+				for (i in 0 until arr.length()) {
+					val obj = arr.getJSONObject(i)
+					val hour = obj.getInt("hour")
+					val volumeMl = obj.getDouble("volume_ml")
+					hourlyMap[hour] = (volumeMl / sizeMl).toFloat()
 				}
-				hour to sampleConsumption
-			}
-			
-			// Convert daily baseline and goal to hourly (divide by 24)
-			val baselineHourlyDrinks = (baselineDaily / sizeMl / 24.0).toFloat()
-			val goalHourlyDrinks = (getSharedPreferences("brewlog_prefs", MODE_PRIVATE).getFloat("goal_daily_ml", 0f) / sizeMl / 24.0).toFloat()
-			
-			// Debug logging
-			android.util.Log.d("ProgressActivity", "Hourly data: $hourlyData")
-			android.util.Log.d("ProgressActivity", "Baseline hourly drinks: $baselineHourlyDrinks, Goal hourly drinks: $goalHourlyDrinks")
-			
-			setChartData("Actual", hourlyData, baselineHourlyDrinks, goalHourlyDrinks, historicalToday)
+			} catch (_: Throwable) {}
+
+			val hourlyData = (0..23).map { hour -> hour to (hourlyMap[hour] ?: 0.0f) }
+
+			// Show daily baseline/goal as flat reference lines
+			val baselineDailyDrinks = (baselineDaily / sizeMl).toFloat()
+			val goalDailyDrinks = (getSharedPreferences("brewlog_prefs", MODE_PRIVATE).getFloat("goal_daily_ml", 0f) / sizeMl).toFloat()
+
+			setChartData("Actual", hourlyData, baselineDailyDrinks, goalDailyDrinks, today)
 		}
 
 		findViewById<com.google.android.material.chip.Chip>(R.id.chip_week)?.setOnClickListener {
