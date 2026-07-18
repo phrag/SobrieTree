@@ -16,6 +16,7 @@ object BottomNavHelper {
             val target = when (item.itemId) {
                 R.id.nav_home -> MainActivity::class.java
                 R.id.nav_progress -> ProgressActivity::class.java
+                R.id.nav_journey -> JourneyActivity::class.java
                 R.id.nav_calendar -> CalendarActivity::class.java
                 R.id.nav_settings -> SettingsActivity::class.java
                 else -> null

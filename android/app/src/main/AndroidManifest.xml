@@ -26,6 +26,10 @@
             android:exported="false"
             android:theme="@style/Theme.BrewLog" />
         <activity
+            android:name=".JourneyActivity"
+            android:exported="false"
+            android:theme="@style/Theme.BrewLog" />
+        <activity
             android:name=".CalendarActivity"
             android:exported="false"
             android:theme="@style/Theme.BrewLog" />

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/tv_edu_detail_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.BrewLog.Headline"
+            tools:text="Why the nightcap backfires" />
+
+        <TextView
+            android:id="@+id/tv_edu_detail_body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:lineSpacingExtra="3sp"
+            android:textAppearance="@style/TextAppearance.BrewLog.Body"
+            tools:text="Alcohol is sedating at first..." />
+
+        <TextView
+            android:id="@+id/tv_edu_detail_source"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+            tools:text="Based on sleep research summarised by the Sleep Foundation." />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_edu_close"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textAllCaps="false"
+            android:text="@string/got_it"
+            style="@style/Widget.BrewLog.Button" />
+
+    </LinearLayout>
+
+</ScrollView>

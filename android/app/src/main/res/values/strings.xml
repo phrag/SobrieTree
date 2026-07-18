@@ -27,6 +27,29 @@
     <string name="milestone_reached">Milestone reached</string>
     <string name="badge_earned_description">Badge earned</string>
     <string name="keep_going">Keep going</string>
+
+    <!-- Journey screen -->
+    <string name="growth_stage_description">Your growth stage</string>
+    <string name="total_af_days_label">alcohol-free days in total</string>
+    <string name="current_streak_label">current streak</string>
+    <string name="best_streak_label">best streak</string>
+    <string name="shields_label">shields</string>
+    <string name="shields_explainer">You earn a shield for every 7 alcohol-free days. A shield automatically protects your streak through a single off day.</string>
+    <string name="timeline_title">Your body\'s recovery</string>
+    <string name="timeline_subtitle">Milestones unlock with your total alcohol-free days</string>
+    <string name="milestone_reached_on">Reached %s</string>
+    <string name="milestone_next_up">Next up — keep going</string>
+    <string name="milestone_af_days">At %d AF days</string>
+    <string name="badges_title">Badges</string>
+    <string name="savings_title">What you\'ve saved</string>
+    <string name="money_row">💰 %.0f saved since your baseline</string>
+    <string name="money_row_unset">💰 Set a price per drink in Settings to see money saved</string>
+    <string name="calories_row">🔥 %,d calories avoided</string>
+    <string name="calories_row_with_burgers">🔥 %,d calories avoided — about %d burgers</string>
+    <string name="learn_title">Learn</string>
+    <string name="learn_subtitle">Short, evidence-based reads</string>
+    <string name="read_more">Read more</string>
+    <string name="got_it">Got it</string>
     <string name="add_beer">Add Beer</string>
     <string name="beer_name">Beer Name</string>
     <string name="alcohol_percentage">Alcohol %</string>

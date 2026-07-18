@@ -118,6 +118,14 @@ class MainActivity : AppCompatActivity() {
             showManageGoalsBaselineDialog()
         }
 
+        // Stat tiles open the Journey tab
+        val openJourney = View.OnClickListener {
+            startActivity(Intent(this, JourneyActivity::class.java))
+        }
+        findViewById<View>(R.id.tile_money).setOnClickListener(openJourney)
+        findViewById<View>(R.id.tile_calories).setOnClickListener(openJourney)
+        findViewById<View>(R.id.tile_milestone).setOnClickListener(openJourney)
+
         BottomNavHelper.wire(this, findViewById(R.id.bottom_nav), R.id.nav_home)
     }
 

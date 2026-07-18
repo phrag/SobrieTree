@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/iv_badge"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:background="@drawable/ic_circle_background"
+        android:padding="12dp"
+        android:src="@drawable/ic_nav_journey"
+        app:tint="@color/badge_earned"
+        android:contentDescription="@string/badge_earned_description" />
+
+    <TextView
+        android:id="@+id/tv_badge_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:maxLines="2"
+        android:minLines="2"
+        android:ellipsize="end"
+        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+        android:textColor="@color/text_primary"
+        tools:text="Week of Clarity" />
+
+    <TextView
+        android:id="@+id/tv_badge_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+        tools:text="5 of 7 AF days" />
+
+</LinearLayout>
