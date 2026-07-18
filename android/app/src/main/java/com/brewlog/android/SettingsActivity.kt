@@ -38,6 +38,20 @@ class SettingsActivity : AppCompatActivity() {
     private val importFileLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let { importFromFile(it) }
     }
+
+    private val notificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            val appPrefs = AppPrefs(this)
+            val reminderSwitch = findViewById<SwitchMaterial>(R.id.switch_reminder)
+            if (granted) {
+                appPrefs.reminderEnabled = true
+                ReminderScheduler.schedule(this, appPrefs.reminderHour, appPrefs.reminderMinute)
+            } else {
+                appPrefs.reminderEnabled = false
+                reminderSwitch.isChecked = false
+                Toast.makeText(this, getString(R.string.reminder_permission_denied), Toast.LENGTH_LONG).show()
+            }
+        }
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,6 +101,54 @@ class SettingsActivity : AppCompatActivity() {
         val currentThemeIndex = themeModes.indexOf(appPrefs.themeMode).coerceAtLeast(0)
         themeDropdown.setText(themeOptions[currentThemeIndex], false)
         themeDropdown.setOnClickListener { themeDropdown.showDropDown() }
+
+        // Price per drink (powers money-saved counters; optional)
+        val priceEdit = findViewById<TextInputEditText>(R.id.et_price_per_drink)
+        if (appPrefs.pricePerDrink > 0) {
+            priceEdit.setText(String.format("%.2f", appPrefs.pricePerDrink))
+        }
+
+        // Daily check-in reminder (opt-in, local only)
+        val reminderSwitch = findViewById<SwitchMaterial>(R.id.switch_reminder)
+        val reminderTimeText = findViewById<TextView>(R.id.tv_reminder_time)
+        fun renderReminderTime() {
+            reminderTimeText.text = String.format("%02d:%02d", appPrefs.reminderHour, appPrefs.reminderMinute)
+        }
+        reminderSwitch.isChecked = appPrefs.reminderEnabled
+        renderReminderTime()
+        reminderSwitch.setOnCheckedChangeListener { _, checked ->
+            if (checked) {
+                if (android.os.Build.VERSION.SDK_INT >= 33 &&
+                    androidx.core.content.ContextCompat.checkSelfPermission(
+                        this, android.Manifest.permission.POST_NOTIFICATIONS
+                    ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+                ) {
+                    notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                } else {
+                    appPrefs.reminderEnabled = true
+                    ReminderScheduler.schedule(this, appPrefs.reminderHour, appPrefs.reminderMinute)
+                }
+            } else {
+                appPrefs.reminderEnabled = false
+                ReminderScheduler.cancel(this)
+            }
+        }
+        findViewById<android.view.View>(R.id.row_reminder_time).setOnClickListener {
+            android.app.TimePickerDialog(
+                this,
+                { _, hour, minute ->
+                    appPrefs.reminderHour = hour
+                    appPrefs.reminderMinute = minute
+                    renderReminderTime()
+                    if (appPrefs.reminderEnabled) {
+                        ReminderScheduler.schedule(this, hour, minute)
+                    }
+                },
+                appPrefs.reminderHour,
+                appPrefs.reminderMinute,
+                true
+            ).show()
+        }
         
         // Setup start of week dropdown
         val daysOfWeek = arrayOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
@@ -140,6 +202,8 @@ class SettingsActivity : AppCompatActivity() {
                 val themeIndex = themeOptions.indexOf(themeDropdown.text.toString()).coerceAtLeast(0)
                 appPrefs.themeMode = themeModes[themeIndex]
                 AppCompatDelegate.setDefaultNightMode(themeModes[themeIndex])
+
+                appPrefs.pricePerDrink = priceEdit.text?.toString()?.toFloatOrNull()?.coerceAtLeast(0f) ?: 0f
 
                 Toast.makeText(this, "Settings saved", Toast.LENGTH_SHORT).show()
             } catch (e: NumberFormatException) {

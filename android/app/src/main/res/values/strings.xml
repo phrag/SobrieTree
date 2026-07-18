@@ -64,6 +64,24 @@
     <string name="chart_actual_label">Drinks</string>
     <string name="chart_baseline_label">Baseline</string>
     <string name="chart_goal_label">Goal</string>
+
+    <!-- Reminders -->
+    <string name="reminder_settings_title">Daily check-in</string>
+    <string name="reminder_settings_description">One gentle local notification a day, at a time you choose. Nothing leaves your phone.</string>
+    <string name="reminder_enable_label">Remind me to check in</string>
+    <string name="reminder_time_label">Reminder time</string>
+    <string name="reminder_title">Evening check-in</string>
+    <string name="reminder_streak_message">Day %d alcohol-free — open BrewLog and keep your ring full.</string>
+    <string name="reminder_permission_denied">Notifications are blocked, so the reminder stays off. You can allow them in system settings.</string>
+    <string name="price_per_drink_hint">Price per drink (for money saved, optional)</string>
+    <string name="reminder_channel_name">Daily check-in</string>
+    <string name="reminder_channel_description">A single daily reminder to log your day</string>
+    <string-array name="reminder_messages">
+        <item>Evening check-in: how did today go?</item>
+        <item>A 10-second log keeps your picture honest. How was today?</item>
+        <item>Quick check-in — log today and see your week take shape.</item>
+        <item>However today went, logging it is the win. Take 10 seconds.</item>
+    </string-array>
     <string name="add_beer">Add Beer</string>
     <string name="beer_name">Beer Name</string>
     <string name="alcohol_percentage">Alcohol %</string>
