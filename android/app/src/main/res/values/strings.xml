@@ -50,6 +50,20 @@
     <string name="learn_subtitle">Short, evidence-based reads</string>
     <string name="read_more">Read more</string>
     <string name="got_it">Got it</string>
+
+    <!-- Progress screen -->
+    <string name="af_days_this_week">AF days this week</string>
+    <string name="less_than_baseline">less than baseline this week</string>
+    <string name="more_than_baseline">more than baseline this week</string>
+    <string name="n_of_7">%d of 7</string>
+    <string name="consumption_trend">Your pattern</string>
+    <string name="range_7_days">7 days</string>
+    <string name="range_4_weeks">4 weeks</string>
+    <string name="range_3_months">3 months</string>
+    <string name="chart_empty">Log a few days and your pattern appears here.</string>
+    <string name="chart_actual_label">Drinks</string>
+    <string name="chart_baseline_label">Baseline</string>
+    <string name="chart_goal_label">Goal</string>
     <string name="add_beer">Add Beer</string>
     <string name="beer_name">Beer Name</string>
     <string name="alcohol_percentage">Alcohol %</string>
