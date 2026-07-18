@@ -1,15 +1,15 @@
 <resources>
-    <!-- Base dark palette -->
-    <color name="dark_background">#121212</color>
-    <color name="dark_surface">#1E1E1E</color>
-    <color name="dark_surface_variant">#2C2C2C</color>
-    <color name="dark_card_background">#2C2C2C</color>
-    <color name="dark_text_primary">#FFFFFFFF</color>
-    <color name="dark_text_secondary">#B3FFFFFF</color>
-    <color name="dark_text_hint">#80FFFFFF</color>
-    <color name="dark_text_on_surface">#FFFFFFFF</color>
+    <!-- Night palette: deep green-black, softened brand tones -->
+    <color name="dark_background">#101613</color>
+    <color name="dark_surface">#161E1A</color>
+    <color name="dark_surface_variant">#1F2A24</color>
+    <color name="dark_card_background">#1B2520</color>
+    <color name="dark_text_primary">#ECF2EE</color>
+    <color name="dark_text_secondary">#A9B8B0</color>
+    <color name="dark_text_hint">#6F7F76</color>
+    <color name="dark_text_on_surface">#ECF2EE</color>
 
-    <!-- Map light color names to dark variants for night mode -->
+    <!-- Remap semantic tokens for night -->
     <color name="background">@color/dark_background</color>
     <color name="surface">@color/dark_surface</color>
     <color name="surface_variant">@color/dark_surface_variant</color>
@@ -20,4 +20,35 @@
     <color name="text_secondary">@color/dark_text_secondary</color>
     <color name="text_hint">@color/dark_text_hint</color>
     <color name="text_on_surface">@color/dark_text_on_surface</color>
+
+    <color name="brand_primary">#5FBFB0</color>
+    <color name="brand_primary_dark">#00453B</color>
+    <color name="brand_primary_light">#83D5C8</color>
+    <color name="brand_primary_container">#1E3B35</color>
+    <color name="brand_secondary">#D7B285</color>
+
+    <color name="state_positive">#7CC47F</color>
+    <color name="state_positive_container">#22392A</color>
+    <color name="state_caution">#D9B24C</color>
+    <color name="state_caution_container">#3A3222</color>
+    <color name="state_neutral">#90A4AE</color>
+    <color name="state_neutral_container">#25313A</color>
+
+    <color name="ring_track">#25302A</color>
+    <color name="ring_progress_start">#66BB6A</color>
+    <color name="ring_progress_end">#D9B24C</color>
+    <color name="ring_af_glow">#81C784</color>
+    <color name="growth_leaf">#66BB6A</color>
+
+    <color name="chart_actual">#4DB6AC</color>
+    <color name="chart_baseline">#8D8D8D</color>
+    <color name="chart_goal">#7CC47F</color>
+    <color name="chart_grid">#3390A4AE</color>
+    <color name="chart_axis_text">#A9B8B0</color>
+
+    <color name="divider">#26322C</color>
+    <color name="border">#2A362F</color>
+
+    <color name="badge_earned">#5FBFB0</color>
+    <color name="badge_locked">#3B4740</color>
 </resources>

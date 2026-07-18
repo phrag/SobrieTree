@@ -2,21 +2,23 @@
     <!-- Base application theme. -->
     <style name="Theme.BrewLog" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/blue_500</item>
-        <item name="colorPrimaryVariant">@color/blue_700</item>
-        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimary">@color/brand_primary</item>
+        <item name="colorPrimaryVariant">@color/brand_primary_dark</item>
+        <item name="colorOnPrimary">@color/text_on_primary</item>
+        <item name="colorPrimaryContainer">@color/brand_primary_container</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/accent</item>
-        <item name="colorSecondaryVariant">@color/accent_dark</item>
+        <item name="colorSecondary">@color/brand_secondary</item>
+        <item name="colorSecondaryVariant">@color/brand_secondary_dark</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">@color/blue_700</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/brand_primary_dark</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
         <!-- Background colors -->
         <item name="android:colorBackground">@color/background</item>
         <item name="colorSurface">@color/surface</item>
         <item name="colorSurfaceVariant">@color/surface_variant</item>
         <item name="colorOnSurface">@color/text_on_surface</item>
+        <item name="colorError">@color/error</item>
         <!-- Text colors -->
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
@@ -34,8 +36,8 @@
 
     <!-- Custom Button Styles -->
     <style name="Widget.BrewLog.Button" parent="Widget.Material3.Button">
-        <item name="android:textColor">@color/white</item>
-        <item name="backgroundTint">@color/blue_500</item>
+        <item name="android:textColor">@color/text_on_primary</item>
+        <item name="backgroundTint">@color/brand_primary</item>
         <item name="cornerRadius">24dp</item>
         <item name="android:paddingStart">24dp</item>
         <item name="android:paddingEnd">24dp</item>
@@ -48,8 +50,8 @@
     </style>
 
     <style name="Widget.BrewLog.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
-        <item name="android:textColor">@color/blue_500</item>
-        <item name="strokeColor">@color/blue_500</item>
+        <item name="android:textColor">@color/brand_primary</item>
+        <item name="strokeColor">@color/brand_primary</item>
         <item name="cornerRadius">24dp</item>
         <item name="android:paddingStart">24dp</item>
         <item name="android:paddingEnd">24dp</item>
@@ -64,7 +66,7 @@
     <!-- Card Styles -->
     <style name="Widget.BrewLog.Card" parent="Widget.Material3.CardView.Elevated">
         <item name="cardBackgroundColor">@color/card_background</item>
-        <item name="cardElevation">4dp</item>
+        <item name="cardElevation">2dp</item>
         <item name="cardCornerRadius">24dp</item>
         <item name="contentPadding">20dp</item>
         <item name="strokeColor">@color/border</item>
@@ -72,15 +74,21 @@
     </style>
 
     <!-- Text Styles -->
+    <style name="TextAppearance.BrewLog.Display" parent="TextAppearance.Material3.DisplaySmall">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">34sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="TextAppearance.BrewLog.Headline" parent="TextAppearance.Material3.HeadlineMedium">
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">22sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
     <style name="TextAppearance.BrewLog.Title" parent="TextAppearance.Material3.TitleLarge">
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
@@ -91,12 +99,19 @@
 
     <style name="TextAppearance.BrewLog.Caption" parent="TextAppearance.Material3.BodyMedium">
         <item name="android:textColor">@color/text_hint</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">13sp</item>
     </style>
 
     <style name="TextAppearance.BrewLog.Body2" parent="TextAppearance.Material3.BodyMedium">
         <item name="android:textColor">@color/text_secondary</item>
         <item name="android:textSize">14sp</item>
+    </style>
+
+    <!-- Warm adaptive status copy under the growth ring -->
+    <style name="TextAppearance.BrewLog.Encourage" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:lineSpacingExtra">2sp</item>
     </style>
 
     <!-- TextInputLayout style -->
@@ -107,8 +122,8 @@
         <item name="boxCornerRadiusBottomStart">12dp</item>
         <item name="boxCornerRadiusTopEnd">12dp</item>
         <item name="boxCornerRadiusTopStart">12dp</item>
-        <item name="boxStrokeColor">@color/blue_500</item>
-        <item name="hintTextColor">@color/blue_500</item>
+        <item name="boxStrokeColor">@color/brand_primary</item>
+        <item name="hintTextColor">@color/brand_primary</item>
     </style>
 
     <!-- Custom Input Field Styles -->
@@ -119,7 +134,7 @@
         <item name="boxCornerRadiusBottomStart">12dp</item>
         <item name="boxCornerRadiusTopEnd">12dp</item>
         <item name="boxCornerRadiusTopStart">12dp</item>
-        <item name="boxStrokeColor">@color/blue_500</item>
-        <item name="hintTextColor">@color/blue_500</item>
+        <item name="boxStrokeColor">@color/brand_primary</item>
+        <item name="hintTextColor">@color/brand_primary</item>
     </style>
 </resources>

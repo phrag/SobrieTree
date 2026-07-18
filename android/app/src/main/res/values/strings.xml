@@ -1,5 +1,13 @@
 <resources>
     <string name="app_name">BrewLog</string>
+    <string name="app_tagline">Drink less. Feel more.</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_progress">Progress</string>
+    <string name="nav_journey">Journey</string>
+    <string name="nav_calendar">Calendar</string>
+    <string name="nav_settings">Settings</string>
     <string name="add_beer">Add Beer</string>
     <string name="beer_name">Beer Name</string>
     <string name="alcohol_percentage">Alcohol %</string>

@@ -1,57 +1,60 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Base application theme (night). Token colors resolve to the night palette,
+         so only structural differences live here. -->
     <style name="Theme.BrewLog" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/blue_200</item>
-        <item name="colorPrimaryVariant">@color/blue_700</item>
+        <item name="colorPrimary">@color/brand_primary</item>
+        <item name="colorPrimaryVariant">@color/brand_primary_dark</item>
         <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimaryContainer">@color/brand_primary_container</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/accent</item>
-        <item name="colorSecondaryVariant">@color/accent</item>
+        <item name="colorSecondary">@color/brand_secondary</item>
+        <item name="colorSecondaryVariant">@color/brand_secondary</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/dark_background</item>
         <!-- Background colors -->
         <item name="android:colorBackground">@color/dark_background</item>
         <item name="colorSurface">@color/dark_surface</item>
         <item name="colorSurfaceVariant">@color/dark_surface_variant</item>
         <item name="colorOnSurface">@color/dark_text_on_surface</item>
+        <item name="colorError">@color/error</item>
         <!-- Text colors -->
         <item name="android:textColorPrimary">@color/dark_text_primary</item>
         <item name="android:textColorSecondary">@color/dark_text_secondary</item>
         <item name="android:textColorHint">@color/dark_text_hint</item>
         <!-- Card styling -->
         <item name="cardBackgroundColor">@color/dark_card_background</item>
-        <item name="cardElevation">4dp</item>
+        <item name="cardElevation">2dp</item>
         <item name="cardCornerRadius">24dp</item>
         <!-- Button styling -->
-        <item name="materialButtonStyle">@style/Widget.BrewLog.Button.Bubble</item>
-        <item name="materialButtonOutlinedStyle">@style/Widget.BrewLog.Button.Outlined.Bubble</item>
+        <item name="materialButtonStyle">@style/Widget.BrewLog.Button.Night</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.BrewLog.Button.Outlined.Night</item>
         <!-- Input field styling -->
-        <item name="textInputStyle">@style/Widget.BrewLog.TextInputLayout.OutlinedBox.Dark</item>
+        <item name="textInputStyle">@style/Widget.BrewLog.TextInputLayout.OutlinedBox.Night</item>
     </style>
 
-    <style name="Widget.BrewLog.Button.Bubble" parent="Widget.Material3.Button">
-        <item name="android:textColor">@color/white</item>
-        <item name="backgroundTint">@color/blue_500</item>
+    <style name="Widget.BrewLog.Button.Night" parent="Widget.Material3.Button">
+        <item name="android:textColor">@color/black</item>
+        <item name="backgroundTint">@color/brand_primary</item>
         <item name="cornerRadius">24dp</item>
     </style>
 
-    <style name="Widget.BrewLog.Button.Outlined.Bubble" parent="Widget.Material3.Button.OutlinedButton">
-        <item name="android:textColor">@color/blue_200</item>
-        <item name="strokeColor">@color/blue_200</item>
+    <style name="Widget.BrewLog.Button.Outlined.Night" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textColor">@color/brand_primary</item>
+        <item name="strokeColor">@color/brand_primary</item>
         <item name="cornerRadius">24dp</item>
     </style>
 
-    <!-- Custom Input Field Styles for Dark Theme -->
-    <style name="Widget.BrewLog.TextInputLayout.OutlinedBox.Dark" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+    <!-- Custom Input Field Styles for Night Theme -->
+    <style name="Widget.BrewLog.TextInputLayout.OutlinedBox.Night" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="boxBackgroundMode">filled</item>
-        <item name="boxBackgroundColor">@color/dark_surface</item>
+        <item name="boxBackgroundColor">@color/dark_surface_variant</item>
         <item name="boxCornerRadiusBottomEnd">12dp</item>
         <item name="boxCornerRadiusBottomStart">12dp</item>
         <item name="boxCornerRadiusTopEnd">12dp</item>
         <item name="boxCornerRadiusTopStart">12dp</item>
-        <item name="boxStrokeColor">@color/blue_200</item>
-        <item name="hintTextColor">@color/blue_200</item>
+        <item name="boxStrokeColor">@color/brand_primary</item>
+        <item name="hintTextColor">@color/brand_primary</item>
     </style>
 </resources>

@@ -1,71 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Modern Blue Color Scheme -->
-    <color name="primary">#2196F3</color>
-    <color name="primary_dark">#1976D2</color>
-    <color name="primary_light">#64B5F6</color>
-    <color name="accent">#03DAC6</color>
-    <color name="accent_dark">#018786</color>
-    
-    <!-- Background and Surface Colors -->
-    <color name="background">#FAFBFF</color>
+    <!-- ============================================================
+         BrewLog design tokens - calm, health-focused identity.
+         Rule: no red for consumption states; error is reserved for
+         destructive actions and input validation only.
+         ============================================================ -->
+
+    <!-- Brand -->
+    <color name="brand_primary">#00695C</color>
+    <color name="brand_primary_dark">#00453B</color>
+    <color name="brand_primary_light">#439889</color>
+    <color name="brand_primary_container">#D9EFE9</color>
+    <color name="brand_secondary">#C89B6C</color>
+    <color name="brand_secondary_dark">#A87F50</color>
+
+    <!-- Backgrounds and surfaces -->
+    <color name="background">#F6F9F7</color>
     <color name="surface">#FFFFFF</color>
-    <color name="surface_variant">#F5F7FF</color>
+    <color name="surface_variant">#ECF2EE</color>
     <color name="card_background">#FFFFFF</color>
-    
-    <!-- Status Colors -->
-    <color name="error">#F44336</color>
-    <color name="success">#4CAF50</color>
-    <color name="warning">#FF9800</color>
-    <color name="info">#2196F3</color>
-    
-    <!-- Text Colors -->
-    <color name="text_primary">#1A1A1A</color>
-    <color name="text_secondary">#666666</color>
-    <color name="text_hint">#BDBDBD</color>
+    <color name="input_background">#F0F5F1</color>
+
+    <!-- Text -->
+    <color name="text_primary">#182420</color>
+    <color name="text_secondary">#54655E</color>
+    <color name="text_hint">#93A39B</color>
     <color name="text_on_primary">#FFFFFF</color>
-    <color name="text_on_surface">#1A1A1A</color>
-    
-    <!-- Divider and Border Colors -->
-    <color name="divider">#E8EAF6</color>
-    <color name="border">#E3F2FD</color>
-    <color name="input_background">#F8F9FF</color>
-    
-    <!-- Beer Theme Colors -->
-    <color name="beer_amber">#FF8C00</color>
-    <color name="beer_gold">#FFD700</color>
-    <color name="beer_brown">#8B4513</color>
-    
-    <!-- Material theme required colors -->
-    <color name="purple_500">#6200EE</color>
-    <color name="purple_700">#3700B3</color>
-    <color name="teal_200">#03DAC5</color>
-    <color name="teal_700">#018786</color>
+    <color name="text_on_surface">#182420</color>
+
+    <!-- Consumption states (never red) -->
+    <color name="state_positive">#2E7D32</color>
+    <color name="state_positive_container">#E2F1E3</color>
+    <color name="state_caution">#B98A00</color>
+    <color name="state_caution_container">#F6EDD4</color>
+    <color name="state_neutral">#607D8B</color>
+    <color name="state_neutral_container">#ECEFF1</color>
+
+    <!-- Destructive / validation only -->
+    <color name="error">#C62828</color>
+    <color name="success">#2E7D32</color>
+    <color name="warning">#B98A00</color>
+    <color name="info">#00695C</color>
+
+    <!-- Growth ring + plant -->
+    <color name="ring_track">#E2EAE5</color>
+    <color name="ring_progress_start">#43A047</color>
+    <color name="ring_progress_end">#D8A200</color>
+    <color name="ring_af_glow">#66BB6A</color>
+    <color name="growth_leaf">#4CAF50</color>
+    <color name="growth_stem">#33691E</color>
+    <color name="growth_soil">#8D6E63</color>
+
+    <!-- Charts -->
+    <color name="chart_actual">#26A69A</color>
+    <color name="chart_baseline">#8D8D8D</color>
+    <color name="chart_goal">#2E7D32</color>
+    <color name="chart_grid">#26607D8B</color>
+    <color name="chart_axis_text">#54655E</color>
+
+    <!-- Dividers and borders -->
+    <color name="divider">#E0E8E3</color>
+    <color name="border">#DCE6E0</color>
+
+    <!-- Common -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    
-    <!-- Modern Blue Gradients -->
-    <color name="blue_50">#E3F2FD</color>
-    <color name="blue_100">#BBDEFB</color>
-    <color name="blue_200">#90CAF9</color>
-    <color name="blue_300">#64B5F6</color>
-    <color name="blue_400">#42A5F5</color>
-    <color name="blue_500">#2196F3</color>
-    <color name="blue_600">#1E88E5</color>
-    <color name="blue_700">#1976D2</color>
-    <color name="blue_800">#1565C0</color>
-    <color name="blue_900">#0D47A1</color>
-    
-    <color name="primaryBlue">#2196F3</color>
-    <color name="green_500">#4CAF50</color>
+
+    <!-- Badge tiers -->
+    <color name="badge_earned">#00695C</color>
+    <color name="badge_locked">#B8C4BE</color>
+
+    <!-- ============================================================
+         Legacy aliases - old names still referenced by layouts/code.
+         They now point at the new palette; removed as call sites
+         migrate.
+         ============================================================ -->
+    <color name="primary">@color/brand_primary</color>
+    <color name="primary_dark">@color/brand_primary_dark</color>
+    <color name="primary_light">@color/brand_primary_light</color>
+    <color name="accent">@color/brand_secondary</color>
+    <color name="accent_dark">@color/brand_secondary_dark</color>
+    <color name="primaryBlue">@color/brand_primary</color>
+    <color name="green_500">@color/state_positive</color>
+    <color name="blue_50">@color/brand_primary_container</color>
+    <color name="blue_100">@color/brand_primary_container</color>
+    <color name="blue_200">@color/brand_primary_light</color>
+    <color name="blue_300">@color/brand_primary_light</color>
+    <color name="blue_400">@color/brand_primary</color>
+    <color name="blue_500">@color/brand_primary</color>
+    <color name="blue_600">@color/brand_primary</color>
+    <color name="blue_700">@color/brand_primary_dark</color>
+    <color name="blue_800">@color/brand_primary_dark</color>
+    <color name="blue_900">@color/brand_primary_dark</color>
+    <color name="purple_500">@color/brand_primary</color>
+    <color name="purple_700">@color/brand_primary_dark</color>
+    <color name="teal_200">@color/brand_primary_light</color>
+    <color name="teal_700">@color/brand_primary_dark</color>
 
     <!-- Dark palette fallbacks for lint (actual night values in values-night) -->
-    <color name="dark_background">#121212</color>
-    <color name="dark_surface">#1E1E1E</color>
-    <color name="dark_surface_variant">#2C2C2C</color>
-    <color name="dark_card_background">#2C2C2C</color>
-    <color name="dark_text_primary">#FFFFFFFF</color>
-    <color name="dark_text_secondary">#B3FFFFFF</color>
-    <color name="dark_text_hint">#80FFFFFF</color>
-    <color name="dark_text_on_surface">#FFFFFFFF</color>
-</resources> 
+    <color name="dark_background">#101613</color>
+    <color name="dark_surface">#161E1A</color>
+    <color name="dark_surface_variant">#1F2A24</color>
+    <color name="dark_card_background">#1B2520</color>
+    <color name="dark_text_primary">#ECF2EE</color>
+    <color name="dark_text_secondary">#A9B8B0</color>
+    <color name="dark_text_hint">#6F7F76</color>
+    <color name="dark_text_on_surface">#ECF2EE</color>
+</resources>

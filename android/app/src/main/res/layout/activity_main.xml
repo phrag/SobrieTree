@@ -539,7 +539,7 @@
         android:layout_gravity="bottom"
         android:background="@color/surface"
         app:menu="@menu/menu_bottom"
-        app:itemIconTint="@color/blue_700"
-        app:itemTextColor="@color/blue_700" />
+        app:itemIconTint="@color/nav_item_tint"
+        app:itemTextColor="@color/nav_item_tint" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
