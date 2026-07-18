@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
@@ -14,7 +15,7 @@
         android:src="@drawable/ic_star"
         android:contentDescription="Favorite"
         android:layout_marginEnd="8dp"
-        android:tint="@color/brand_primary" />
+        app:tint="@color/brand_primary" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -46,7 +47,7 @@
         android:src="@drawable/ic_edit"
         android:contentDescription="Edit"
         android:layout_marginEnd="12dp"
-        android:tint="@color/brand_primary" />
+        app:tint="@color/brand_primary" />
 
     <ImageView
         android:id="@+id/iv_delete"
@@ -54,6 +55,6 @@
         android:layout_height="24dp"
         android:src="@drawable/ic_delete"
         android:contentDescription="Delete"
-        android:tint="@color/error" />
+        app:tint="@color/error" />
 
 </LinearLayout> 
