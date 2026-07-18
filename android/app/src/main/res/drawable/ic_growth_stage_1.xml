@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Soil mound -->
+    <path
+        android:fillColor="@color/growth_soil"
+        android:pathData="M12,40c0,-3.3 5.4,-5 12,-5s12,1.7 12,5c0,1.1 -0.9,2 -2,2H14C12.9,42 12,41.1 12,40z" />
+    <!-- Stem -->
+    <path
+        android:fillColor="@color/growth_stem"
+        android:pathData="M23.2,36h1.6c0.4,0 0.7,-0.3 0.7,-0.7V22h-3v13.3C22.5,35.7 22.8,36 23.2,36z" />
+    <!-- Left leaf -->
+    <path
+        android:fillColor="@color/growth_leaf"
+        android:pathData="M24,24c-1,-4 -4.5,-6.5 -9,-6.5c0.5,4.5 3.5,7 9,6.5z" />
+    <!-- Right leaf -->
+    <path
+        android:fillColor="@color/growth_leaf"
+        android:pathData="M24,20c1,-4 4.5,-6.5 9,-6.5c-0.5,4.5 -3.5,7 -9,6.5z" />
+</vector>

@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ground -->
+    <path
+        android:fillColor="@color/growth_soil"
+        android:pathData="M10,42c0,-1.7 6.3,-3 14,-3s14,1.3 14,3c0,0.6 -0.9,1 -2,1H12C10.9,43 10,42.6 10,42z" />
+    <!-- Trunk -->
+    <path
+        android:fillColor="@color/growth_stem"
+        android:pathData="M22.5,40h3c0.3,0 0.5,-0.2 0.5,-0.5V24h-4v15.5C22,39.8 22.2,40 22.5,40z" />
+    <!-- Foliage: layered circles -->
+    <path
+        android:fillColor="@color/growth_leaf"
+        android:pathData="M24,7c-6.6,0 -12,4.9 -12,11c0,6.1 5.4,11 12,11s12,-4.9 12,-11C36,11.9 30.6,7 24,7z" />
+    <path
+        android:fillColor="@color/ring_af_glow"
+        android:pathData="M18,12c-2.2,1.5 -3.6,3.8 -3.6,6.4c0,1 0.2,1.9 0.5,2.8c-1.6,-1.6 -2.6,-3.7 -2.6,-6C12.3,13.9 14.8,12.3 18,12z" />
+</vector>
