@@ -43,20 +43,7 @@ class CalendarActivity : AppCompatActivity() {
             setDate(selected)
         }
 
-        findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottom_nav).apply {
-            menu.clear()
-            inflateMenu(R.menu.menu_bottom)
-            selectedItemId = R.id.nav_calendar
-            setOnItemSelectedListener { item ->
-                when (item.itemId) {
-                    R.id.nav_home -> { startActivity(android.content.Intent(this@CalendarActivity, MainActivity::class.java)); true }
-                    R.id.nav_progress -> { startActivity(android.content.Intent(this@CalendarActivity, ProgressActivity::class.java)); true }
-                    R.id.nav_calendar -> true
-                    R.id.nav_settings -> { startActivity(android.content.Intent(this@CalendarActivity, SettingsActivity::class.java)); true }
-                    else -> false
-                }
-            }
-        }
+        BottomNavHelper.wire(this, findViewById(R.id.bottom_nav), R.id.nav_calendar)
     }
 
     private fun setDate(date: LocalDate) {
@@ -80,7 +67,7 @@ class CalendarActivity : AppCompatActivity() {
 
     private fun showQuickAddForDate(date: LocalDate) {
         val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
-        val presets = (MainActivity()).getDrinkPresets(prefs)
+        val presets = DrinkPresetStore.getPresets(prefs)
         if (presets.isEmpty()) {
             android.widget.Toast.makeText(this, "Add a drink preset first", android.widget.Toast.LENGTH_SHORT).show()
             return

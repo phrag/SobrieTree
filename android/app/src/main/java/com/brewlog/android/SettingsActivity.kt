@@ -58,7 +58,7 @@ class SettingsActivity : AppCompatActivity() {
         val beerStrengthEdit = findViewById<TextInputEditText>(R.id.et_beer_strength)
         val beerSizeLayout = findViewById<TextInputLayout>(R.id.beer_size_layout)
         val beerStrengthLayout = findViewById<TextInputLayout>(R.id.beer_strength_layout)
-        val themeSwitch = findViewById<SwitchMaterial>(R.id.switch_theme)
+        val themeDropdown = findViewById<AutoCompleteTextView>(R.id.et_theme)
         val secureSwitch = findViewById<SwitchMaterial>(R.id.switch_secure)
         val eodEdit = findViewById<TextInputEditText>(R.id.et_end_of_day)
         val exportBtn = findViewById<MaterialButton>(R.id.btn_export)
@@ -71,9 +71,22 @@ class SettingsActivity : AppCompatActivity() {
         
         beerSizeEdit.setText(defaultSize.toString())
         beerStrengthEdit.setText(defaultStrength.toString())
-        themeSwitch.isChecked = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
         secureSwitch.isChecked = prefs.getBoolean("flag_secure", true)
         eodEdit.setText(endOfDay.toString())
+
+        // Theme dropdown (System / Light / Dark), persisted so it survives restart
+        val appPrefs = AppPrefs(this)
+        val themeOptions = arrayOf("System default", "Light", "Dark")
+        val themeModes = intArrayOf(
+            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM,
+            AppCompatDelegate.MODE_NIGHT_NO,
+            AppCompatDelegate.MODE_NIGHT_YES
+        )
+        val themeAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, themeOptions)
+        themeDropdown.setAdapter(themeAdapter)
+        val currentThemeIndex = themeModes.indexOf(appPrefs.themeMode).coerceAtLeast(0)
+        themeDropdown.setText(themeOptions[currentThemeIndex], false)
+        themeDropdown.setOnClickListener { themeDropdown.showDropDown() }
         
         // Setup start of week dropdown
         val daysOfWeek = arrayOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
@@ -122,14 +135,12 @@ class SettingsActivity : AppCompatActivity() {
                     .putInt("start_of_week", newStartOfWeek)
                     .putBoolean("flag_secure", secureSwitch.isChecked)
                     .apply()
-                
-                // Apply theme change
-                if (themeSwitch.isChecked) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                } else {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                }
-                
+
+                // Apply and persist theme change
+                val themeIndex = themeOptions.indexOf(themeDropdown.text.toString()).coerceAtLeast(0)
+                appPrefs.themeMode = themeModes[themeIndex]
+                AppCompatDelegate.setDefaultNightMode(themeModes[themeIndex])
+
                 Toast.makeText(this, "Settings saved", Toast.LENGTH_SHORT).show()
             } catch (e: NumberFormatException) {
                 Toast.makeText(this, "Invalid input", Toast.LENGTH_SHORT).show()
@@ -189,30 +200,7 @@ class SettingsActivity : AppCompatActivity() {
             Toast.makeText(this, "Source: National health guidelines for low-risk alcohol consumption", Toast.LENGTH_LONG).show()
         }
         
-        // Bottom nav
-        findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottom_nav).apply {
-            menu.clear()
-            inflateMenu(R.menu.menu_bottom)
-            selectedItemId = R.id.nav_settings
-            setOnItemSelectedListener { item ->
-                when (item.itemId) {
-                    R.id.nav_home -> {
-                        startActivity(Intent(this@SettingsActivity, MainActivity::class.java))
-                        true
-                    }
-                    R.id.nav_progress -> {
-                        startActivity(Intent(this@SettingsActivity, ProgressActivity::class.java))
-                        true
-                    }
-                    R.id.nav_calendar -> {
-                        startActivity(Intent(this@SettingsActivity, CalendarActivity::class.java))
-                        true
-                    }
-                    R.id.nav_settings -> true
-                    else -> false
-                }
-            }
-        }
+        BottomNavHelper.wire(this, findViewById(R.id.bottom_nav), R.id.nav_settings)
     }
     
     private fun exportToFile(uri: Uri) {

@@ -416,33 +416,8 @@ class ProgressActivity : AppCompatActivity() {
 			setChartData("Actual", monthData, baselineMonthDrinks, goalMonthDrinks, monthStartDate)
 		}
 
-		// Bottom nav
-		findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottom_nav).apply {
-			menu.clear()
-			inflateMenu(R.menu.menu_bottom)
-			selectedItemId = R.id.nav_progress
-			setOnItemSelectedListener { item ->
-				when (item.itemId) {
-					R.id.nav_home -> {
-						startActivity(android.content.Intent(this@ProgressActivity, MainActivity::class.java))
-						true
-					}
-					R.id.nav_progress -> true
-					R.id.nav_calendar -> {
-						startActivity(android.content.Intent(this@ProgressActivity, CalendarActivity::class.java))
-						true
-					}
-					R.id.nav_settings -> {
-						startActivity(android.content.Intent(this@ProgressActivity, MainActivity::class.java).apply {
-							putExtra("open_settings", true)
-						})
-						true
-					}
-					else -> false
-				}
-			}
+		BottomNavHelper.wire(this, findViewById(R.id.bottom_nav), R.id.nav_progress)
 	}
-}
 
 	private fun getDailyTotals(start: LocalDate, end: LocalDate): Map<LocalDate, Double> {
 		return try {

@@ -122,30 +122,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Bottom nav
-        findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottom_nav).apply {
-            menu.clear()
-            inflateMenu(R.menu.menu_bottom)
-            selectedItemId = R.id.nav_home
-            setOnItemSelectedListener { item ->
-                when (item.itemId) {
-                    R.id.nav_home -> true
-                    R.id.nav_progress -> {
-                        startActivity(android.content.Intent(this@MainActivity, ProgressActivity::class.java))
-                        true
-                    }
-                    R.id.nav_calendar -> {
-                        startActivity(android.content.Intent(this@MainActivity, CalendarActivity::class.java))
-                        true
-                    }
-                    R.id.nav_settings -> {
-                        startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
-                        true
-                    }
-                    else -> false
-                }
-            }
-        }
+        BottomNavHelper.wire(this, findViewById(R.id.bottom_nav), R.id.nav_home)
     }
 
     private fun initializeBrewLog() {
@@ -475,25 +452,14 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    fun getDrinkPresets(prefs: android.content.SharedPreferences): List<DrinkPreset> {
-        val json = prefs.getString("drink_presets", "[]") ?: "[]"
-        val arr = JSONArray(json)
-        return List(arr.length()) { i -> DrinkPreset.fromJson(arr.getJSONObject(i)) }
-    }
+    fun getDrinkPresets(prefs: android.content.SharedPreferences): List<DrinkPreset> =
+        DrinkPresetStore.getPresets(prefs)
 
-    fun saveDrinkPresets(prefs: android.content.SharedPreferences, presets: List<DrinkPreset>) {
-        val arr = JSONArray()
-        presets.forEach { arr.put(it.toJson()) }
-        prefs.edit().putString("drink_presets", arr.toString()).apply()
-    }
+    fun saveDrinkPresets(prefs: android.content.SharedPreferences, presets: List<DrinkPreset>) =
+        DrinkPresetStore.savePresets(prefs, presets)
 
-    fun addDrinkPreset(prefs: android.content.SharedPreferences, preset: DrinkPreset) {
-        val presets = getDrinkPresets(prefs).toMutableList()
-        if (presets.none { it.name == preset.name && it.type == preset.type && it.volume == preset.volume && it.strength == preset.strength }) {
-            presets.add(preset)
-            saveDrinkPresets(prefs, presets)
-        }
-    }
+    fun addDrinkPreset(prefs: android.content.SharedPreferences, preset: DrinkPreset) =
+        DrinkPresetStore.addPreset(prefs, preset)
 
     private fun showDrinkManagerDialog(
         onDrinkSelected: (DrinkPreset) -> Unit
