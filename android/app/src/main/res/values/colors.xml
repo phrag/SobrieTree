@@ -62,6 +62,10 @@
     <color name="divider">#E0E8E3</color>
     <color name="border">#DCE6E0</color>
 
+    <!-- App bar (stays deep teal in light mode, surface-dark at night) -->
+    <color name="app_bar_background">#00695C</color>
+    <color name="app_bar_content">#FFFFFF</color>
+
     <!-- Common -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>

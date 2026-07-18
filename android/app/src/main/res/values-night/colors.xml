@@ -51,4 +51,7 @@
 
     <color name="badge_earned">#5FBFB0</color>
     <color name="badge_locked">#3B4740</color>
+
+    <color name="app_bar_background">#161E1A</color>
+    <color name="app_bar_content">#ECF2EE</color>
 </resources>

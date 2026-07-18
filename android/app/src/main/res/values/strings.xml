@@ -8,6 +8,25 @@
     <string name="nav_journey">Journey</string>
     <string name="nav_calendar">Calendar</string>
     <string name="nav_settings">Settings</string>
+
+    <!-- Home screen -->
+    <string name="start_setup">Get started</string>
+    <string name="ring_description">Today\'s progress ring. Tap to log your favorite drink.</string>
+    <string name="tile_money_saved">saved</string>
+    <string name="tile_calories_avoided">calories avoided</string>
+    <string name="tile_next_badge">next badge</string>
+    <string name="log_a_drink">Log a drink</string>
+    <string name="add_drink">Add drink</string>
+    <string name="manage">Manage</string>
+    <string name="manage_goals_baseline">Goals &amp; baseline</string>
+    <string name="recent_entries">Recent entries</string>
+    <string name="no_entries_yet">Nothing logged yet. An empty list is a full ring.</string>
+    <string name="logged_toast">Logged.</string>
+
+    <!-- Milestone celebration -->
+    <string name="milestone_reached">Milestone reached</string>
+    <string name="badge_earned_description">Badge earned</string>
+    <string name="keep_going">Keep going</string>
     <string name="add_beer">Add Beer</string>
     <string name="beer_name">Beer Name</string>
     <string name="alcohol_percentage">Alcohol %</string>

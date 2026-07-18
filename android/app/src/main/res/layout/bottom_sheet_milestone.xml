@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="28dp">
+
+    <ImageView
+        android:id="@+id/iv_badge_icon"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:background="@drawable/ic_circle_background"
+        android:padding="16dp"
+        android:src="@drawable/ic_nav_journey"
+        app:tint="@color/badge_earned"
+        android:contentDescription="@string/badge_earned_description" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/milestone_reached"
+        android:textAppearance="@style/TextAppearance.BrewLog.Caption" />
+
+    <TextView
+        android:id="@+id/tv_badge_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.BrewLog.Headline"
+        tools:text="Week of Clarity" />
+
+    <TextView
+        android:id="@+id/tv_badge_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+        tools:text="7 alcohol-free days in total — deeper sleep territory." />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_keep_going"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:minHeight="52dp"
+        android:textAllCaps="false"
+        android:text="@string/keep_going"
+        style="@style/Widget.BrewLog.Button" />
+
+</LinearLayout>
