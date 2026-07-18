@@ -29,6 +29,19 @@ class MainActivity : AppCompatActivity() {
     private val repo by lazy { EntryRepository() }
     private val gamification by lazy { GamificationManager(this) }
 
+    private val onboardingNotifPermission = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        val prefs = AppPrefs(this)
+        if (granted) {
+            prefs.reminderEnabled = true
+            ReminderScheduler.schedule(this, prefs.reminderHour, prefs.reminderMinute)
+        } else {
+            prefs.reminderEnabled = false
+        }
+        completeOnboarding()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -322,7 +335,78 @@ class MainActivity : AppCompatActivity() {
 
         dialogView.findViewById<View>(R.id.btn_get_started).setOnClickListener {
             dialog.dismiss()
-            showSetGoalsDialog(true) // Start with goals setup first
+            showMotivationDialog()
+        }
+
+        dialog.show()
+    }
+
+    private fun showMotivationDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_onboarding_motivation, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        val chipToKey = mapOf(
+            R.id.chip_sleep to "sleep",
+            R.id.chip_health to "health",
+            R.id.chip_money to "money",
+            R.id.chip_weight to "weight",
+            R.id.chip_mind to "mind",
+            R.id.chip_curious to "curious"
+        )
+        dialogView.findViewById<View>(R.id.btn_motivation_continue).setOnClickListener {
+            val selected = chipToKey.filter { (id, _) ->
+                dialogView.findViewById<com.google.android.material.chip.Chip>(id).isChecked
+            }.values.toSet()
+            AppPrefs(this).motivations = selected
+            dialog.dismiss()
+            showSetGoalsDialog(true)
+        }
+
+        dialog.show()
+    }
+
+    private fun showReminderOptInDialog() {
+        val prefs = AppPrefs(this)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_onboarding_reminder, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        val timeText = dialogView.findViewById<TextView>(R.id.tv_onboarding_reminder_time)
+        timeText.text = String.format("%02d:%02d", prefs.reminderHour, prefs.reminderMinute)
+        dialogView.findViewById<View>(R.id.row_onboarding_reminder_time).setOnClickListener {
+            android.app.TimePickerDialog(
+                this,
+                { _, hour, minute ->
+                    prefs.reminderHour = hour
+                    prefs.reminderMinute = minute
+                    timeText.text = String.format("%02d:%02d", hour, minute)
+                },
+                prefs.reminderHour, prefs.reminderMinute, true
+            ).show()
+        }
+
+        dialogView.findViewById<View>(R.id.btn_reminder_skip).setOnClickListener {
+            prefs.reminderEnabled = false
+            dialog.dismiss()
+            completeOnboarding()
+        }
+        dialogView.findViewById<View>(R.id.btn_reminder_enable).setOnClickListener {
+            dialog.dismiss()
+            if (android.os.Build.VERSION.SDK_INT >= 33 &&
+                ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) !=
+                android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
+                onboardingNotifPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                prefs.reminderEnabled = true
+                ReminderScheduler.schedule(this, prefs.reminderHour, prefs.reminderMinute)
+                completeOnboarding()
+            }
         }
 
         dialog.show()
@@ -364,9 +448,9 @@ class MainActivity : AppCompatActivity() {
             hasShownFavoriteSetup = false
             dialog.dismiss()
 
-            // If this is part of initial setup, mark onboarding as complete since this is the last step
+            // Last data step of initial setup; the reminder opt-in closes the flow
             if (isInitialSetup) {
-                completeOnboarding()
+                showReminderOptInDialog()
             }
         }
 

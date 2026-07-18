@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@color/background">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/reminder_optin_title"
+        android:textAppearance="@style/TextAppearance.BrewLog.Headline" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="@string/reminder_optin_body"
+        android:textAppearance="@style/TextAppearance.BrewLog.Body" />
+
+    <LinearLayout
+        android:id="@+id/row_onboarding_reminder_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="?android:attr/selectableItemBackground"
+        android:padding="8dp"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/reminder_time_label"
+            android:textColor="@color/text_primary" />
+
+        <TextView
+            android:id="@+id/tv_onboarding_reminder_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.BrewLog.Body"
+            android:textColor="@color/brand_primary"
+            android:text="20:00" />
+
+    </LinearLayout>
+
+    <!-- Declining is a first-class choice, styled equally prominently -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_reminder_skip"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:textAllCaps="false"
+            android:text="@string/reminder_no_thanks"
+            style="@style/Widget.BrewLog.Button.Outlined" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_reminder_enable"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:textAllCaps="false"
+            android:text="@string/reminder_yes"
+            style="@style/Widget.BrewLog.Button" />
+
+    </LinearLayout>
+
+</LinearLayout>

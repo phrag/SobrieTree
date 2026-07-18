@@ -76,6 +76,26 @@
     <string name="price_per_drink_hint">Price per drink (for money saved, optional)</string>
     <string name="reminder_channel_name">Daily check-in</string>
     <string name="reminder_channel_description">A single daily reminder to log your day</string>
+
+    <!-- Onboarding -->
+    <string name="welcome_title">Welcome to BrewLog</string>
+    <string name="welcome_message">Track what you drink, watch alcohol-free days grow into real health gains, and cut back at your own pace.</string>
+    <string name="welcome_feature_track">See your pattern honestly, without judgment</string>
+    <string name="welcome_feature_grow">Grow a streak — and a plant — with alcohol-free days</string>
+    <string name="welcome_feature_private">Everything stays on this phone. No account, no cloud.</string>
+    <string name="motivation_title">What\'s bringing you here?</string>
+    <string name="motivation_subtitle">Pick any that fit — BrewLog tunes its encouragement and tips to what matters to you.</string>
+    <string name="motivation_sleep">😴 Better sleep</string>
+    <string name="motivation_health">❤️ Health</string>
+    <string name="motivation_money">💰 Save money</string>
+    <string name="motivation_weight">⚖️ Weight</string>
+    <string name="motivation_mind">🧠 Clearer head</string>
+    <string name="motivation_curious">🌱 Just curious</string>
+    <string name="continue_label">Continue</string>
+    <string name="reminder_optin_title">A daily nudge?</string>
+    <string name="reminder_optin_body">People who check in daily cut back the most. One local notification a day, at a time you pick — nothing leaves your phone, and you can turn it off anytime.</string>
+    <string name="reminder_no_thanks">No thanks</string>
+    <string name="reminder_yes">Remind me</string>
     <string-array name="reminder_messages">
         <item>Evening check-in: how did today go?</item>
         <item>A 10-second log keeps your picture honest. How was today?</item>
