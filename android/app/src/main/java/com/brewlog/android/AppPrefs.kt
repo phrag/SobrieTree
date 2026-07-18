@@ -98,10 +98,10 @@ class AppPrefs(context: Context) {
             prefs.edit().putString("badges_earned", obj.toString()).apply()
         }
 
-    /** Number of streak shields already consumed bridging lapse days. */
-    var shieldsUsed: Int
-        get() = prefs.getInt("shields_used", 0)
-        set(value) = prefs.edit().putInt("shields_used", value).apply()
+    /** ISO dates of lapse days already bridged by a streak shield (idempotent across recomputes). */
+    var shieldBridgedDates: Set<String>
+        get() = prefs.getStringSet("shield_bridged_dates", emptySet()) ?: emptySet()
+        set(value) = prefs.edit().putStringSet("shield_bridged_dates", value).apply()
 
     /** Milestone ids that already had their celebration sheet shown. */
     var celebratedMilestones: Set<String>
