@@ -160,7 +160,7 @@
                 android:layout_height="20dp"
                 android:layout_marginEnd="12dp"
                 android:src="@android:drawable/ic_dialog_info"
-                app:tint="@color/blue_500" />
+                app:tint="@color/brand_primary" />
 
             <TextView
                 android:layout_width="0dp"
@@ -168,7 +168,7 @@
                 android:layout_weight="1"
                 android:text="Tip: Many health guidelines recommend no more than 2 standard drinks per day."
                 android:textAppearance="@style/TextAppearance.BrewLog.Caption"
-                android:textColor="@color/blue_700" />
+                android:textColor="@color/brand_primary_dark" />
 
         </LinearLayout>
 

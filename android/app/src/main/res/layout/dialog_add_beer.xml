@@ -21,8 +21,8 @@
             android:layout_marginEnd="16dp"
             android:background="@drawable/ic_circle_background"
             android:padding="6dp"
-            android:src="@android:drawable/ic_input_add"
-            app:tint="@color/blue_500" />
+            android:src="@drawable/ic_add"
+            app:tint="@color/brand_primary" />
 
         <TextView
             android:layout_width="0dp"

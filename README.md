@@ -1,16 +1,18 @@
 # BrewLog
 
-A simple, private beer consumption tracker for Android.
+A private alcohol-reduction companion for Android. Drink less. Feel more.
 
-- Set daily/weekly goals in drinks (based on your default drink size)
-- See a fun Beer Glass that fills as you log drinks
-- One‑tap Quick Add and a dedicated Drinks manager to add or edit presets
-- Initial Setup button on first launch to set goals and baseline quickly
+- Growth Ring home screen: today's drinks as a calm ring around a plant that grows with your alcohol-free days
+- Supportive gamification: cumulative AF-day count, forgiving streaks with earned shields, 14 milestone badges
+- Journey tab: your body's recovery timeline, badge collection, money/calorie savings, and short evidence-based reads
+- Adaptive encouragement that never shames — a heavy day gets a plan, not a scolding
+- One-tap Quick Add chips and a Drinks manager for presets
 - Calendar view to track, view, and edit past days
-- Configurable end‑of‑day cut‑off (default 3 AM)
-- Export/import your data to JSON; Delete All Data from settings
-- Progress screen shows Today/This Week and reduction vs. baseline
-- Native Rust + SQLite backend via JNI for on‑device storage
+- Progress charts of your real pattern vs. baseline and goal (7 days / 4 weeks / 3 months)
+- Optional local-only daily check-in reminder (off by default)
+- Configurable end-of-day cut-off (default 3 AM)
+- Export/import your data to CSV; Delete All Data from settings
+- Native Rust + SQLite backend via JNI for on-device storage
 - Works fully offline. No account, no cloud, no analytics, no ads
 
 ### Privacy & Security
@@ -34,13 +36,13 @@ Your data, your control:
 - You may need to enable “Install unknown apps” in Android settings
 
 2) First‑time setup
-- Open the app → menu ▸ Set Goals & Baseline
+- The guided flow asks why you're cutting back, then sets goals and baseline
 - Pick your default drink size (e.g., 500 ml)
 - Enter your Daily Goal (in drinks). Weekly auto‑fills as 7× daily
 
 3) Add a drink
-- Tap a Quick Add chip, or tap the Beer Glass to repeat the last drink
-- The Beer Glass shows daily progress (e.g., “2 / 5 drinks”)
+- Tap a Quick Add chip, or tap the Growth Ring to log your favorite drink
+- The ring shows daily progress; on an alcohol-free day it renders full
 
 4) View Progress
 - Bottom navigation ▸ Progress

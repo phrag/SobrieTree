@@ -38,9 +38,6 @@
 
     <!-- Destructive / validation only -->
     <color name="error">#C62828</color>
-    <color name="success">#2E7D32</color>
-    <color name="warning">#B98A00</color>
-    <color name="info">#00695C</color>
 
     <!-- Growth ring + plant -->
     <color name="ring_track">#E2EAE5</color>
@@ -73,33 +70,6 @@
     <!-- Badge tiers -->
     <color name="badge_earned">#00695C</color>
     <color name="badge_locked">#B8C4BE</color>
-
-    <!-- ============================================================
-         Legacy aliases - old names still referenced by layouts/code.
-         They now point at the new palette; removed as call sites
-         migrate.
-         ============================================================ -->
-    <color name="primary">@color/brand_primary</color>
-    <color name="primary_dark">@color/brand_primary_dark</color>
-    <color name="primary_light">@color/brand_primary_light</color>
-    <color name="accent">@color/brand_secondary</color>
-    <color name="accent_dark">@color/brand_secondary_dark</color>
-    <color name="primaryBlue">@color/brand_primary</color>
-    <color name="green_500">@color/state_positive</color>
-    <color name="blue_50">@color/brand_primary_container</color>
-    <color name="blue_100">@color/brand_primary_container</color>
-    <color name="blue_200">@color/brand_primary_light</color>
-    <color name="blue_300">@color/brand_primary_light</color>
-    <color name="blue_400">@color/brand_primary</color>
-    <color name="blue_500">@color/brand_primary</color>
-    <color name="blue_600">@color/brand_primary</color>
-    <color name="blue_700">@color/brand_primary_dark</color>
-    <color name="blue_800">@color/brand_primary_dark</color>
-    <color name="blue_900">@color/brand_primary_dark</color>
-    <color name="purple_500">@color/brand_primary</color>
-    <color name="purple_700">@color/brand_primary_dark</color>
-    <color name="teal_200">@color/brand_primary_light</color>
-    <color name="teal_700">@color/brand_primary_dark</color>
 
     <!-- Dark palette fallbacks for lint (actual night values in values-night) -->
     <color name="dark_background">#101613</color>

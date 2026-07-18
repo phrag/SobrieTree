@@ -3,16 +3,16 @@
     <item
         android:id="@+id/action_settings"
         android:title="Settings"
-        android:icon="@android:drawable/ic_menu_preferences"
+        android:icon="@drawable/ic_nav_settings"
         android:showAsAction="always" />
     <item
         android:id="@+id/action_set_goals"
         android:title="Set Goals"
-        android:icon="@android:drawable/ic_menu_edit"
+        android:icon="@drawable/ic_edit"
         android:showAsAction="never" />
     <item
         android:id="@+id/action_filter"
         android:title="Filter"
-        android:icon="@android:drawable/ic_menu_month"
+        android:icon="@drawable/ic_nav_calendar"
         android:showAsAction="always" />
 </menu> 

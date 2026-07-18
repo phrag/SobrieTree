@@ -45,7 +45,7 @@
     <string name="money_row">💰 %.0f saved since your baseline</string>
     <string name="money_row_unset">💰 Set a price per drink in Settings to see money saved</string>
     <string name="calories_row">🔥 %,d calories avoided</string>
-    <string name="calories_row_with_burgers">🔥 %,d calories avoided — about %d burgers</string>
+    <string name="calories_row_with_burgers">🔥 %1$,d calories avoided — about %2$d burgers</string>
     <string name="learn_title">Learn</string>
     <string name="learn_subtitle">Short, evidence-based reads</string>
     <string name="read_more">Read more</string>
