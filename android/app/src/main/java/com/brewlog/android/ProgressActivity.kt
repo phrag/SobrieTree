@@ -75,7 +75,7 @@ class ProgressActivity : AppCompatActivity() {
         val moneyTile = findViewById<View>(R.id.tile_money_progress)
         if (state.moneyAvailable) {
             moneyTile.visibility = View.VISIBLE
-            findViewById<TextView>(R.id.tv_money_progress).text = String.format("%.0f", state.moneySaved)
+            findViewById<TextView>(R.id.tv_money_progress).text = Money.format(state.moneySaved)
         } else {
             moneyTile.visibility = View.GONE
         }

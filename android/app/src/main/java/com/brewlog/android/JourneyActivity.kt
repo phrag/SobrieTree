@@ -80,8 +80,8 @@ class JourneyActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.tv_money_row).text = when {
             state.moneyAvailable && state.moneySpent > 0 ->
-                getString(R.string.money_row_with_spent, state.moneySaved, state.moneySpent)
-            state.moneyAvailable -> getString(R.string.money_row, state.moneySaved)
+                getString(R.string.money_row_with_spent, Money.format(state.moneySaved), Money.format(state.moneySpent))
+            state.moneyAvailable -> getString(R.string.money_row, Money.format(state.moneySaved))
             else -> getString(R.string.money_row_unset)
         }
         findViewById<TextView>(R.id.tv_calories_row).text =

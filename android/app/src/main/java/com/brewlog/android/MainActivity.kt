@@ -207,8 +207,9 @@ class MainActivity : AppCompatActivity() {
             if (state.isTodayAf) "Alcohol-free so far"
             else "${todayDrinks.toInt()} of ${goalDrinks.toInt()} drinks"
 
+        val bestPart = if (state.streaks.bestStreak > 0) " · best ${state.streaks.bestStreak}" else ""
         findViewById<TextView>(R.id.tv_streak).text =
-            "🌱 ${state.streaks.displayStreak}-day streak · best ${state.streaks.bestStreak}"
+            "🌱 ${state.streaks.displayStreak}-day streak$bestPart"
         val shieldSuffix = if (state.streaks.shieldsHeld > 0) " · 🛡 ${state.streaks.shieldsHeld}" else ""
         findViewById<TextView>(R.id.tv_total_af).text =
             "${state.streaks.totalAfDays} alcohol-free days$shieldSuffix"
@@ -225,7 +226,7 @@ class MainActivity : AppCompatActivity() {
         val moneyTile = findViewById<View>(R.id.tile_money)
         if (state.moneyAvailable) {
             moneyTile.visibility = View.VISIBLE
-            findViewById<TextView>(R.id.tv_money_saved).text = String.format("%.0f", state.moneySaved)
+            findViewById<TextView>(R.id.tv_money_saved).text = Money.format(state.moneySaved)
         } else {
             moneyTile.visibility = View.GONE
         }

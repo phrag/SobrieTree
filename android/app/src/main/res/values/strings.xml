@@ -42,8 +42,8 @@
     <string name="milestone_af_days">At %d AF days</string>
     <string name="badges_title">Badges</string>
     <string name="savings_title">What you\'ve saved</string>
-    <string name="money_row">💰 %.0f saved since your baseline</string>
-    <string name="money_row_with_spent">💰 %1$.0f saved since your baseline · %2$.0f spent</string>
+    <string name="money_row">💰 %1$s saved since your baseline</string>
+    <string name="money_row_with_spent">💰 %1$s saved since your baseline · %2$s spent</string>
     <string name="money_row_unset">💰 Add a cost to your drinks (or set a fallback price in Settings) to see money saved</string>
     <string name="calories_row">🔥 %,d calories avoided</string>
     <string name="calories_row_with_burgers">🔥 %1$,d calories avoided — about %2$d burgers</string>
