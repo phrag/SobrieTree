@@ -32,10 +32,10 @@ class DrinkManagerAdapter(
     override fun onBindViewHolder(holder: DrinkViewHolder, position: Int) {
         val drink = drinks[position]
         holder.name.text = drink.name
-        holder.details.text = "${drink.type.displayName} • ${drink.volume}ml • ${drink.strength}% ABV"
-        holder.favorite.setImageResource(
-            if (drink.favorite) android.R.drawable.btn_star_big_on else android.R.drawable.btn_star_big_off
-        )
+        val costPart = if (drink.cost > 0) " • ${String.format("%.2f", drink.cost)}" else ""
+        holder.details.text = "${drink.type.displayName} • ${drink.volume}ml • ${drink.strength}% ABV$costPart"
+        holder.favorite.setImageResource(R.drawable.ic_star)
+        holder.favorite.imageAlpha = if (drink.favorite) 255 else 70
         holder.favorite.setOnClickListener { onFavorite(drink) }
         holder.edit.setOnClickListener { onEdit(drink) }
         holder.delete.setOnClickListener { onDelete(drink) }

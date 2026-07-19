@@ -33,9 +33,7 @@ class JourneyActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_journey)
 
-        if (getSharedPreferences(AppPrefs.NAME, MODE_PRIVATE).getBoolean("flag_secure", true)) {
-            window.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
-        }
+        SecureWindow.apply(this)
 
         setSupportActionBar(findViewById(R.id.toolbar))
 
@@ -62,6 +60,7 @@ class JourneyActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        SecureWindow.apply(this)
         bindState()
     }
 
@@ -79,14 +78,11 @@ class JourneyActivity : AppCompatActivity() {
         badgeAdapter.update(state.badges)
         educationAdapter.update(state.educationCards)
 
-        findViewById<TextView>(R.id.tv_money_row).apply {
-            if (state.moneyAvailable) {
-                visibility = android.view.View.VISIBLE
-                text = getString(R.string.money_row, state.moneySaved)
-            } else {
-                visibility = android.view.View.VISIBLE
-                text = getString(R.string.money_row_unset)
-            }
+        findViewById<TextView>(R.id.tv_money_row).text = when {
+            state.moneyAvailable && state.moneySpent > 0 ->
+                getString(R.string.money_row_with_spent, state.moneySaved, state.moneySpent)
+            state.moneyAvailable -> getString(R.string.money_row, state.moneySaved)
+            else -> getString(R.string.money_row_unset)
         }
         findViewById<TextView>(R.id.tv_calories_row).text =
             if (state.burgersEquivalent > 0) {

@@ -116,6 +116,28 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Cost Input (powers money-saved tracking) -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="@string/drink_cost_hint"
+        style="?attr/textInputStyle"
+        app:boxBackgroundMode="filled"
+        app:boxBackgroundColor="@color/input_background"
+        app:hintTextColor="@color/text_hint">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_cost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:maxLines="1"
+            android:textColor="@color/text_on_surface"
+            android:textColorHint="@color/text_hint" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
     <!-- Notes Input -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"

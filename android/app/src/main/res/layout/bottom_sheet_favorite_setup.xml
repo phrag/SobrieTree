@@ -66,10 +66,27 @@
         style="?attr/textInputStyle"
         app:boxBackgroundMode="filled"
         app:boxBackgroundColor="@color/input_background"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="12dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_strength"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:textColor="@color/text_on_surface"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/drink_cost_hint"
+        style="?attr/textInputStyle"
+        app:boxBackgroundMode="filled"
+        app:boxBackgroundColor="@color/input_background"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_fav_cost"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"

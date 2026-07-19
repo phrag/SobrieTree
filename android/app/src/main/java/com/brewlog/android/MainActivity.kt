@@ -49,10 +49,7 @@ class MainActivity : AppCompatActivity() {
         val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        // Apply FLAG_SECURE at startup (default ON)
-        if (getSharedPreferences(prefsName, MODE_PRIVATE).getBoolean("flag_secure", true)) {
-            window.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
-        }
+        SecureWindow.apply(this)
 
         setupRecyclerView()
         setupClickListeners()
@@ -93,6 +90,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        SecureWindow.apply(this)
         // Also re-checks for badges earned by days passing since the last visit
         try { loadData() } catch (_: Exception) {}
     }
@@ -427,19 +425,24 @@ class MainActivity : AppCompatActivity() {
         val etName = sheet.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_name)
         val etVol = sheet.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_volume)
         val etStr = sheet.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_strength)
+        val etCost = sheet.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_fav_cost)
         etName.setText("Beer")
         etVol.setText(defaultSize.toString())
         etStr.setText(defaultStrength.toString())
+        if (AppPrefs(this).pricePerDrink > 0) {
+            etCost.setText(String.format("%.2f", AppPrefs(this).pricePerDrink))
+        }
 
         fun saveFavorite(addOne: Boolean) {
             val name = etName.text?.toString()?.trim().orEmpty()
             val vol = etVol.text?.toString()?.toIntOrNull() ?: defaultSize
             val str = etStr.text?.toString()?.toFloatOrNull() ?: defaultStrength
+            val cost = etCost.text?.toString()?.toFloatOrNull()?.coerceAtLeast(0f) ?: 0f
             if (name.isEmpty() || vol <= 0 || str <= 0f) {
                 Toast.makeText(this, "Enter a valid favorite drink", Toast.LENGTH_SHORT).show()
                 return
             }
-            addDrinkPreset(prefs, DrinkPreset(name, DrinkType.BEER, vol, str, favorite = true))
+            addDrinkPreset(prefs, DrinkPreset(name, DrinkType.BEER, vol, str, favorite = true, cost = cost))
             if (addOne) {
                 addBeerEntry(name, str.toDouble(), vol.toDouble(), "")
             } else {
@@ -541,6 +544,7 @@ class MainActivity : AppCompatActivity() {
         val nameEdit = dialogView.findViewById<TextInputEditText>(R.id.et_beer_name)
         val strengthEdit = dialogView.findViewById<TextInputEditText>(R.id.et_alcohol_percentage)
         val volumeEdit = dialogView.findViewById<TextInputEditText>(R.id.et_volume_ml)
+        val costEdit = dialogView.findViewById<TextInputEditText>(R.id.et_cost)
         val typeSpinner = dialogView.findViewById<android.widget.Spinner>(R.id.spinner_drink_type)
         val typeNames = DrinkType.values().map { it.displayName }
         val typeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, typeNames)
@@ -549,6 +553,7 @@ class MainActivity : AppCompatActivity() {
             nameEdit.setText(drink.name)
             strengthEdit.setText(drink.strength.toString())
             volumeEdit.setText(drink.volume.toString())
+            if (drink.cost > 0) costEdit.setText(String.format("%.2f", drink.cost))
             typeSpinner.setSelection(DrinkType.values().indexOf(drink.type))
         }
         val dialog = AlertDialog.Builder(this)
@@ -558,9 +563,10 @@ class MainActivity : AppCompatActivity() {
                 val name = nameEdit.text.toString()
                 val strength = strengthEdit.text.toString().toFloatOrNull() ?: 0f
                 val volume = volumeEdit.text.toString().toIntOrNull() ?: 0
+                val cost = costEdit.text?.toString()?.toFloatOrNull()?.coerceAtLeast(0f) ?: 0f
                 val type = DrinkType.values()[typeSpinner.selectedItemPosition]
                 if (name.isNotEmpty() && strength > 0 && volume > 0) {
-                    onSave(DrinkPreset(name, type, volume, strength, drink?.favorite ?: false))
+                    onSave(DrinkPreset(name, type, volume, strength, drink?.favorite ?: false, cost))
                     d.dismiss()
                 }
             }
@@ -613,6 +619,8 @@ class MainActivity : AppCompatActivity() {
             val name = nameEdit.text.toString()
             val alcoholPercentage = strengthEdit.text.toString().toDoubleOrNull() ?: 0.0
             val volumeMl = volumeEdit.text.toString().toDoubleOrNull() ?: 0.0
+            val cost = dialogView.findViewById<android.widget.EditText>(R.id.et_cost)
+                ?.text?.toString()?.toFloatOrNull()?.coerceAtLeast(0f) ?: 0f
             val notes = notesEdit.text.toString()
             val type = DrinkType.values()[typeSpinner.selectedItemPosition]
             if (name.isNotEmpty() && volumeMl > 0) {
@@ -625,7 +633,8 @@ class MainActivity : AppCompatActivity() {
                             type = type,
                             volume = volumeMl.toInt(),
                             strength = alcoholPercentage.toFloat(),
-                            favorite = favoriteSwitch?.isChecked == true
+                            favorite = favoriteSwitch?.isChecked == true,
+                            cost = cost
                         )
                     )
                 }

@@ -49,9 +49,11 @@ class BadgeEngineTest {
     }
 
     @Test
-    fun `money badge at fifty`() {
-        val earned = BadgeEngine.evaluate(inputs(moneySaved = 50.0), emptySet()).map { it.id }
+    fun `money badges at rising thresholds`() {
+        val earned = BadgeEngine.evaluate(inputs(moneySaved = 120.0), emptySet()).map { it.id }
         assertTrue("saver_50" in earned)
+        assertTrue("saver_100" in earned)
+        assertTrue("saver_500" !in earned)
     }
 
     @Test
@@ -62,8 +64,8 @@ class BadgeEngineTest {
     }
 
     @Test
-    fun `catalog has fourteen unique badges`() {
-        assertEquals(14, BadgeCatalog.all.size)
-        assertEquals(14, BadgeCatalog.all.map { it.id }.toSet().size)
+    fun `catalog has sixteen unique badges`() {
+        assertEquals(16, BadgeCatalog.all.size)
+        assertEquals(16, BadgeCatalog.all.map { it.id }.toSet().size)
     }
 }

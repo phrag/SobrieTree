@@ -17,7 +17,9 @@ data class DrinkPreset(
     val type: DrinkType,
     val volume: Int,
     val strength: Float,
-    val favorite: Boolean = false
+    val favorite: Boolean = false,
+    /** What one of these drinks costs the user; 0 = not set (falls back to the global price). */
+    val cost: Float = 0f
 ) {
     fun toJson(): JSONObject = JSONObject().apply {
         put("name", name)
@@ -25,6 +27,7 @@ data class DrinkPreset(
         put("volume", volume)
         put("strength", strength)
         put("favorite", favorite)
+        put("cost", cost)
     }
     companion object {
         fun fromJson(obj: JSONObject): DrinkPreset = DrinkPreset(
@@ -32,7 +35,8 @@ data class DrinkPreset(
             DrinkType.fromString(obj.optString("type", "CUSTOM")),
             obj.getInt("volume"),
             obj.getDouble("strength").toFloat(),
-            obj.optBoolean("favorite", false)
+            obj.optBoolean("favorite", false),
+            obj.optDouble("cost", 0.0).toFloat()
         )
     }
-} 
+}

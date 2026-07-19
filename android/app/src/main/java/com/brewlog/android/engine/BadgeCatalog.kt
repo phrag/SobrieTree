@@ -39,7 +39,9 @@ object BadgeCatalog {
         Badge("streak_14", "Two-Week Streak", "14 alcohol-free days in a row.", BadgeKind.STREAK, 14),
         Badge("week_under_goal", "Steady Week", "A full week at or under your goal.", BadgeKind.WEEKS_UNDER_GOAL, 1),
         Badge("month_under_goal", "Month of Balance", "Four weeks in a row at or under your goal.", BadgeKind.WEEKS_UNDER_GOAL, 4),
-        Badge("saver_50", "Smart Saver", "50 saved by drinking less.", BadgeKind.MONEY_SAVED, 50)
+        Badge("saver_50", "Smart Saver", "50 saved by drinking less.", BadgeKind.MONEY_SAVED, 50),
+        Badge("saver_100", "Hundred Back", "100 saved. Real money, back in your pocket.", BadgeKind.MONEY_SAVED, 100),
+        Badge("saver_500", "Money in the Bank", "500 saved by drinking less - that's a weekend away.", BadgeKind.MONEY_SAVED, 500)
     )
 
     fun byId(id: String): Badge? = all.firstOrNull { it.id == id }

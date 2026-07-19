@@ -43,7 +43,8 @@
     <string name="badges_title">Badges</string>
     <string name="savings_title">What you\'ve saved</string>
     <string name="money_row">💰 %.0f saved since your baseline</string>
-    <string name="money_row_unset">💰 Set a price per drink in Settings to see money saved</string>
+    <string name="money_row_with_spent">💰 %1$.0f saved since your baseline · %2$.0f spent</string>
+    <string name="money_row_unset">💰 Add a cost to your drinks (or set a fallback price in Settings) to see money saved</string>
     <string name="calories_row">🔥 %,d calories avoided</string>
     <string name="calories_row_with_burgers">🔥 %1$,d calories avoided — about %2$d burgers</string>
     <string name="learn_title">Learn</string>
@@ -73,7 +74,8 @@
     <string name="reminder_title">Evening check-in</string>
     <string name="reminder_streak_message">Day %d alcohol-free — open BrewLog and keep your ring full.</string>
     <string name="reminder_permission_denied">Notifications are blocked, so the reminder stays off. You can allow them in system settings.</string>
-    <string name="price_per_drink_hint">Price per drink (for money saved, optional)</string>
+    <string name="price_per_drink_hint">Fallback price per drink (used when a drink has no cost set)</string>
+    <string name="drink_cost_hint">Cost per drink (optional, for money saved)</string>
     <string name="reminder_channel_name">Daily check-in</string>
     <string name="reminder_channel_description">A single daily reminder to log your day</string>
 

@@ -70,6 +70,7 @@ class GamificationManager(context: Context) {
         val timeline: List<TimelineEntry>,
         val badges: List<BadgeState>,
         val moneySaved: Double,
+        val moneySpent: Double,
         val moneyAvailable: Boolean,
         val caloriesSaved: Double,
         val burgersEquivalent: Int,
@@ -109,14 +110,22 @@ class GamificationManager(context: Context) {
         if (streaks.newlyBridgedDates.isNotEmpty()) {
             prefs.shieldBridgedDates = prefs.shieldBridgedDates + streaks.newlyBridgedDates.map { it.toString() }
         }
-        val drinkSize = (DrinkPresetStore.defaultPreset(prefs.prefs)?.volume ?: prefs.defaultDrinkSizeMl).toDouble()
+        val presets = DrinkPresetStore.getPresets(prefs.prefs)
+        val favorite = presets.firstOrNull { it.favorite } ?: presets.firstOrNull()
+        val drinkSize = (favorite?.volume ?: prefs.defaultDrinkSizeMl).toDouble()
         val savings = SavingsEngine.compute(
             entries = entries,
             ledger = ledger,
             baselineDailyMl = prefs.baselineDailyMl,
             defaultAbv = prefs.defaultDrinkStrength.toDouble(),
             drinkSizeMl = drinkSize,
-            pricePerDrink = prefs.pricePerDrink.toDouble()
+            pricePerDrink = prefs.pricePerDrink.toDouble(),
+            presetCosts = presets.map {
+                SavingsEngine.DrinkCost(it.name, it.volume.toDouble(), it.cost.toDouble())
+            },
+            // The baseline is denominated in the favorite drink, so use its cost when set
+            baselineCostPerDrink = favorite?.cost?.takeIf { it > 0 }?.toDouble()
+                ?: prefs.pricePerDrink.toDouble()
         )
         return Computed(ledger, entries, metrics, streaks, savings)
     }
@@ -242,6 +251,7 @@ class GamificationManager(context: Context) {
             timeline = timeline,
             badges = badges,
             moneySaved = c.savings.moneySaved,
+            moneySpent = c.savings.moneySpent,
             moneyAvailable = c.savings.moneyAvailable,
             caloriesSaved = c.savings.caloriesSaved,
             burgersEquivalent = c.savings.burgersEquivalent,
