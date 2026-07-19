@@ -28,9 +28,7 @@ class ProgressActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_progress)
 
-        if (getSharedPreferences(AppPrefs.NAME, MODE_PRIVATE).getBoolean("flag_secure", true)) {
-            window.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
-        }
+        SecureWindow.apply(this)
 
         setSupportActionBar(findViewById(R.id.toolbar))
 
@@ -43,6 +41,7 @@ class ProgressActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        SecureWindow.apply(this)
         loadData()
     }
 

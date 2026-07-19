@@ -56,7 +56,9 @@ class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-        
+
+        SecureWindow.apply(this)
+
         val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -86,6 +88,11 @@ class SettingsActivity : AppCompatActivity() {
         beerSizeEdit.setText(defaultSize.toString())
         beerStrengthEdit.setText(defaultStrength.toString())
         secureSwitch.isChecked = prefs.getBoolean("flag_secure", true)
+        // Apply immediately so the change is visible without leaving Settings
+        secureSwitch.setOnCheckedChangeListener { _, checked ->
+            prefs.edit().putBoolean("flag_secure", checked).apply()
+            SecureWindow.apply(this, checked)
+        }
         eodEdit.setText(endOfDay.toString())
 
         // Theme dropdown (System / Light / Dark), persisted so it survives restart
@@ -197,6 +204,7 @@ class SettingsActivity : AppCompatActivity() {
                     .putInt("start_of_week", newStartOfWeek)
                     .putBoolean("flag_secure", secureSwitch.isChecked)
                     .apply()
+                SecureWindow.apply(this, secureSwitch.isChecked)
 
                 // Apply and persist theme change
                 val themeIndex = themeOptions.indexOf(themeDropdown.text.toString()).coerceAtLeast(0)

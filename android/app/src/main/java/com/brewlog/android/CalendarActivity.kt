@@ -15,6 +15,8 @@ class CalendarActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_calendar)
 
+        SecureWindow.apply(this)
+
         val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -44,6 +46,11 @@ class CalendarActivity : AppCompatActivity() {
         }
 
         BottomNavHelper.wire(this, findViewById(R.id.bottom_nav), R.id.nav_calendar)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        SecureWindow.apply(this)
     }
 
     private fun setDate(date: LocalDate) {
