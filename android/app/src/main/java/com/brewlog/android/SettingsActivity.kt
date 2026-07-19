@@ -39,19 +39,28 @@ class SettingsActivity : AppCompatActivity() {
         uri?.let { importFromFile(it) }
     }
 
+    // Whatever feature requested notification permission runs its callback here
+    private var onNotifPermission: ((Boolean) -> Unit)? = null
+
     private val notificationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            val appPrefs = AppPrefs(this)
-            val reminderSwitch = findViewById<SwitchMaterial>(R.id.switch_reminder)
-            if (granted) {
-                appPrefs.reminderEnabled = true
-                ReminderScheduler.schedule(this, appPrefs.reminderHour, appPrefs.reminderMinute)
-            } else {
-                appPrefs.reminderEnabled = false
-                reminderSwitch.isChecked = false
-                Toast.makeText(this, getString(R.string.reminder_permission_denied), Toast.LENGTH_LONG).show()
-            }
+            onNotifPermission?.invoke(granted)
+            onNotifPermission = null
         }
+
+    /** Run [action] once notification permission is available, requesting it on API 33+ if needed. */
+    private fun withNotificationPermission(action: (granted: Boolean) -> Unit) {
+        if (android.os.Build.VERSION.SDK_INT >= 33 &&
+            androidx.core.content.ContextCompat.checkSelfPermission(
+                this, android.Manifest.permission.POST_NOTIFICATIONS
+            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            onNotifPermission = action
+            notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            action(true)
+        }
+    }
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -125,15 +134,15 @@ class SettingsActivity : AppCompatActivity() {
         renderReminderTime()
         reminderSwitch.setOnCheckedChangeListener { _, checked ->
             if (checked) {
-                if (android.os.Build.VERSION.SDK_INT >= 33 &&
-                    androidx.core.content.ContextCompat.checkSelfPermission(
-                        this, android.Manifest.permission.POST_NOTIFICATIONS
-                    ) != android.content.pm.PackageManager.PERMISSION_GRANTED
-                ) {
-                    notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-                } else {
-                    appPrefs.reminderEnabled = true
-                    ReminderScheduler.schedule(this, appPrefs.reminderHour, appPrefs.reminderMinute)
+                withNotificationPermission { granted ->
+                    if (granted) {
+                        appPrefs.reminderEnabled = true
+                        ReminderScheduler.schedule(this, appPrefs.reminderHour, appPrefs.reminderMinute)
+                    } else {
+                        appPrefs.reminderEnabled = false
+                        reminderSwitch.isChecked = false
+                        Toast.makeText(this, getString(R.string.reminder_permission_denied), Toast.LENGTH_LONG).show()
+                    }
                 }
             } else {
                 appPrefs.reminderEnabled = false
@@ -153,6 +162,48 @@ class SettingsActivity : AppCompatActivity() {
                 },
                 appPrefs.reminderHour,
                 appPrefs.reminderMinute,
+                true
+            ).show()
+        }
+
+        // Support around your usual start-drinking time (opt-in, local only)
+        val highRiskSwitch = findViewById<SwitchMaterial>(R.id.switch_high_risk)
+        val highRiskTimeText = findViewById<TextView>(R.id.tv_high_risk_time)
+        fun renderHighRiskTime() {
+            highRiskTimeText.text = String.format("%02d:%02d", appPrefs.highRiskHour, appPrefs.highRiskMinute)
+        }
+        highRiskSwitch.isChecked = appPrefs.highRiskEnabled
+        renderHighRiskTime()
+        highRiskSwitch.setOnCheckedChangeListener { _, checked ->
+            if (checked) {
+                withNotificationPermission { granted ->
+                    if (granted) {
+                        appPrefs.highRiskEnabled = true
+                        HighRiskScheduler.schedule(this, appPrefs.highRiskHour, appPrefs.highRiskMinute)
+                    } else {
+                        appPrefs.highRiskEnabled = false
+                        highRiskSwitch.isChecked = false
+                        Toast.makeText(this, getString(R.string.reminder_permission_denied), Toast.LENGTH_LONG).show()
+                    }
+                }
+            } else {
+                appPrefs.highRiskEnabled = false
+                HighRiskScheduler.cancel(this)
+            }
+        }
+        findViewById<android.view.View>(R.id.row_high_risk_time).setOnClickListener {
+            android.app.TimePickerDialog(
+                this,
+                { _, hour, minute ->
+                    appPrefs.highRiskHour = hour
+                    appPrefs.highRiskMinute = minute
+                    renderHighRiskTime()
+                    if (appPrefs.highRiskEnabled) {
+                        HighRiskScheduler.schedule(this, hour, minute)
+                    }
+                },
+                appPrefs.highRiskHour,
+                appPrefs.highRiskMinute,
                 true
             ).show()
         }

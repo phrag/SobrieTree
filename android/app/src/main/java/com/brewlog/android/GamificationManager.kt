@@ -10,6 +10,7 @@ import com.brewlog.android.engine.EducationLibrary
 import com.brewlog.android.engine.EncouragementEngine
 import com.brewlog.android.engine.HealthMilestone
 import com.brewlog.android.engine.HealthTimeline
+import com.brewlog.android.engine.HighRiskSupport
 import com.brewlog.android.engine.MetricsEngine
 import com.brewlog.android.engine.SavingsEngine
 import com.brewlog.android.engine.StreakEngine
@@ -45,6 +46,8 @@ class GamificationManager(context: Context) {
         val nextBadgeHint: String?,
         val weekDots: List<DayDot>,
         val drinkSizeMl: Double,
+        /** Craving-time support message, non-null when now is in the high-risk window. */
+        val cravingSupport: String?,
         /** Badges earned but not yet celebrated with the bottom sheet. */
         val uncelebrated: List<Badge>
     )
@@ -201,6 +204,18 @@ class GamificationManager(context: Context) {
 
         val drinkSize = (DrinkPresetStore.defaultPreset(prefs.prefs)?.volume ?: prefs.defaultDrinkSizeMl).toDouble()
 
+        // Craving-time support: only while inside the user's high-risk window
+        val cravingSupport = if (prefs.highRiskEnabled) {
+            val nowT = java.time.LocalTime.now()
+            val nowMin = nowT.hour * 60 + nowT.minute
+            val startMin = prefs.highRiskHour * 60 + prefs.highRiskMinute
+            if (HighRiskSupport.isInWindow(nowMin, startMin)) {
+                val daysSinceStart = java.time.temporal.ChronoUnit.DAYS
+                    .between(ledger.trackingStart, ledger.todayEffective).toInt().coerceAtLeast(0)
+                HighRiskSupport.message(HighRiskSupport.intensity(daysSinceStart), ledger.todayEffective)
+            } else null
+        } else null
+
         return HomeState(
             metrics = c.metrics,
             streaks = streaks,
@@ -214,6 +229,7 @@ class GamificationManager(context: Context) {
             nextBadgeHint = nextBadge?.let { BadgeEngine.progressHint(it, inputs) },
             weekDots = weekDots,
             drinkSizeMl = drinkSize,
+            cravingSupport = cravingSupport,
             uncelebrated = refreshBadges(c)
         )
     }

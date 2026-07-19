@@ -83,6 +83,19 @@ class AppPrefs(context: Context) {
         get() = prefs.getInt("reminder_minute", 0)
         set(value) = prefs.edit().putInt("reminder_minute", value).apply()
 
+    /** Support around the user's usual start-drinking time. */
+    var highRiskEnabled: Boolean
+        get() = prefs.getBoolean("high_risk_enabled", false)
+        set(value) = prefs.edit().putBoolean("high_risk_enabled", value).apply()
+
+    var highRiskHour: Int
+        get() = prefs.getInt("high_risk_hour", 18)
+        set(value) = prefs.edit().putInt("high_risk_hour", value).apply()
+
+    var highRiskMinute: Int
+        get() = prefs.getInt("high_risk_minute", 0)
+        set(value) = prefs.edit().putInt("high_risk_minute", value).apply()
+
     /** Badge id -> ISO date earned. */
     var badgesEarned: Map<String, String>
         get() {

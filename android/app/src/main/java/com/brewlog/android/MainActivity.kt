@@ -214,6 +214,14 @@ class MainActivity : AppCompatActivity() {
             "${state.streaks.totalAfDays} alcohol-free days$shieldSuffix"
         findViewById<TextView>(R.id.tv_encouragement).text = state.encouragement
 
+        val cravingCard = findViewById<View>(R.id.card_craving_support)
+        if (state.cravingSupport != null) {
+            cravingCard.visibility = View.VISIBLE
+            findViewById<TextView>(R.id.tv_craving_support).text = state.cravingSupport
+        } else {
+            cravingCard.visibility = View.GONE
+        }
+
         val moneyTile = findViewById<View>(R.id.tile_money)
         if (state.moneyAvailable) {
             moneyTile.visibility = View.VISIBLE

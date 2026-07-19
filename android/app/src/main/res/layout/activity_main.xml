@@ -144,6 +144,59 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Craving-time support (shown only during the high-risk window) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_craving_support"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="@color/brand_primary_container"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:contentPadding="18dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/ic_growth_stage_2"
+                        android:contentDescription="@string/high_risk_card_label" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/high_risk_card_label"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                            android:textColor="@color/brand_primary" />
+
+                        <TextView
+                            android:id="@+id/tv_craving_support"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Encourage"
+                            android:textColor="@color/text_primary"
+                            tools:text="This is usually when the pull is strongest. It passes in about 20 minutes." />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Stat tiles: money, calories, next milestone -->
             <LinearLayout
                 android:layout_width="match_parent"

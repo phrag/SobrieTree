@@ -98,6 +98,16 @@
     <string name="reminder_optin_body">People who check in daily cut back the most. One local notification a day, at a time you pick — nothing leaves your phone, and you can turn it off anytime.</string>
     <string name="reminder_no_thanks">No thanks</string>
     <string name="reminder_yes">Remind me</string>
+    <!-- Craving-time support -->
+    <string name="high_risk_settings_title">Support around cravings</string>
+    <string name="high_risk_settings_description">Tell BrewLog when you usually start drinking, and it will send a supportive nudge just before — strongest in your first days, easing as new habits settle. Local only.</string>
+    <string name="high_risk_enable_label">Support before my usual time</string>
+    <string name="high_risk_time_label">When I usually start drinking</string>
+    <string name="high_risk_notif_title">You\'ve got this</string>
+    <string name="high_risk_channel_name">Craving-time support</string>
+    <string name="high_risk_channel_description">A supportive nudge just before your usual drinking time</string>
+    <string name="high_risk_card_label">Support</string>
+
     <string-array name="reminder_messages">
         <item>Evening check-in: how did today go?</item>
         <item>A 10-second log keeps your picture honest. How was today?</item>
