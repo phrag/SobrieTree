@@ -229,6 +229,46 @@
 
                     </LinearLayout>
 
+                    <!-- Journey start date -->
+                    <LinearLayout
+                        android:id="@+id/row_start_date"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/start_date_label"
+                                android:textColor="@color/text_primary" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/start_date_hint"
+                                android:textAppearance="@style/TextAppearance.BrewLog.Caption" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tv_start_date"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                            android:textColor="@color/brand_primary" />
+
+                    </LinearLayout>
+
                     <!-- Save Button -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_save_settings"

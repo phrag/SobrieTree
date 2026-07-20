@@ -19,6 +19,7 @@ import java.io.FileReader
 import java.io.BufferedReader
 import java.time.LocalDate
 import java.time.DayOfWeek
+import java.time.format.DateTimeFormatter
 import org.json.JSONArray
 import org.json.JSONObject
 import android.net.Uri
@@ -208,6 +209,32 @@ class SettingsActivity : AppCompatActivity() {
             ).show()
         }
         
+        // Journey start date — what all progress counts from
+        val startDateText = findViewById<TextView>(R.id.tv_start_date)
+        val startDateFormat = DateTimeFormatter.ofPattern("MMM d, yyyy")
+        fun renderStartDate() {
+            startDateText.text = (appPrefs.baselineSetDate ?: LocalDate.now()).format(startDateFormat)
+        }
+        renderStartDate()
+        findViewById<android.view.View>(R.id.row_start_date).setOnClickListener {
+            val current = appPrefs.baselineSetDate ?: LocalDate.now()
+            val picker = android.app.DatePickerDialog(
+                this,
+                { _, year, month, day ->
+                    val picked = LocalDate.of(year, month + 1, day)
+                    if (picked.isAfter(LocalDate.now())) {
+                        Toast.makeText(this, getString(R.string.start_date_future_error), Toast.LENGTH_SHORT).show()
+                    } else {
+                        appPrefs.baselineSetDate = picked
+                        renderStartDate()
+                    }
+                },
+                current.year, current.monthValue - 1, current.dayOfMonth
+            )
+            picker.datePicker.maxDate = System.currentTimeMillis()
+            picker.show()
+        }
+
         // Setup start of week dropdown
         val daysOfWeek = arrayOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
         val dayAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, daysOfWeek)

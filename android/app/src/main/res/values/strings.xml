@@ -98,6 +98,11 @@
     <string name="reminder_optin_body">People who check in daily cut back the most. One local notification a day, at a time you pick — nothing leaves your phone, and you can turn it off anytime.</string>
     <string name="reminder_no_thanks">No thanks</string>
     <string name="reminder_yes">Remind me</string>
+    <!-- Journey start date -->
+    <string name="start_date_label">Journey start date</string>
+    <string name="start_date_hint">When your progress counts from</string>
+    <string name="start_date_future_error">Start date can\'t be in the future</string>
+
     <!-- Craving-time support -->
     <string name="high_risk_settings_title">Support around cravings</string>
     <string name="high_risk_settings_description">Tell BrewLog when you usually start drinking, and it will send a supportive nudge just before — strongest in your first days, easing as new habits settle. Local only.</string>
