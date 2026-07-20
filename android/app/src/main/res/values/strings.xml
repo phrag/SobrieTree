@@ -98,6 +98,13 @@
     <string name="reminder_optin_body">People who check in daily cut back the most. One local notification a day, at a time you pick — nothing leaves your phone, and you can turn it off anytime.</string>
     <string name="reminder_no_thanks">No thanks</string>
     <string name="reminder_yes">Remind me</string>
+    <!-- Goals & currency -->
+    <string name="goals_settings_title">Goals &amp; baseline</string>
+    <string name="goals_settings_description">Set your daily and weekly goal, and the baseline your reduction is measured against.</string>
+    <string name="goals_edit_button">Edit goals &amp; baseline</string>
+    <string name="currency_label">Currency</string>
+    <string name="currency_system_default">System default</string>
+
     <!-- Journey start date -->
     <string name="start_date_label">Journey start date</string>
     <string name="start_date_hint">When your progress counts from</string>

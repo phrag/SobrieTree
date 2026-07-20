@@ -35,7 +35,7 @@ class BadgeEngineTest {
 
     @Test
     fun `already earned badges are not re-issued`() {
-        val earned = BadgeEngine.evaluate(inputs(totalAfDays = 3), setOf("first_af", "first_log"))
+        val earned = BadgeEngine.evaluate(inputs(totalAfDays = 3), setOf("first_af", "first_log", "af_2"))
         assertEquals(listOf("af_3"), earned.map { it.id })
     }
 
@@ -64,8 +64,12 @@ class BadgeEngineTest {
     }
 
     @Test
-    fun `catalog has sixteen unique badges`() {
-        assertEquals(16, BadgeCatalog.all.size)
-        assertEquals(16, BadgeCatalog.all.map { it.id }.toSet().size)
+    fun `catalog badges are all unique with dense early wins`() {
+        assertEquals(BadgeCatalog.all.size, BadgeCatalog.all.map { it.id }.toSet().size)
+        // Frequent early AF milestones sustain momentum in the first weeks
+        val earlyAf = BadgeCatalog.all
+            .filter { it.kind == BadgeKind.AF_TOTAL && it.threshold <= 14 }
+            .map { it.threshold }
+        assertTrue("expected several AF badges within the first 14 days", earlyAf.size >= 6)
     }
 }

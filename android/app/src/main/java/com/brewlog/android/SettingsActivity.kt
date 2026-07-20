@@ -119,10 +119,42 @@ class SettingsActivity : AppCompatActivity() {
         themeDropdown.setText(themeOptions[currentThemeIndex], false)
         themeDropdown.setOnClickListener { themeDropdown.showDropDown() }
 
-        // Price per drink (powers money-saved counters; optional)
+        // Currency for money displays (code, label); null code = follow device locale
+        val currencyDropdown = findViewById<AutoCompleteTextView>(R.id.et_currency)
+        val currencyOptions = listOf(
+            null to getString(R.string.currency_system_default),
+            "USD" to "US Dollar ($)",
+            "EUR" to "Euro (€)",
+            "GBP" to "British Pound (£)",
+            "CAD" to "Canadian Dollar ($)",
+            "AUD" to "Australian Dollar ($)",
+            "CHF" to "Swiss Franc (CHF)",
+            "SEK" to "Swedish Krona (kr)",
+            "NOK" to "Norwegian Krone (kr)",
+            "DKK" to "Danish Krone (kr)",
+            "PLN" to "Polish Złoty (zł)",
+            "JPY" to "Japanese Yen (¥)",
+            "INR" to "Indian Rupee (₹)",
+            "BRL" to "Brazilian Real (R$)",
+            "MXN" to "Mexican Peso ($)",
+            "ZAR" to "South African Rand (R)"
+        )
+        val currencyLabels = currencyOptions.map { it.second }
+        val currencyAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, currencyLabels)
+        currencyDropdown.setAdapter(currencyAdapter)
+        val currentCurrencyIndex = currencyOptions.indexOfFirst { it.first == appPrefs.currencyCode }.coerceAtLeast(0)
+        currencyDropdown.setText(currencyLabels[currentCurrencyIndex], false)
+        currencyDropdown.setOnClickListener { currencyDropdown.showDropDown() }
+
+        // Price per drink (fallback when a drink has no cost; powers money-saved)
         val priceEdit = findViewById<TextInputEditText>(R.id.et_price_per_drink)
         if (appPrefs.pricePerDrink > 0) {
             priceEdit.setText(String.format("%.2f", appPrefs.pricePerDrink))
+        }
+
+        // Edit goals & baseline directly from Settings
+        findViewById<MaterialButton>(R.id.btn_edit_goals).setOnClickListener {
+            GoalsSetupDialog.show(this) {}
         }
 
         // Daily check-in reminder (opt-in, local only)
@@ -290,6 +322,11 @@ class SettingsActivity : AppCompatActivity() {
                 AppCompatDelegate.setDefaultNightMode(themeModes[themeIndex])
 
                 appPrefs.pricePerDrink = priceEdit.text?.toString()?.toFloatOrNull()?.coerceAtLeast(0f) ?: 0f
+
+                val currencyIndex = currencyOptions.indexOfFirst { it.second == currencyDropdown.text.toString() }
+                    .coerceAtLeast(0)
+                appPrefs.currencyCode = currencyOptions[currencyIndex].first
+                Money.applyFrom(appPrefs)
 
                 Toast.makeText(this, "Settings saved", Toast.LENGTH_SHORT).show()
             } catch (e: NumberFormatException) {

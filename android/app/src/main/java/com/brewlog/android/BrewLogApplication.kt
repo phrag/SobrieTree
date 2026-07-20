@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatDelegate
 class BrewLogApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        AppCompatDelegate.setDefaultNightMode(AppPrefs(this).themeMode)
+        val prefs = AppPrefs(this)
+        AppCompatDelegate.setDefaultNightMode(prefs.themeMode)
+        Money.applyFrom(prefs)
         try {
             System.loadLibrary("brewlog_core")
         } catch (_: Throwable) {}

@@ -71,6 +71,11 @@ class AppPrefs(context: Context) {
         get() = prefs.getFloat("price_per_drink", 0f)
         set(value) = prefs.edit().putFloat("price_per_drink", value).apply()
 
+    /** ISO 4217 currency code (e.g. "EUR"); null = follow the device locale. */
+    var currencyCode: String?
+        get() = prefs.getString("currency_code", null)
+        set(value) = prefs.edit().putString("currency_code", value).apply()
+
     var reminderEnabled: Boolean
         get() = prefs.getBoolean("reminder_enabled", false)
         set(value) = prefs.edit().putBoolean("reminder_enabled", value).apply()

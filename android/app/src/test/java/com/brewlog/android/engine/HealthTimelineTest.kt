@@ -2,6 +2,7 @@ package com.brewlog.android.engine
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.LocalDate
 
@@ -21,11 +22,13 @@ class HealthTimelineTest {
     }
 
     @Test
-    fun `next milestone after current total`() {
-        assertEquals(1, HealthTimeline.next(0)?.afDays)
-        assertEquals(30, HealthTimeline.next(14)?.afDays)
-        assertEquals(180, HealthTimeline.next(90)?.afDays)
-        assertNull(HealthTimeline.next(180))
+    fun `next milestone is the smallest one still ahead`() {
+        for (x in listOf(0, 5, 14, 90, 180, 999)) {
+            val expected = HealthTimeline.milestones.filter { it.afDays > x }.minByOrNull { it.afDays }
+            assertEquals(expected, HealthTimeline.next(x))
+        }
+        assertEquals(1, HealthTimeline.next(0)?.afDays) // day 1 is always first
+        assertNull(HealthTimeline.next(HealthTimeline.milestones.maxOf { it.afDays }))
     }
 
     @Test
@@ -33,5 +36,6 @@ class HealthTimelineTest {
         val days = HealthTimeline.milestones.map { it.afDays }
         assertEquals(days.sorted(), days)
         assertEquals(days.toSet().size, days.size)
+        assertTrue("expected an expanded set", days.size >= 12)
     }
 }

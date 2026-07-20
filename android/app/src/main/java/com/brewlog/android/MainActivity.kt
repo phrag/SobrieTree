@@ -20,8 +20,6 @@ import java.time.format.DateTimeFormatter
 class MainActivity : AppCompatActivity() {
     private lateinit var adapter: BeerEntryAdapter
     private var brewLog: BrewLog? = null
-    private var selectedStartDate: LocalDate? = null
-    private var selectedEndDate: LocalDate? = null
     private var hasShownFavoriteSetup = false
     private var celebrationShowing = false
     private val prefsName = AppPrefs.NAME
@@ -732,118 +730,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showSetupDialog(isInitialSetup: Boolean = false) {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_setup, null)
-        val defaultDrinkEdit = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_default_drink_ml)
-        val dailyGoalDrinks = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_goal_daily_drinks)
-        val weeklyGoalDrinks = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_goal_weekly_drinks)
-        val dailyBaselineDrinks = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_baseline_daily_drinks)
-        val weeklyBaselineDrinks = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_baseline_weekly_drinks)
-
-        val layoutDailyGoal = dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.layout_daily_goal_drinks)
-        val layoutWeeklyGoal = dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.layout_weekly_goal_drinks)
-        val layoutDailyBaseline = dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.layout_daily_baseline_drinks)
-        val layoutWeeklyBaseline = dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.layout_weekly_baseline_drinks)
-
-        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
-        val drinks = getDrinkPresets(prefs)
-        val defaultDrink = drinks.firstOrNull { it.favorite } ?: drinks.firstOrNull()
-        val defaultSizeMl = defaultDrink?.volume ?: prefs.getInt("default_beer_size", 500)
-        defaultDrinkEdit.setText(defaultSizeMl.toString())
-
-        // Prefill goals in drinks
-        val currentDailyMl = brewLog?.getDailyGoal() ?: 0.0
-        val currentWeeklyMl = brewLog?.getWeeklyGoal() ?: 0.0
-        val vol = if (defaultSizeMl > 0) defaultSizeMl.toDouble() else 500.0
-        // Low-risk guideline anchor: ~12 g pure alcohol/day (lower) to ~24 g (upper)
-        val assumedAbv = prefs.getFloat("default_beer_strength", 5.0f).toDouble().coerceAtLeast(1.0)
-        val gramsPerDrink = vol * (assumedAbv / 100.0) * 0.8
-        val guidelineDailyDrinks = if (gramsPerDrink > 0) (24.0 / gramsPerDrink) else 2.0
-        val defaultDailyDrinks = guidelineDailyDrinks.coerceIn(1.0, 5.0)
-        val defaultWeeklyDrinks = (defaultDailyDrinks * 7).toInt()
-        dailyGoalDrinks.setText(
-            if (currentDailyMl > 0) (currentDailyMl / vol).toInt().toString() else defaultDailyDrinks.toInt().toString()
-        )
-        weeklyGoalDrinks.setText(
-            if (currentWeeklyMl > 0) (currentWeeklyMl / vol).toInt().toString() else defaultWeeklyDrinks.toString()
-        )
-
-        // Prefill baseline in drinks
-        val baseline = brewLog?.getCurrentBaseline()
-        dailyBaselineDrinks.setText(if ((baseline?.averageDailyConsumption ?: 0.0) > 0) ((baseline!!.averageDailyConsumption) / vol).toInt().toString() else "0")
-        weeklyBaselineDrinks.setText(if ((baseline?.averageWeeklyConsumption ?: 0.0) > 0) ((baseline!!.averageWeeklyConsumption) / vol).toInt().toString() else "0")
-
-        // Show guideline note
-        val dailyFemale = (12.0 / gramsPerDrink).coerceAtLeast(0.0).toInt()
-        val dailyMale = (24.0 / gramsPerDrink).coerceAtLeast(0.0).toInt()
-        dialogView.findViewById<TextView>(R.id.tv_guideline_note)?.text =
-            "💡 Low-risk guidelines: ${dailyFemale}-${dailyMale} drinks/day (${vol.toInt()}ml @ ${assumedAbv}%). " +
-            "Aim for 2+ alcohol-free days each week - they grow the plant in your ring."
-
-        fun recalcWeeklyFromDaily(source: com.google.android.material.textfield.TextInputEditText, target: com.google.android.material.textfield.TextInputEditText) {
-            val d = source.text.toString().toDoubleOrNull() ?: 0.0
-            target.setText((d * 7).toInt().toString())
-        }
-        dailyGoalDrinks.addTextChangedListener(object : android.text.TextWatcher {
-            override fun afterTextChanged(s: android.text.Editable?) { recalcWeeklyFromDaily(dailyGoalDrinks, weeklyGoalDrinks) }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
-        dailyBaselineDrinks.addTextChangedListener(object : android.text.TextWatcher {
-            override fun afterTextChanged(s: android.text.Editable?) { recalcWeeklyFromDaily(dailyBaselineDrinks, weeklyBaselineDrinks) }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
-
-        val dialog = AlertDialog.Builder(this)
-            .setView(dialogView)
-            .create()
-
-        dialogView.findViewById<View>(R.id.btn_cancel).setOnClickListener { dialog.dismiss() }
-        dialogView.findViewById<View>(R.id.btn_save).setOnClickListener {
-            val sizeInput = defaultDrinkEdit.text.toString().toIntOrNull() ?: 0
-            val dailyGoal = dailyGoalDrinks.text.toString().toDoubleOrNull() ?: 0.0
-            val weeklyGoal = weeklyGoalDrinks.text.toString().toDoubleOrNull() ?: 0.0
-            val dailyBase = dailyBaselineDrinks.text.toString().toDoubleOrNull() ?: 0.0
-            val weeklyBase = weeklyBaselineDrinks.text.toString().toDoubleOrNull() ?: 0.0
-
-            var valid = true
-            if (dailyGoal <= 0) { layoutDailyGoal.error = "Enter daily goal"; valid = false } else layoutDailyGoal.error = null
-            if (weeklyGoal <= 0) { layoutWeeklyGoal.error = "Enter weekly goal"; valid = false } else layoutWeeklyGoal.error = null
-            if (dailyBase <= 0) { layoutDailyBaseline.error = "Enter daily baseline"; valid = false } else layoutDailyBaseline.error = null
-            if (weeklyBase <= 0) { layoutWeeklyBaseline.error = "Enter weekly baseline"; valid = false } else layoutWeeklyBaseline.error = null
-
-            if (!valid) return@setOnClickListener
-
-            val effectiveSize = if (sizeInput > 0) sizeInput else defaultSizeMl
-            if (effectiveSize > 0) {
-                prefs.edit().putInt("default_beer_size", effectiveSize).apply()
-            }
-
-            val mlDailyGoal = dailyGoal * effectiveSize
-            val mlWeeklyGoal = weeklyGoal * effectiveSize
-            val mlDailyBaseline = dailyBase * effectiveSize
-
-            val today = LocalDate.now()
-            brewLog?.setConsumptionGoal(mlDailyGoal, mlWeeklyGoal, today, today.plusWeeks(4))
-            brewLog?.setBaseline(startDate = today, endDate = today.plusWeeks(4), totalConsumption = null, dailyAverage = mlDailyBaseline)
-
-            // Persist selections for next launch
-            prefs.edit()
-                .putFloat("goal_daily_ml", mlDailyGoal.toFloat())
-                .putFloat("goal_weekly_ml", mlWeeklyGoal.toFloat())
-                .putFloat("baseline_daily_ml", mlDailyBaseline.toFloat())
-                .putString("baseline_set_date", today.toString())
-                .apply()
-
-            Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
-            dialog.dismiss()
+        GoalsSetupDialog.show(this) {
             loadData()
-
-            // If this is part of initial setup, proceed to favorite drink setup
             if (isInitialSetup) {
                 showFavoriteSetupSheet(true)
             } else {
-                // Mark onboarding as complete after first successful setup
                 val prefsDone = getSharedPreferences(prefsName, MODE_PRIVATE)
                 if (!prefsDone.getBoolean("onboarding_complete", false)) {
                     prefsDone.edit().putBoolean("onboarding_complete", true).apply()
@@ -851,7 +742,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        dialog.show()
     }
 
     private fun showDatePicker(onDateSelected: (LocalDate) -> Unit) {
@@ -866,37 +756,6 @@ class MainActivity : AppCompatActivity() {
             today.monthValue - 1,
             today.dayOfMonth
         ).show()
-    }
-
-    private fun showFilterMenu() {
-        val choices = arrayOf("Today", "Yesterday", "Last 7 days", "Last 30 days", "Custom date", "Custom range")
-        AlertDialog.Builder(this)
-            .setTitle("Filter entries")
-            .setItems(choices) { d, which ->
-                val today = LocalDate.now()
-                when (which) {
-                    0 -> { selectedStartDate = today; selectedEndDate = today; loadDataWithRange() }
-                    1 -> { val y = today.minusDays(1); selectedStartDate = y; selectedEndDate = y; loadDataWithRange() }
-                    2 -> { selectedStartDate = today.minusDays(6); selectedEndDate = today; loadDataWithRange() }
-                    3 -> { selectedStartDate = today.minusDays(29); selectedEndDate = today; loadDataWithRange() }
-                    4 -> showDatePicker { date -> selectedStartDate = date; selectedEndDate = date; loadDataWithRange() }
-                    5 -> showDatePicker { start -> showDatePicker { end -> selectedStartDate = start; selectedEndDate = end; loadDataWithRange() } }
-                }
-                d.dismiss()
-            }
-            .show()
-    }
-
-    private fun loadDataWithRange() {
-        try {
-            val start = selectedStartDate ?: LocalDate.now().minusDays(6)
-            val end = selectedEndDate ?: LocalDate.now()
-            val entries = repo.getEntries(start, end)
-            adapter.submitList(entries)
-            findViewById<View>(R.id.empty_state).visibility = if (entries.isEmpty()) View.VISIBLE else View.GONE
-        } catch (_: Exception) {
-            Toast.makeText(this, "Failed to apply filter", Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun addBeerEntry(name: String, alcoholPercentage: Double, volumeMl: Double, notes: String) {
@@ -964,29 +823,6 @@ class MainActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Toast.makeText(this, "Failed to reset baseline", Toast.LENGTH_SHORT).show()
             }
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: android.view.Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_settings -> {
-                startActivity(Intent(this, SettingsActivity::class.java))
-                true
-            }
-            R.id.action_set_goals -> {
-                showSetGoalsDialog()
-                true
-            }
-            R.id.action_filter -> {
-                showFilterMenu()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
         }
     }
 
