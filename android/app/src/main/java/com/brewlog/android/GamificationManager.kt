@@ -255,10 +255,20 @@ class GamificationManager(context: Context) {
         val celebrated = prefs.celebratedMilestones
         return (1..trees).filter { "tree_$it" !in celebrated }.map { n ->
             val cost = StreakEngine.treeCost(n - 1)
+            val big = StreakEngine.isBigTree(n - 1)
             Badge(
                 id = "tree_$n",
-                title = if (n == 1) "Your first tree!" else "Tree #$n joins your forest",
-                description = "$cost alcohol-free days grew a whole tree. It's planted in your Journey forest - and a fresh seed is already in the ring.",
+                title = when {
+                    n == 1 -> "Your first tree!"
+                    big && !StreakEngine.isBigTree(n - 2) -> "Your first month tree!"
+                    big -> "A mighty month tree joins your forest"
+                    else -> "Tree #$n joins your forest"
+                },
+                description = if (big) {
+                    "A full month of alcohol-free days grew a big tree - the tall kind your forest is built around. A fresh seed is already in the ring."
+                } else {
+                    "$cost alcohol-free days grew a tree for your forest. Keep going - a new seed is already planted."
+                },
                 kind = com.brewlog.android.engine.BadgeKind.AF_TOTAL,
                 threshold = StreakEngine.treeCompletionDay(n)
             )

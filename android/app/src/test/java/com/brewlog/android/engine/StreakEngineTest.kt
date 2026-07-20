@@ -1,6 +1,7 @@
 package com.brewlog.android.engine
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.LocalDate
@@ -122,33 +123,36 @@ class StreakEngineTest {
     }
 
     @Test
-    fun `early trees grow faster then settle at 30 days`() {
-        // Ramp: tree 1 = 7 days, tree 2 = 14, tree 3+ = 30
+    fun `first month grows a tree per week then big month trees`() {
+        // Trees 1-4: 7 days each (first month); tree 5 onward: 30 days, bigger
         assertEquals(7, StreakEngine.treeCost(0))
-        assertEquals(14, StreakEngine.treeCost(1))
-        assertEquals(30, StreakEngine.treeCost(2))
+        assertEquals(7, StreakEngine.treeCost(3))
+        assertEquals(30, StreakEngine.treeCost(4))
         assertEquals(30, StreakEngine.treeCost(9))
+        assertFalse(StreakEngine.isBigTree(0))
+        assertFalse(StreakEngine.isBigTree(3))
+        assertTrue(StreakEngine.isBigTree(4))
 
         assertEquals(0, StreakEngine.treesCollected(0))
         assertEquals(0, StreakEngine.treesCollected(6))
-        assertEquals(1, StreakEngine.treesCollected(7))       // first payoff in week one
-        assertEquals(1, StreakEngine.treesCollected(20))
-        assertEquals(2, StreakEngine.treesCollected(21))      // 7 + 14
-        assertEquals(2, StreakEngine.treesCollected(50))
-        assertEquals(3, StreakEngine.treesCollected(51))      // 7 + 14 + 30
-        assertEquals(4, StreakEngine.treesCollected(81))
+        assertEquals(1, StreakEngine.treesCollected(7))       // weekly payoffs
+        assertEquals(2, StreakEngine.treesCollected(14))
+        assertEquals(3, StreakEngine.treesCollected(21))
+        assertEquals(4, StreakEngine.treesCollected(28))      // first month done
+        assertEquals(4, StreakEngine.treesCollected(57))
+        assertEquals(5, StreakEngine.treesCollected(58))      // 28 + 30: first big tree
         assertEquals(0, StreakEngine.treesCollected(-1))      // defensive
 
         assertEquals(0f, StreakEngine.treeProgress(0), 0.001f)
         assertEquals(3f / 7f, StreakEngine.treeProgress(3), 0.001f)
         assertEquals(0f, StreakEngine.treeProgress(7), 0.001f)    // tree 2 starts
-        assertEquals(3f / 14f, StreakEngine.treeProgress(10), 0.001f)
-        assertEquals(15f / 30f, StreakEngine.treeProgress(66), 0.001f)
+        assertEquals(15f / 30f, StreakEngine.treeProgress(43), 0.001f) // 28 + 15 into big tree
 
-        assertEquals(3, StreakEngine.treeDaysGrown(10))
-        assertEquals(14, StreakEngine.treeDaysNeeded(10))
+        assertEquals(3, StreakEngine.treeDaysGrown(3))
+        assertEquals(7, StreakEngine.treeDaysNeeded(3))
+        assertEquals(30, StreakEngine.treeDaysNeeded(28))
         assertEquals(7, StreakEngine.treeCompletionDay(1))
-        assertEquals(21, StreakEngine.treeCompletionDay(2))
-        assertEquals(51, StreakEngine.treeCompletionDay(3))
+        assertEquals(28, StreakEngine.treeCompletionDay(4))
+        assertEquals(58, StreakEngine.treeCompletionDay(5))
     }
 }

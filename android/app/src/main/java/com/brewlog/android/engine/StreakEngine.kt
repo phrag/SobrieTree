@@ -152,15 +152,19 @@ object StreakEngine {
         else -> 0
     }
 
-    /** Steady-state days per tree once the early ramp is done. */
+    /** Steady-state days per (big) tree once the first-month ramp is done. */
     const val TREE_DAYS = 30
 
-    /** The first trees grow faster for an early payoff: 7, then 14, then 30 each. */
-    private val EARLY_TREE_DAYS = intArrayOf(7, 14)
+    /** During the first month a tree grows every week: 4 quick weekly trees. */
+    const val WEEKLY_TREE_DAYS = 7
+    const val WEEKLY_TREE_COUNT = 4
 
     /** AF days needed to grow the tree at [treeIndex] (0-based). */
     fun treeCost(treeIndex: Int): Int =
-        if (treeIndex < EARLY_TREE_DAYS.size) EARLY_TREE_DAYS[treeIndex] else TREE_DAYS
+        if (treeIndex < WEEKLY_TREE_COUNT) WEEKLY_TREE_DAYS else TREE_DAYS
+
+    /** Month trees (post-ramp) are the big ones in the forest. */
+    fun isBigTree(treeIndex: Int): Boolean = treeIndex >= WEEKLY_TREE_COUNT
 
     /** (trees fully grown, AF days into the current tree). */
     private fun decompose(totalAfDays: Int): Pair<Int, Int> {

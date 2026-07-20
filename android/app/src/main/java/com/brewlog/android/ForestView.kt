@@ -60,11 +60,14 @@ class ForestView @JvmOverloads constructor(
             // Deterministic organic jitter per tree
             val rnd = Random(i * 7919 + 31)
             val jx = (rnd.nextFloat() - 0.5f) * 8 * density
-            val jh = 0.85f + rnd.nextFloat() * 0.3f
+            val jh = 0.88f + rnd.nextFloat() * 0.24f
+
+            // Weekly starter trees stay small; month trees stand tall
+            val sizeFactor = if (com.brewlog.android.engine.StreakEngine.isBigTree(i)) 1.0f else 0.62f
 
             val cx = (col + 0.5f) * cellW + jx
             val baseY = (row + 1) * cellH - 6 * density
-            val h = cellH * 0.78f * jh
+            val h = cellH * 0.82f * jh * sizeFactor
             val progress = if (i < treesCollected) 1f else currentProgress
             TreePainter.draw(canvas, cx, baseY, h, progress, palette)
         }
