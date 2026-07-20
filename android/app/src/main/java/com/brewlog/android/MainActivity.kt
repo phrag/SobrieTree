@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity() {
             view.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             val preset = DrinkPresetStore.defaultPreset(getSharedPreferences(prefsName, MODE_PRIVATE))
             if (preset != null) {
-                addBeerEntry(preset.name, preset.strength.toDouble(), preset.volume.toDouble(), "")
+                addBeerEntry(preset.name, preset.abv, preset.volume.toDouble(), "")
             } else {
                 Toast.makeText(this, "No saved drinks yet. Add one first.", Toast.LENGTH_SHORT).show()
             }
@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.btn_add_drink_tile).setOnClickListener { showAddBeerDialog() }
         findViewById<View>(R.id.btn_manage_drinks_tile).setOnClickListener {
             showDrinkManagerDialog { selected ->
-                addBeerEntry(selected.name, selected.strength.toDouble(), selected.volume.toDouble(), "")
+                addBeerEntry(selected.name, selected.abv, selected.volume.toDouble(), "")
             }
         }
         findViewById<View>(R.id.btn_manage_goals_baseline).setOnClickListener {
@@ -201,9 +201,12 @@ class MainActivity : AppCompatActivity() {
         val drinkVolume = state.drinkSizeMl
         val todayDrinks = if (drinkVolume > 0) state.metrics.todayMl / drinkVolume else 0.0
         val goalDrinks = if (drinkVolume > 0) state.metrics.effectiveDailyGoalMl / drinkVolume else 0.0
+        // A weekly-only goal spreads to a fractional daily figure; show one decimal for those.
+        val goalLabel = if (goalDrinks == Math.floor(goalDrinks)) goalDrinks.toInt().toString()
+            else String.format("%.1f", goalDrinks)
         findViewById<TextView>(R.id.tv_ring_progress).text =
             if (state.isTodayAf) "Alcohol-free so far"
-            else "${todayDrinks.toInt()} of ${goalDrinks.toInt()} drinks"
+            else "${todayDrinks.toInt()} of $goalLabel drinks"
 
         val bestPart = if (state.streaks.bestStreak > 0) " · best ${state.streaks.bestStreak}" else ""
         findViewById<TextView>(R.id.tv_streak).text =
@@ -223,11 +226,23 @@ class MainActivity : AppCompatActivity() {
         }
 
         val moneyTile = findViewById<View>(R.id.tile_money)
+        val moneyValue = findViewById<TextView>(R.id.tv_money_saved)
+        val moneyCaption = findViewById<TextView>(R.id.tv_money_caption)
+        moneyTile.visibility = View.VISIBLE
         if (state.moneyAvailable) {
-            moneyTile.visibility = View.VISIBLE
-            findViewById<TextView>(R.id.tv_money_saved).text = Money.format(state.moneySaved)
+            moneyValue.text = Money.format(state.moneySaved)
+            moneyCaption.setText(R.string.tile_money_saved)
+            moneyTile.setOnClickListener {
+                startActivity(Intent(this, JourneyActivity::class.java))
+            }
         } else {
-            moneyTile.visibility = View.GONE
+            // No price set anywhere: keep the tile visible so the feature is
+            // discoverable, and send the tap to Settings to add one.
+            moneyValue.text = "—"
+            moneyCaption.setText(R.string.tile_set_price)
+            moneyTile.setOnClickListener {
+                startActivity(Intent(this, SettingsActivity::class.java))
+            }
         }
         findViewById<TextView>(R.id.tv_calories_saved).text = String.format("%,d", state.caloriesSaved.toInt())
         findViewById<TextView>(R.id.tv_next_milestone).text =
@@ -290,7 +305,7 @@ class MainActivity : AppCompatActivity() {
                 setOnClickListener {
                     addBeerEntry(
                         name = preset.name,
-                        alcoholPercentage = preset.strength.toDouble(),
+                        alcoholPercentage = preset.abv,
                         volumeMl = preset.volume.toDouble(),
                         notes = ""
                     )

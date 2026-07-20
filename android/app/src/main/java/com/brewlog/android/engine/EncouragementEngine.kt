@@ -71,12 +71,12 @@ object EncouragementEngine {
             "One day at a time works. Today is that day."
         ),
         EncourageState.MILESTONE_NEAR to listOf(
-            "You're within touching distance of your next badge. Hold the line today.",
-            "Almost there - a day or two from your next milestone.",
-            "Your next badge is this close. Today's AF day gets you nearer.",
-            "Milestone in sight. Finish today clean and it's nearly yours.",
-            "So close to the next badge - your future self is cheering.",
-            "Keep today alcohol-free and the next milestone is around the corner."
+            "One more good day and your next badge is yours.",
+            "You're a day or two from a new badge - keep today easy.",
+            "A new badge is waiting just ahead. Tonight, water wins.",
+            "Almost at your next milestone - today is the last stretch.",
+            "Your next badge unlocks this week, and today counts toward it.",
+            "So close now. One quiet evening at a time."
         )
     )
 

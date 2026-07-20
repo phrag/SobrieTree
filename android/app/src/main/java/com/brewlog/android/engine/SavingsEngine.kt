@@ -8,8 +8,12 @@ import kotlin.math.abs
  * Money and calories not consumed compared to the user's baseline.
  * Both are floored at zero: the counters encourage, they never accuse.
  *
+ * Only *completed* days count - the in-progress day is excluded from both the
+ * expected and the actual side, so savings never appear out of thin air the
+ * moment a new day starts; numbers move when a day closes.
+ *
  * Money uses real per-drink costs where the user has set them on a preset,
- * falling back to the global price-per-drink (scaled by volume) otherwise.
+ * falling back to the global price, then to the average of priced presets.
  */
 object SavingsEngine {
 
@@ -21,7 +25,7 @@ object SavingsEngine {
 
     data class Result(
         val moneySaved: Double,
-        /** What was actually spent on logged drinks in the tracking window. */
+        /** What was actually spent on logged drinks over completed days. */
         val moneySpent: Double,
         /** False until the user has set any price (per-preset or global). */
         val moneyAvailable: Boolean,
@@ -30,7 +34,16 @@ object SavingsEngine {
         val burgersEquivalent: Int
     )
 
-    /** Cost of a single logged entry using preset costs, else the global price scaled by volume. */
+    /** Average cost of the presets that have one, or 0 when none do. */
+    fun averagePresetCost(presetCosts: List<DrinkCost>): Double {
+        val priced = presetCosts.filter { it.cost > 0 }
+        return if (priced.isEmpty()) 0.0 else priced.sumOf { it.cost } / priced.size
+    }
+
+    /**
+     * Cost of a single logged entry: matched preset cost, else the global
+     * price scaled by volume, else the average preset cost scaled by volume.
+     */
     fun entryCost(
         entry: BeerEntry,
         presetCosts: List<DrinkCost>,
@@ -41,7 +54,8 @@ object SavingsEngine {
             it.cost > 0 && it.name.equals(entry.name, ignoreCase = true) && abs(it.volumeMl - entry.volumeMl) < 1.0
         }
         if (preset != null) return preset.cost
-        return if (pricePerDrink > 0 && drinkSizeMl > 0) pricePerDrink * (entry.volumeMl / drinkSizeMl) else 0.0
+        val perDrink = if (pricePerDrink > 0) pricePerDrink else averagePresetCost(presetCosts)
+        return if (perDrink > 0 && drinkSizeMl > 0) perDrink * (entry.volumeMl / drinkSizeMl) else 0.0
     }
 
     fun compute(
@@ -55,24 +69,25 @@ object SavingsEngine {
         /** Cost of one baseline drink; callers pass the favorite preset's cost when set. */
         baselineCostPerDrink: Double = pricePerDrink
     ): Result {
-        // Include today so counters move from the very first day.
-        val daysTracked = ledger.completedDays.size + 1
+        // Completed days only - today joins the ledger when it closes.
+        val daysTracked = ledger.completedDays.size
 
+        val effectiveBaselineCost = if (baselineCostPerDrink > 0) baselineCostPerDrink else averagePresetCost(presetCosts)
         val moneyAvailable = drinkSizeMl > 0 &&
-            (baselineCostPerDrink > 0 || pricePerDrink > 0 || presetCosts.any { it.cost > 0 })
+            (effectiveBaselineCost > 0 || pricePerDrink > 0 || presetCosts.any { it.cost > 0 })
 
         var actualSpend = 0.0
         var actualKcal = 0.0
         for (entry in entries) {
             if (entry.alcoholPercentage <= 0) continue
             val date = try { LocalDate.parse(entry.date) } catch (_: Exception) { continue }
-            if (date < ledger.trackingStart || date > ledger.todayEffective) continue
+            if (date < ledger.trackingStart || date >= ledger.todayEffective) continue
             actualSpend += entryCost(entry, presetCosts, drinkSizeMl, pricePerDrink)
             actualKcal += entry.volumeMl * (entry.alcoholPercentage / 100.0) * KCAL_PER_ML_ALCOHOL
         }
 
-        val moneySaved = if (moneyAvailable && baselineCostPerDrink > 0) {
-            val expectedSpend = (baselineDailyMl / drinkSizeMl) * baselineCostPerDrink * daysTracked
+        val moneySaved = if (moneyAvailable && effectiveBaselineCost > 0) {
+            val expectedSpend = (baselineDailyMl / drinkSizeMl) * effectiveBaselineCost * daysTracked
             (expectedSpend - actualSpend).coerceAtLeast(0.0)
         } else 0.0
 

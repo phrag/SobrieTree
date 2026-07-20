@@ -85,7 +85,7 @@ class CalendarActivity : AppCompatActivity() {
             .setItems(names) { d, which ->
                 val p = presets[which]
                 val id = java.util.UUID.randomUUID().toString()
-                val res = BrewLogNative.add_beer_entry_full_jni(id, p.name, p.strength.toDouble(), p.volume.toDouble(), date.toString(), "")
+                val res = BrewLogNative.add_beer_entry_full_jni(id, p.name, p.abv, p.volume.toDouble(), date.toString(), "")
                 if (res.startsWith("OK")) { setDate(date) }
                 d.dismiss()
             }

@@ -34,8 +34,10 @@
 
             <TextView
                 android:id="@+id/beer_name"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:maxLines="2"
+                android:ellipsize="end"
                 android:text="Beer Name"
                 android:textAppearance="@style/TextAppearance.BrewLog.Title"
                 android:textColor="@color/text_primary"
@@ -52,6 +54,7 @@
                     android:id="@+id/beer_volume"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:maxLines="1"
                     android:text="330ml"
                     android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                     android:textColor="@color/text_secondary"
@@ -70,6 +73,7 @@
                     android:id="@+id/beer_alcohol"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:maxLines="1"
                     android:text="4.5%"
                     android:textAppearance="@style/TextAppearance.BrewLog.Caption"
                     android:textColor="@color/text_secondary"

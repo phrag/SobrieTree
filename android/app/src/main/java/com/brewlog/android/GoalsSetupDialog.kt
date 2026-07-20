@@ -50,17 +50,22 @@ object GoalsSetupDialog {
         val guidelineDailyDrinks = if (gramsPerDrink > 0) (24.0 / gramsPerDrink) else 2.0
         val defaultDailyDrinks = guidelineDailyDrinks.coerceIn(1.0, 5.0)
         val defaultWeeklyDrinks = (defaultDailyDrinks * 7).toInt()
+        // Drinks may be fractional once a weekly-only goal is spread across 7 days;
+        // show whole numbers cleanly and one decimal otherwise.
+        fun fmtDrinks(d: Double): String =
+            if (d == Math.floor(d)) d.toInt().toString() else String.format("%.1f", d)
+
         dailyGoalDrinks.setText(
-            if (currentDailyMl > 0) (currentDailyMl / vol).toInt().toString() else defaultDailyDrinks.toInt().toString()
+            if (currentDailyMl > 0) fmtDrinks(currentDailyMl / vol) else defaultDailyDrinks.toInt().toString()
         )
         weeklyGoalDrinks.setText(
-            if (currentWeeklyMl > 0) (currentWeeklyMl / vol).toInt().toString() else defaultWeeklyDrinks.toString()
+            if (currentWeeklyMl > 0) fmtDrinks(currentWeeklyMl / vol) else defaultWeeklyDrinks.toString()
         )
 
-        // Prefill baseline in drinks
+        // Prefill baseline in drinks (blank when unset, so the field can stay empty)
         val baseline = brewLog.getCurrentBaseline()
-        dailyBaselineDrinks.setText(if ((baseline?.averageDailyConsumption ?: 0.0) > 0) ((baseline!!.averageDailyConsumption) / vol).toInt().toString() else "0")
-        weeklyBaselineDrinks.setText(if ((baseline?.averageWeeklyConsumption ?: 0.0) > 0) ((baseline!!.averageWeeklyConsumption) / vol).toInt().toString() else "0")
+        dailyBaselineDrinks.setText(if ((baseline?.averageDailyConsumption ?: 0.0) > 0) fmtDrinks((baseline!!.averageDailyConsumption) / vol) else "")
+        weeklyBaselineDrinks.setText(if ((baseline?.averageWeeklyConsumption ?: 0.0) > 0) fmtDrinks((baseline!!.averageWeeklyConsumption) / vol) else "")
 
         // Guideline note
         val dailyFemale = (12.0 / gramsPerDrink).coerceAtLeast(0.0).toInt()
@@ -69,20 +74,36 @@ object GoalsSetupDialog {
             "💡 Low-risk guidelines: ${dailyFemale}-${dailyMale} drinks/day (${vol.toInt()}ml @ ${assumedAbv}%). " +
             "Aim for 2+ alcohol-free days each week - they grow the plant in your ring."
 
-        fun recalcWeeklyFromDaily(source: TextInputEditText, target: TextInputEditText) {
-            val d = source.text.toString().toDoubleOrNull() ?: 0.0
-            target.setText((d * 7).toInt().toString())
+        // A daily amount auto-fills its weekly partner (×7), but only while the
+        // user hasn't typed a weekly value of their own. This lets people enter a
+        // weekly-only goal without a daily figure being forced back over it.
+        var goalWeeklyTouched = false
+        var baselineWeeklyTouched = false
+
+        fun recalcWeeklyFromDaily(source: TextInputEditText, target: TextInputEditText, weeklyTouched: () -> Boolean) {
+            if (weeklyTouched()) return
+            val d = source.text.toString().toDoubleOrNull() ?: return
+            target.setText(fmtDrinks(d * 7))
         }
-        dailyGoalDrinks.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) { recalcWeeklyFromDaily(dailyGoalDrinks, weeklyGoalDrinks) }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
-        dailyBaselineDrinks.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) { recalcWeeklyFromDaily(dailyBaselineDrinks, weeklyBaselineDrinks) }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
+        fun onDailyChanged(source: TextInputEditText, target: TextInputEditText, weeklyTouched: () -> Boolean) =
+            object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) { recalcWeeklyFromDaily(source, target, weeklyTouched) }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            }
+        // The weekly field marks itself "touched" only when the user is the one
+        // editing it (has focus); programmatic ×7 fills happen while it is unfocused.
+        fun markTouchedWatcher(field: TextInputEditText, setTouched: () -> Unit) =
+            object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) { if (field.hasFocus()) setTouched() }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            }
+
+        weeklyGoalDrinks.addTextChangedListener(markTouchedWatcher(weeklyGoalDrinks) { goalWeeklyTouched = true })
+        weeklyBaselineDrinks.addTextChangedListener(markTouchedWatcher(weeklyBaselineDrinks) { baselineWeeklyTouched = true })
+        dailyGoalDrinks.addTextChangedListener(onDailyChanged(dailyGoalDrinks, weeklyGoalDrinks) { goalWeeklyTouched })
+        dailyBaselineDrinks.addTextChangedListener(onDailyChanged(dailyBaselineDrinks, weeklyBaselineDrinks) { baselineWeeklyTouched })
 
         val dialog = AlertDialog.Builder(activity)
             .setView(dialogView)
@@ -91,18 +112,28 @@ object GoalsSetupDialog {
         dialogView.findViewById<View>(R.id.btn_cancel).setOnClickListener { dialog.dismiss() }
         dialogView.findViewById<View>(R.id.btn_save).setOnClickListener {
             val sizeInput = defaultDrinkEdit.text.toString().toIntOrNull() ?: 0
-            val dailyGoal = dailyGoalDrinks.text.toString().toDoubleOrNull() ?: 0.0
-            val weeklyGoal = weeklyGoalDrinks.text.toString().toDoubleOrNull() ?: 0.0
-            val dailyBase = dailyBaselineDrinks.text.toString().toDoubleOrNull() ?: 0.0
-            val weeklyBase = weeklyBaselineDrinks.text.toString().toDoubleOrNull() ?: 0.0
+            // Daily is optional; a weekly-only entry derives its daily as weekly / 7.
+            val dailyGoalIn = dailyGoalDrinks.text.toString().toDoubleOrNull()?.takeIf { it > 0 }
+            val weeklyGoalIn = weeklyGoalDrinks.text.toString().toDoubleOrNull()?.takeIf { it > 0 }
+            val dailyBaseIn = dailyBaselineDrinks.text.toString().toDoubleOrNull()?.takeIf { it > 0 }
+            val weeklyBaseIn = weeklyBaselineDrinks.text.toString().toDoubleOrNull()?.takeIf { it > 0 }
+
+            listOf(layoutDailyGoal, layoutWeeklyGoal, layoutDailyBaseline, layoutWeeklyBaseline).forEach { it.error = null }
 
             var valid = true
-            if (dailyGoal <= 0) { layoutDailyGoal.error = "Enter daily goal"; valid = false } else layoutDailyGoal.error = null
-            if (weeklyGoal <= 0) { layoutWeeklyGoal.error = "Enter weekly goal"; valid = false } else layoutWeeklyGoal.error = null
-            if (dailyBase <= 0) { layoutDailyBaseline.error = "Enter daily baseline"; valid = false } else layoutDailyBaseline.error = null
-            if (weeklyBase <= 0) { layoutWeeklyBaseline.error = "Enter weekly baseline"; valid = false } else layoutWeeklyBaseline.error = null
-
+            if (dailyGoalIn == null && weeklyGoalIn == null) {
+                layoutWeeklyGoal.error = "Enter a daily or weekly goal"; valid = false
+            }
+            if (dailyBaseIn == null && weeklyBaseIn == null) {
+                layoutWeeklyBaseline.error = "Enter a daily or weekly baseline"; valid = false
+            }
             if (!valid) return@setOnClickListener
+
+            // Fill in whichever side of each pair was left blank.
+            val weeklyGoal = weeklyGoalIn ?: (dailyGoalIn!! * 7.0)
+            val dailyGoal = dailyGoalIn ?: (weeklyGoal / 7.0)
+            val weeklyBase = weeklyBaseIn ?: (dailyBaseIn!! * 7.0)
+            val dailyBase = dailyBaseIn ?: (weeklyBase / 7.0)
 
             val effectiveSize = if (sizeInput > 0) sizeInput else defaultSizeMl
             if (effectiveSize > 0) {

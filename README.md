@@ -1,130 +1,116 @@
 # BrewLog
 
-A private alcohol-reduction companion for Android. Drink less. Feel more.
+A private, offline alcohol-reduction companion for Android. Drink less, notice more, and watch something grow as you go.
 
-- Growth Ring home screen: today's drinks as a calm ring around a plant that grows with your alcohol-free days
-- Supportive gamification: cumulative AF-day count, forgiving streaks with earned shields, 14 milestone badges
-- Journey tab: your body's recovery timeline, badge collection, money/calorie savings, and short evidence-based reads
-- Adaptive encouragement that never shames — a heavy day gets a plan, not a scolding
-- One-tap Quick Add chips and a Drinks manager for presets
-- Calendar view to track, view, and edit past days
-- Progress charts of your real pattern vs. baseline and goal (7 days / 4 weeks / 3 months)
-- Optional local-only daily check-in reminder (off by default)
-- Configurable end-of-day cut-off (default 3 AM)
-- Export/import your data to CSV; Delete All Data from settings
-- Native Rust + SQLite backend via JNI for on-device storage
-- Works fully offline. No account, no cloud, no analytics, no ads
+BrewLog turns cutting back into a calm, encouraging daily practice instead of a scoreboard of failures. It tracks what you drink, compares it against your own goal and baseline, and rewards the days you skip — never punishing the days you don't. Everything runs on-device: no account, no cloud, no analytics, no ads.
 
-### Privacy & Security
-BrewLog is privacy‑focused by design:
-- No account or sign‑in
-- No dangerous/runtime permissions requested (no contacts, location, camera, mic)
-- Network‑free by default: the app does not make any internet requests
-- All data stays on your device; nothing is uploaded or shared
-- No analytics, trackers, ads, or third‑party SDKs
-- Works completely offline; no cloud services are required
+## What it does
 
-Your data, your control:
-- Entries live in the app’s private storage; uninstalling the app or clearing its data removes everything
-- Open‑source codebase — audit how data is handled
-- Battery‑friendly: no background sync, polling, or push connections
+### A home screen that grows with you
+- **Growth Ring** — today's drinks shown as a soft ring. On an alcohol-free day the ring fills and a seedling at its centre keeps growing.
+- **A forest you collect** — the seedling matures into trees you keep. In your first month you earn a tree every week (four smaller trees), then a larger tree for each alcohol-free month after that. Your forest is a running picture of how far you've come.
+- **Stat tiles** — money saved, calories avoided, and your next badge, always a tap away.
 
-## Quick Start
+### Support when you need it
+- **Craving-time nudges** — tell BrewLog when you usually start drinking and it sends a supportive, local-only nudge just before, strongest in your first days and easing as new habits settle.
+- **Shame-free encouragement** — a quiet evening is celebrated; a heavy day gets a plan, not a scolding. Copy adapts to your reasons for cutting back.
 
-1) Install the app
-- Download `BrewLog-debug.apk` and install on your phone
-- You may need to enable “Install unknown apps” in Android settings
+### Gamification that only ever moves forward
+- **Cumulative alcohol-free days** that never regress.
+- **Forgiving streaks** — an earned shield bridges a single lapse so one slip doesn't erase weeks of progress.
+- **Badges** for alcohol-free milestones, streak lengths, and money saved.
 
-2) First‑time setup
-- The guided flow asks why you're cutting back, then sets goals and baseline
-- Pick your default drink size (e.g., 500 ml)
-- Enter your Daily Goal (in drinks). Weekly auto‑fills as 7× daily
+### Your journey, explained
+- **Recovery timeline** — evidence-based milestones showing what changes in your body from your first alcohol-free day out to a year.
+- **Money & calorie savings** — set a per-drink cost (or a default price) and BrewLog totals what you haven't spent and haven't consumed, counting only completed days so the numbers are honest.
+- **Short reads** — bite-sized, evidence-based notes on the benefits of drinking less.
 
-3) Add a drink
-- Tap a Quick Add chip, or tap the Growth Ring to log your favorite drink
-- The ring shows daily progress; on an alcohol-free day it renders full
+### Day-to-day tracking
+- **Quick Add chips** and a one-tap favorite drink, plus a **Drinks manager** for presets (size, strength, and cost).
+- **Calendar** view to review and edit past days.
+- **Progress charts** of your real pattern versus baseline and goal (7 days / 4 weeks / 3 months).
+- **Flexible goals** — enter a daily amount, or a weekly amount if you don't drink every day.
+- **Journey start date** you can set yourself.
+- **Configurable currency** and an end-of-day cut-off (default 3 AM) so late nights land on the right day.
 
-4) View Progress
-- Bottom navigation ▸ Progress
-- See Today and This Week in drinks, plus reduction vs. baseline
+### Private by design
+- No account or sign-in; no contacts, location, camera, or microphone permissions.
+- Network-free: the app makes no internet requests. All data stays in the app's private storage.
+- No analytics, trackers, ads, or third-party SDKs.
+- Optional **prevent-screenshots** toggle for extra discretion.
+- Export/import your data as CSV, or wipe everything with **Delete All Data**.
+- Optional local-only daily check-in reminder (off by default).
 
-### Screenshots
+## Architecture
 
-![Home](screenshots/home.png)
+BrewLog is native Android (Kotlin + XML Views + Material 3) on top of a Rust core.
 
----
+- **UI** — Activities with a five-tab bottom navigation (Home, Progress, Journey, Calendar, Settings). Custom canvas views render the growth ring, trees, and forest.
+- **Engine** (`com.brewlog.android.engine`) — a pure-Kotlin, JVM-testable layer with no Android dependencies. All gamification is derived here or stored in `SharedPreferences`:
+  - `DayLedger` — completed vs. in-progress days and the tracking window.
+  - `StreakEngine` — streaks, shields, and tree/forest growth.
+  - `SavingsEngine` — money and calories not consumed vs. baseline (completed days only).
+  - `MetricsEngine`, `BadgeCatalog`, `EncouragementEngine`, `HealthTimeline`, `EducationLibrary`, `HighRiskSupport`.
+  - `GamificationManager` composes these into the state the UI binds to.
+- **Native core** (`rust/src/lib.rs`) — the data store, exposed to Kotlin over JNI and backed by SQLite on-device.
 
-## Developer Guide
+The engine layer takes plain data in and returns plain results, so its behaviour is covered by fast JVM unit tests that need no device or emulator.
 
-### Requirements
-- JDK 17+
-- Android Studio (SDK + NDK + CMake)
-- Rust toolchain
-- cargo‑ndk (`cargo install cargo-ndk`)
+## Build
 
-### One‑command build
-From the repository root:
+Requirements: JDK 17+, the Android SDK (with NDK + CMake), the Rust toolchain, and `cargo-ndk` (`cargo install cargo-ndk`).
+
 ```bash
-./build.sh              # builds Rust with cargo‑ndk, builds the APK, copies it to ./BrewLog-debug.apk
-PRUNE=1 ./build.sh      # optional: also cargo clean + prune stale jniLibs
-```
-Notes:
-- The script prefers cargo‑ndk; if absent it falls back to plain cargo (requires NDK toolchains on PATH)
-- Output APK: `BrewLog-debug.apk` at the repo root
-
-### Manual build (if you prefer)
-```bash
-# macOS defaults
-export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk"
-export ANDROID_NDK_HOME="$ANDROID_SDK_ROOT/ndk/26.1.10909125"
-# add toolchains bin to PATH (use aarch64 or x86_64 prebuilt dir, depending on host)
-if [ -d "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/darwin-aarch64/bin" ]; then
-  export PATH="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/darwin-aarch64/bin:$PATH"
-else
-  export PATH="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/darwin-x86_64/bin:$PATH"
-fi
-
-# Build Rust core into jniLibs
+# 1. Build the Rust core into jniLibs
 cd rust
 cargo ndk -t arm64-v8a -o ../android/app/src/main/jniLibs build --release
 
-# Build Android app
+# 2. Build the Android app
 cd ../android
 ./gradlew assembleDebug
 ```
 
-### Release build
-```bash
-cd android
-./gradlew assembleRelease
-open app/build/outputs/apk/release
-```
-(The output name is configured in the module’s `build.gradle`.)
+The debug APK is written to `android/app/build/outputs/apk/debug/BrewLog-<version>.apk`. Debug builds are signed with the release key so they install as an upgrade over release builds.
 
-### Project Structure
+### Tests
+
+```bash
+# Android unit tests (includes the engine layer)
+cd android && ./gradlew testDebugUnitTest
+
+# Rust core tests
+cd rust && cargo test --all
+```
+
+### Continuous integration
+
+Every push runs `.github/workflows/ci.yml` on GitHub Actions, which:
+1. builds the Rust core with `cargo-ndk`,
+2. assembles the debug APK,
+3. runs the Android unit tests and the Rust tests,
+4. checks Rust formatting/clippy and runs Android Lint, and
+5. uploads the APK as the `BrewLog-apk` artifact.
+
+## Project structure
+
 ```
 brewlog/
-├── android/                    # Android app (Kotlin)
-│   ├── app/src/main/java/com/brewlog/android/
-│   │   ├── MainActivity.kt     # Home + Beer Glass + Quick Add
-│   │   ├── ProgressActivity.kt # Progress metrics
-│   │   ├── BeerGlassView.kt    # Custom view & animation
-│   │   └── BrewLog.kt          # In‑memory model & metrics
-│   └── app/src/main/jniLibs/   # Native libs (arm64‑v8a)
-├── rust/                       # Rust core (optional)
-│   ├── src/lib.rs              # JNI‑ready core API
+├── android/
+│   └── app/src/main/java/com/brewlog/android/
+│       ├── MainActivity.kt            # Home: growth ring, quick add, recent entries
+│       ├── ProgressActivity.kt        # Progress charts
+│       ├── JourneyActivity.kt         # Timeline, badges, savings, reads
+│       ├── CalendarActivity.kt        # Review and edit past days
+│       ├── SettingsActivity.kt        # Goals, currency, reminders, privacy
+│       ├── GamificationManager.kt     # Composes engine state for the UI
+│       └── engine/                    # Pure-Kotlin, JVM-tested logic
+├── rust/
+│   ├── src/lib.rs                     # JNI core API over SQLite
 │   └── Cargo.toml
-├── build.sh                    # Unified build (Rust + Android), copies APK to repo root
+├── .github/workflows/ci.yml           # Build + test + lint + APK artifact
 └── README.md
 ```
 
-### Troubleshooting
-- aarch64‑linux‑android‑clang not found
-  - Ensure the NDK is installed and `ANDROID_NDK_HOME` is set; add toolchain bin to `PATH` (see Manual build)
-- Lint/AGP warnings
-  - Project uses Android Gradle Plugin 8.5.x and Gradle 8.7
-- Missing SDK dir warning
-  - Ensure `android/local.properties` points to your SDK or export `ANDROID_SDK_ROOT`
+## License
 
-### License
-MIT — see `LICENSE`. 
+See the repository for license details.

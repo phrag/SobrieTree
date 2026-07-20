@@ -21,6 +21,9 @@ data class DrinkPreset(
     /** What one of these drinks costs the user; 0 = not set (falls back to the global price). */
     val cost: Float = 0f
 ) {
+    /** ABV as a clean Double - naive Float widening produces noise like 5.1999999980926513. */
+    val abv: Double get() = Math.round(strength * 10.0) / 10.0
+
     fun toJson(): JSONObject = JSONObject().apply {
         put("name", name)
         put("type", type.name)
