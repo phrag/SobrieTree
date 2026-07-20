@@ -61,10 +61,12 @@ class JourneyActivity : AppCompatActivity() {
         findViewById<TreeView>(R.id.tree_view).setProgress(state.treeProgress)
         findViewById<TextView>(R.id.tv_total_af_days).text = state.totalAfDays.toString()
 
-        val daysGrown = (state.treeProgress * com.brewlog.android.engine.StreakEngine.TREE_DAYS).toInt()
         findViewById<TextView>(R.id.tv_forest_caption).text =
-            if (state.treesCollected == 0) getString(R.string.forest_caption_first, daysGrown)
-            else getString(R.string.forest_caption_growing, state.treesCollected, daysGrown)
+            if (state.treesCollected == 0) {
+                getString(R.string.forest_caption_first, state.treeDaysGrown, state.treeDaysNeeded)
+            } else {
+                getString(R.string.forest_caption_growing, state.treesCollected, state.treeDaysGrown, state.treeDaysNeeded)
+            }
         findViewById<ForestView>(R.id.forest_view).setForest(state.treesCollected, state.treeProgress)
         findViewById<TextView>(R.id.tv_current_streak).text = state.displayStreak.toString()
         findViewById<TextView>(R.id.tv_best_streak).text = state.bestStreak.toString()

@@ -74,6 +74,8 @@ class GamificationManager(context: Context) {
         val shieldsHeld: Int,
         val treeProgress: Float,
         val treesCollected: Int,
+        val treeDaysGrown: Int,
+        val treeDaysNeeded: Int,
         val timeline: List<TimelineEntry>,
         val badges: List<BadgeState>,
         val moneySaved: Double,
@@ -252,12 +254,13 @@ class GamificationManager(context: Context) {
         if (trees <= 0) return emptyList()
         val celebrated = prefs.celebratedMilestones
         return (1..trees).filter { "tree_$it" !in celebrated }.map { n ->
+            val cost = StreakEngine.treeCost(n - 1)
             Badge(
                 id = "tree_$n",
                 title = if (n == 1) "Your first tree!" else "Tree #$n joins your forest",
-                description = "30 alcohol-free days grew a whole tree. It's planted in your Journey forest - and a fresh seed is already in the ring.",
+                description = "$cost alcohol-free days grew a whole tree. It's planted in your Journey forest - and a fresh seed is already in the ring.",
                 kind = com.brewlog.android.engine.BadgeKind.AF_TOTAL,
-                threshold = n * StreakEngine.TREE_DAYS
+                threshold = StreakEngine.treeCompletionDay(n)
             )
         }
     }
@@ -294,6 +297,8 @@ class GamificationManager(context: Context) {
             shieldsHeld = c.streaks.shieldsHeld,
             treeProgress = StreakEngine.treeProgress(displayAfDays),
             treesCollected = StreakEngine.treesCollected(displayAfDays),
+            treeDaysGrown = StreakEngine.treeDaysGrown(displayAfDays),
+            treeDaysNeeded = StreakEngine.treeDaysNeeded(displayAfDays),
             timeline = timeline,
             badges = badges,
             moneySaved = c.savings.moneySaved,

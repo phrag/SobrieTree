@@ -31,8 +31,8 @@
     <!-- Journey screen -->
     <string name="growth_stage_description">Your growth stage</string>
     <string name="forest_title">Your forest</string>
-    <string name="forest_caption_first">Every 30 alcohol-free days grows a tree. Your first is underway — %1$d of 30 days.</string>
-    <string name="forest_caption_growing">%1$d trees collected. The next is %2$d of 30 days grown.</string>
+    <string name="forest_caption_first">Alcohol-free days grow trees — your first takes just 7. It\'s %1$d of %2$d days grown.</string>
+    <string name="forest_caption_growing">%1$d trees collected. The next is %2$d of %3$d days grown.</string>
     <string name="total_af_days_label">alcohol-free days in total</string>
     <string name="current_streak_label">current streak</string>
     <string name="best_streak_label">best streak</string>

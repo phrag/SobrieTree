@@ -152,13 +152,42 @@ object StreakEngine {
         else -> 0
     }
 
-    /** A tree grows over this many alcohol-free days, then joins the forest. */
+    /** Steady-state days per tree once the early ramp is done. */
     const val TREE_DAYS = 30
 
+    /** The first trees grow faster for an early payoff: 7, then 14, then 30 each. */
+    private val EARLY_TREE_DAYS = intArrayOf(7, 14)
+
+    /** AF days needed to grow the tree at [treeIndex] (0-based). */
+    fun treeCost(treeIndex: Int): Int =
+        if (treeIndex < EARLY_TREE_DAYS.size) EARLY_TREE_DAYS[treeIndex] else TREE_DAYS
+
+    /** (trees fully grown, AF days into the current tree). */
+    private fun decompose(totalAfDays: Int): Pair<Int, Int> {
+        var days = totalAfDays.coerceAtLeast(0)
+        var trees = 0
+        while (days >= treeCost(trees)) {
+            days -= treeCost(trees)
+            trees++
+        }
+        return trees to days
+    }
+
     /** Fully grown trees banked in the forest. */
-    fun treesCollected(totalAfDays: Int): Int = totalAfDays.coerceAtLeast(0) / TREE_DAYS
+    fun treesCollected(totalAfDays: Int): Int = decompose(totalAfDays).first
 
     /** Growth of the tree currently in the ring, 0..1 (a fresh cycle starts at 0). */
-    fun treeProgress(totalAfDays: Int): Float =
-        (totalAfDays.coerceAtLeast(0) % TREE_DAYS) / TREE_DAYS.toFloat()
+    fun treeProgress(totalAfDays: Int): Float {
+        val (trees, days) = decompose(totalAfDays)
+        return days / treeCost(trees).toFloat()
+    }
+
+    /** AF days grown into the current tree. */
+    fun treeDaysGrown(totalAfDays: Int): Int = decompose(totalAfDays).second
+
+    /** AF days the current tree needs in total. */
+    fun treeDaysNeeded(totalAfDays: Int): Int = treeCost(decompose(totalAfDays).first)
+
+    /** Cumulative AF days at which tree number [n] (1-based) completes. */
+    fun treeCompletionDay(n: Int): Int = (0 until n).sumOf { treeCost(it) }
 }

@@ -122,17 +122,33 @@ class StreakEngineTest {
     }
 
     @Test
-    fun `trees complete every 30 af days and progress cycles`() {
+    fun `early trees grow faster then settle at 30 days`() {
+        // Ramp: tree 1 = 7 days, tree 2 = 14, tree 3+ = 30
+        assertEquals(7, StreakEngine.treeCost(0))
+        assertEquals(14, StreakEngine.treeCost(1))
+        assertEquals(30, StreakEngine.treeCost(2))
+        assertEquals(30, StreakEngine.treeCost(9))
+
         assertEquals(0, StreakEngine.treesCollected(0))
-        assertEquals(0, StreakEngine.treesCollected(29))
-        assertEquals(1, StreakEngine.treesCollected(30))
-        assertEquals(1, StreakEngine.treesCollected(59))
-        assertEquals(2, StreakEngine.treesCollected(65))
+        assertEquals(0, StreakEngine.treesCollected(6))
+        assertEquals(1, StreakEngine.treesCollected(7))       // first payoff in week one
+        assertEquals(1, StreakEngine.treesCollected(20))
+        assertEquals(2, StreakEngine.treesCollected(21))      // 7 + 14
+        assertEquals(2, StreakEngine.treesCollected(50))
+        assertEquals(3, StreakEngine.treesCollected(51))      // 7 + 14 + 30
+        assertEquals(4, StreakEngine.treesCollected(81))
+        assertEquals(0, StreakEngine.treesCollected(-1))      // defensive
 
         assertEquals(0f, StreakEngine.treeProgress(0), 0.001f)
-        assertEquals(29f / 30f, StreakEngine.treeProgress(29), 0.001f)
-        assertEquals(0f, StreakEngine.treeProgress(30), 0.001f)   // new cycle begins
-        assertEquals(5f / 30f, StreakEngine.treeProgress(65), 0.001f)
-        assertEquals(0, StreakEngine.treesCollected(-1))          // defensive
+        assertEquals(3f / 7f, StreakEngine.treeProgress(3), 0.001f)
+        assertEquals(0f, StreakEngine.treeProgress(7), 0.001f)    // tree 2 starts
+        assertEquals(3f / 14f, StreakEngine.treeProgress(10), 0.001f)
+        assertEquals(15f / 30f, StreakEngine.treeProgress(66), 0.001f)
+
+        assertEquals(3, StreakEngine.treeDaysGrown(10))
+        assertEquals(14, StreakEngine.treeDaysNeeded(10))
+        assertEquals(7, StreakEngine.treeCompletionDay(1))
+        assertEquals(21, StreakEngine.treeCompletionDay(2))
+        assertEquals(51, StreakEngine.treeCompletionDay(3))
     }
 }
