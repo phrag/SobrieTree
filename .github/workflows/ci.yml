@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to publish the rolling "latest" APK release
     env:
       ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
       ANDROID_NDK_VERSION: 26.1.10909125
@@ -118,5 +120,32 @@ jobs:
         with:
           name: BrewLog-apk
           path: android/app/build/outputs/apk/debug/BrewLog-*.apk
+
+      # Publish the built APK directly (not a login-gated zip) to a rolling
+      # "latest" pre-release, so it's downloadable from the Releases page with a
+      # stable URL that always points at the most recent build:
+      #   https://github.com/<owner>/<repo>/releases/download/latest/BrewLog-latest.apk
+      - name: Stage a stable-named APK
+        if: success()
+        run: cp android/app/build/outputs/apk/debug/BrewLog-*.apk BrewLog-latest.apk
+
+      - name: Publish rolling "latest" release
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest build (auto)
+          prerelease: true
+          body: |
+            Automatically published debug APK from the most recent CI build.
+
+            - Commit: ${{ github.sha }}
+            - Branch: ${{ github.ref_name }}
+            - Direct download (always latest): https://github.com/${{ github.repository }}/releases/download/latest/BrewLog-latest.apk
+          files: |
+            BrewLog-latest.apk
+            android/app/build/outputs/apk/debug/BrewLog-*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 

@@ -13,6 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.view.inputmethod.EditorInfo
 import java.io.File
 import java.io.FileWriter
 import java.io.FileReader
@@ -30,6 +31,24 @@ import java.io.OutputStream
 
 class SettingsActivity : AppCompatActivity() {
     private val prefsName = "brewlog_prefs"
+
+    // Flushes the text-field settings to prefs; reassigned in onCreate. Called
+    // from onPause so a typed-but-not-blurred value is still saved on exit.
+    private var flushSettings: () -> Unit = {}
+
+    /** Commit a text field's value the moment it loses focus or the user taps Done. */
+    private fun commitOnBlurAndDone(edit: TextInputEditText, onCommit: () -> Unit) {
+        edit.setOnFocusChangeListener { _, hasFocus -> if (!hasFocus) onCommit() }
+        edit.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) onCommit()
+            false
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        flushSettings()
+    }
     
     // File picker contracts
     private val exportFileLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
@@ -118,6 +137,10 @@ class SettingsActivity : AppCompatActivity() {
         val currentThemeIndex = themeModes.indexOf(appPrefs.themeMode).coerceAtLeast(0)
         themeDropdown.setText(themeOptions[currentThemeIndex], false)
         themeDropdown.setOnClickListener { themeDropdown.showDropDown() }
+        themeDropdown.setOnItemClickListener { _, _, position, _ ->
+            appPrefs.themeMode = themeModes[position]
+            AppCompatDelegate.setDefaultNightMode(themeModes[position])
+        }
 
         // Currency for money displays (code, label); null code = follow device locale
         val currencyDropdown = findViewById<AutoCompleteTextView>(R.id.et_currency)
@@ -145,12 +168,51 @@ class SettingsActivity : AppCompatActivity() {
         val currentCurrencyIndex = currencyOptions.indexOfFirst { it.first == appPrefs.currencyCode }.coerceAtLeast(0)
         currencyDropdown.setText(currencyLabels[currentCurrencyIndex], false)
         currencyDropdown.setOnClickListener { currencyDropdown.showDropDown() }
+        currencyDropdown.setOnItemClickListener { _, _, position, _ ->
+            appPrefs.currencyCode = currencyOptions[position].first
+            Money.applyFrom(appPrefs)
+        }
 
         // Price per drink (fallback when a drink has no cost; powers money-saved)
         val priceEdit = findViewById<TextInputEditText>(R.id.et_price_per_drink)
         if (appPrefs.pricePerDrink > 0) {
             priceEdit.setText(String.format("%.2f", appPrefs.pricePerDrink))
         }
+
+        // Instant-apply for the text fields: each commits on blur / IME Done, and
+        // once more in onPause. Invalid or blank input reverts to the stored value
+        // (except price, where blank legitimately means "no price"), so we never
+        // persist garbage and never nag with a per-keystroke error.
+        fun persistBeerSize() {
+            val v = beerSizeEdit.text.toString().toIntOrNull()?.coerceAtLeast(1)
+            if (v != null) prefs.edit().putInt("default_beer_size", v).apply()
+            else beerSizeEdit.setText(prefs.getInt("default_beer_size", 500).toString())
+        }
+        fun persistBeerStrength() {
+            val v = beerStrengthEdit.text.toString().toFloatOrNull()?.coerceIn(0.1f, 100f)
+            if (v != null) prefs.edit().putFloat("default_beer_strength", v).apply()
+            else beerStrengthEdit.setText(prefs.getFloat("default_beer_strength", 5.0f).toString())
+        }
+        fun persistEndOfDay() {
+            val v = eodEdit.text.toString().toIntOrNull()?.coerceIn(0, 23)
+            if (v != null) prefs.edit().putInt("end_of_day_hour", v).apply()
+            else eodEdit.setText(prefs.getInt("end_of_day_hour", 3).toString())
+        }
+        fun persistPrice() {
+            val raw = priceEdit.text?.toString().orEmpty()
+            if (raw.isBlank()) {
+                appPrefs.pricePerDrink = 0f
+                return
+            }
+            val v = raw.toFloatOrNull()?.coerceAtLeast(0f)
+            if (v != null) appPrefs.pricePerDrink = v
+            else priceEdit.setText(if (appPrefs.pricePerDrink > 0) String.format("%.2f", appPrefs.pricePerDrink) else "")
+        }
+        commitOnBlurAndDone(beerSizeEdit) { persistBeerSize() }
+        commitOnBlurAndDone(beerStrengthEdit) { persistBeerStrength() }
+        commitOnBlurAndDone(eodEdit) { persistEndOfDay() }
+        commitOnBlurAndDone(priceEdit) { persistPrice() }
+        flushSettings = { persistBeerSize(); persistBeerStrength(); persistEndOfDay(); persistPrice() }
 
         // Edit goals & baseline directly from Settings
         findViewById<MaterialButton>(R.id.btn_edit_goals).setOnClickListener {
@@ -274,6 +336,7 @@ class SettingsActivity : AppCompatActivity() {
         startOfWeekDropdown.setText(daysOfWeek[startOfWeek - 1], false)
         startOfWeekDropdown.setOnItemClickListener { _, _, position, _ ->
             startOfWeekDropdown.setText(daysOfWeek[position], false)
+            prefs.edit().putInt("start_of_week", position + 1).apply()
         }
         startOfWeekDropdown.setOnClickListener {
             startOfWeekDropdown.showDropDown()
@@ -296,43 +359,6 @@ class SettingsActivity : AppCompatActivity() {
                 infoGuidelines?.text = "Guideline: keep daily goals modest and include alcohol‑free days each week."
             }
         } catch (_: Exception) { }
-        
-        // Save button
-        val saveBtn = findViewById<MaterialButton>(R.id.btn_save_settings)
-        saveBtn.setOnClickListener {
-            try {
-                val newSize = beerSizeEdit.text.toString().toInt().coerceAtLeast(1)
-                val newStrength = beerStrengthEdit.text.toString().toFloat().coerceIn(0.1f, 100f)
-                val newEod = eodEdit.text.toString().toInt().coerceIn(0, 23)
-                val selectedDay = startOfWeekDropdown.text.toString()
-                val newStartOfWeek = daysOfWeek.indexOf(selectedDay) + 1
-                
-                prefs.edit()
-                    .putInt("default_beer_size", newSize)
-                    .putFloat("default_beer_strength", newStrength)
-                    .putInt("end_of_day_hour", newEod)
-                    .putInt("start_of_week", newStartOfWeek)
-                    .putBoolean("flag_secure", secureSwitch.isChecked)
-                    .apply()
-                SecureWindow.apply(this, secureSwitch.isChecked)
-
-                // Apply and persist theme change
-                val themeIndex = themeOptions.indexOf(themeDropdown.text.toString()).coerceAtLeast(0)
-                appPrefs.themeMode = themeModes[themeIndex]
-                AppCompatDelegate.setDefaultNightMode(themeModes[themeIndex])
-
-                appPrefs.pricePerDrink = priceEdit.text?.toString()?.toFloatOrNull()?.coerceAtLeast(0f) ?: 0f
-
-                val currencyIndex = currencyOptions.indexOfFirst { it.second == currencyDropdown.text.toString() }
-                    .coerceAtLeast(0)
-                appPrefs.currencyCode = currencyOptions[currencyIndex].first
-                Money.applyFrom(appPrefs)
-
-                Toast.makeText(this, "Settings saved", Toast.LENGTH_SHORT).show()
-            } catch (e: NumberFormatException) {
-                Toast.makeText(this, "Invalid input", Toast.LENGTH_SHORT).show()
-            }
-        }
         
         // Export button
         exportBtn.setOnClickListener {
