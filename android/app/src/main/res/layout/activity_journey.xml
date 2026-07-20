@@ -50,11 +50,10 @@
                     android:gravity="center_horizontal"
                     android:padding="20dp">
 
-                    <ImageView
-                        android:id="@+id/iv_growth_stage"
-                        android:layout_width="96dp"
-                        android:layout_height="96dp"
-                        android:src="@drawable/ic_growth_stage_0"
+                    <com.brewlog.android.TreeView
+                        android:id="@+id/tree_view"
+                        android:layout_width="110dp"
+                        android:layout_height="110dp"
                         android:contentDescription="@string/growth_stage_description" />
 
                     <TextView
@@ -153,6 +152,42 @@
                         android:gravity="center"
                         android:text="@string/shields_explainer"
                         android:textAppearance="@style/TextAppearance.BrewLog.Caption" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Your forest -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                style="@style/Widget.BrewLog.Card">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/forest_title"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Title" />
+
+                    <TextView
+                        android:id="@+id/tv_forest_caption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginBottom="8dp"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Caption" />
+
+                    <com.brewlog.android.ForestView
+                        android:id="@+id/forest_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
                 </LinearLayout>
 

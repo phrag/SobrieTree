@@ -120,4 +120,19 @@ class StreakEngineTest {
         assertEquals(3, StreakEngine.growthStage(30))
         assertEquals(4, StreakEngine.growthStage(90))
     }
+
+    @Test
+    fun `trees complete every 30 af days and progress cycles`() {
+        assertEquals(0, StreakEngine.treesCollected(0))
+        assertEquals(0, StreakEngine.treesCollected(29))
+        assertEquals(1, StreakEngine.treesCollected(30))
+        assertEquals(1, StreakEngine.treesCollected(59))
+        assertEquals(2, StreakEngine.treesCollected(65))
+
+        assertEquals(0f, StreakEngine.treeProgress(0), 0.001f)
+        assertEquals(29f / 30f, StreakEngine.treeProgress(29), 0.001f)
+        assertEquals(0f, StreakEngine.treeProgress(30), 0.001f)   // new cycle begins
+        assertEquals(5f / 30f, StreakEngine.treeProgress(65), 0.001f)
+        assertEquals(0, StreakEngine.treesCollected(-1))          // defensive
+    }
 }

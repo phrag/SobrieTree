@@ -1,7 +1,6 @@
 package com.brewlog.android
 
 import android.os.Bundle
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -20,14 +19,6 @@ class JourneyActivity : AppCompatActivity() {
     private lateinit var timelineAdapter: TimelineAdapter
     private lateinit var badgeAdapter: BadgeAdapter
     private lateinit var educationAdapter: EducationAdapter
-
-    private val stageDrawables = intArrayOf(
-        R.drawable.ic_growth_stage_0,
-        R.drawable.ic_growth_stage_1,
-        R.drawable.ic_growth_stage_2,
-        R.drawable.ic_growth_stage_3,
-        R.drawable.ic_growth_stage_4
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,9 +58,14 @@ class JourneyActivity : AppCompatActivity() {
     private fun bindState() {
         val state = gamification.journeyState()
 
-        findViewById<ImageView>(R.id.iv_growth_stage)
-            .setImageResource(stageDrawables[state.growthStage.coerceIn(0, stageDrawables.size - 1)])
+        findViewById<TreeView>(R.id.tree_view).setProgress(state.treeProgress)
         findViewById<TextView>(R.id.tv_total_af_days).text = state.totalAfDays.toString()
+
+        val daysGrown = (state.treeProgress * com.brewlog.android.engine.StreakEngine.TREE_DAYS).toInt()
+        findViewById<TextView>(R.id.tv_forest_caption).text =
+            if (state.treesCollected == 0) getString(R.string.forest_caption_first, daysGrown)
+            else getString(R.string.forest_caption_growing, state.treesCollected, daysGrown)
+        findViewById<ForestView>(R.id.forest_view).setForest(state.treesCollected, state.treeProgress)
         findViewById<TextView>(R.id.tv_current_streak).text = state.displayStreak.toString()
         findViewById<TextView>(R.id.tv_best_streak).text = state.bestStreak.toString()
         findViewById<TextView>(R.id.tv_shields).text = "🛡 ${state.shieldsHeld}"

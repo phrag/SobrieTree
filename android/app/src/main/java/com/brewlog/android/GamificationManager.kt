@@ -37,7 +37,10 @@ class GamificationManager(context: Context) {
         val metrics: MetricsEngine.Result,
         val streaks: StreakEngine.Result,
         val isTodayAf: Boolean,
-        val growthStage: Int,
+        /** Growth of the tree currently in the ring, 0..1 over 30 AF days (today counts). */
+        val treeProgress: Float,
+        /** Fully grown trees banked in the forest. */
+        val treesCollected: Int,
         val encouragement: String,
         val moneySaved: Double,
         val moneyAvailable: Boolean,
@@ -69,7 +72,8 @@ class GamificationManager(context: Context) {
         val displayStreak: Int,
         val bestStreak: Int,
         val shieldsHeld: Int,
-        val growthStage: Int,
+        val treeProgress: Float,
+        val treesCollected: Int,
         val timeline: List<TimelineEntry>,
         val badges: List<BadgeState>,
         val moneySaved: Double,
@@ -216,11 +220,15 @@ class GamificationManager(context: Context) {
             } else null
         } else null
 
+        // Today's provisional AF day counts toward growth so the plant moves the same day
+        val displayAfDays = streaks.totalAfDays + if (isTodayAf) 1 else 0
+
         return HomeState(
             metrics = c.metrics,
             streaks = streaks,
             isTodayAf = isTodayAf,
-            growthStage = StreakEngine.growthStage(streaks.totalAfDays),
+            treeProgress = StreakEngine.treeProgress(displayAfDays),
+            treesCollected = StreakEngine.treesCollected(displayAfDays),
             encouragement = encouragement,
             moneySaved = c.savings.moneySaved,
             moneyAvailable = c.savings.moneyAvailable,
@@ -230,8 +238,28 @@ class GamificationManager(context: Context) {
             weekDots = weekDots,
             drinkSizeMl = drinkSize,
             cravingSupport = cravingSupport,
-            uncelebrated = refreshBadges(c)
+            uncelebrated = treeCelebrations(displayAfDays) + refreshBadges(c)
         )
+    }
+
+    /**
+     * A completed tree is a milestone of its own: synthesise a one-off badge
+     * per tree so the celebration sheet fires once, deduped through the same
+     * milestones_celebrated set as catalog badges.
+     */
+    private fun treeCelebrations(displayAfDays: Int): List<Badge> {
+        val trees = StreakEngine.treesCollected(displayAfDays)
+        if (trees <= 0) return emptyList()
+        val celebrated = prefs.celebratedMilestones
+        return (1..trees).filter { "tree_$it" !in celebrated }.map { n ->
+            Badge(
+                id = "tree_$n",
+                title = if (n == 1) "Your first tree!" else "Tree #$n joins your forest",
+                description = "30 alcohol-free days grew a whole tree. It's planted in your Journey forest - and a fresh seed is already in the ring.",
+                kind = com.brewlog.android.engine.BadgeKind.AF_TOTAL,
+                threshold = n * StreakEngine.TREE_DAYS
+            )
+        }
     }
 
     fun journeyState(): JourneyState {
@@ -258,12 +286,14 @@ class GamificationManager(context: Context) {
             )
         }
 
+        val displayAfDays = totalAf + if (c.ledger.isTodayAfSoFar) 1 else 0
         return JourneyState(
             totalAfDays = totalAf,
             displayStreak = c.streaks.displayStreak,
             bestStreak = c.streaks.bestStreak,
             shieldsHeld = c.streaks.shieldsHeld,
-            growthStage = StreakEngine.growthStage(totalAf),
+            treeProgress = StreakEngine.treeProgress(displayAfDays),
+            treesCollected = StreakEngine.treesCollected(displayAfDays),
             timeline = timeline,
             badges = badges,
             moneySaved = c.savings.moneySaved,

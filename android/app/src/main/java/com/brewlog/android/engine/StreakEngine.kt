@@ -143,7 +143,7 @@ object StreakEngine {
         )
     }
 
-    /** Growth stage for the home ring's plant: 0 seed, 1 sprout, 2 seedling, 3 sapling, 4 tree. */
+    /** Growth stage for static illustrations: 0 seed, 1 sprout, 2 seedling, 3 sapling, 4 tree. */
     fun growthStage(totalAfDays: Int): Int = when {
         totalAfDays >= 90 -> 4
         totalAfDays >= 30 -> 3
@@ -151,4 +151,14 @@ object StreakEngine {
         totalAfDays >= 3 -> 1
         else -> 0
     }
+
+    /** A tree grows over this many alcohol-free days, then joins the forest. */
+    const val TREE_DAYS = 30
+
+    /** Fully grown trees banked in the forest. */
+    fun treesCollected(totalAfDays: Int): Int = totalAfDays.coerceAtLeast(0) / TREE_DAYS
+
+    /** Growth of the tree currently in the ring, 0..1 (a fresh cycle starts at 0). */
+    fun treeProgress(totalAfDays: Int): Float =
+        (totalAfDays.coerceAtLeast(0) % TREE_DAYS) / TREE_DAYS.toFloat()
 }

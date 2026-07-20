@@ -9,19 +9,24 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.DecelerateInterpolator
-import androidx.appcompat.content.res.AppCompatResources
+import android.view.animation.LinearInterpolator
+import android.view.animation.OvershootInterpolator
 import androidx.core.content.ContextCompat
+import kotlin.math.sin
 
 /**
- * The app's signature visual, replacing the old beer glass.
+ * The app's signature visual.
  *
  * An arc ring shows today's consumption against the daily goal: it sweeps
  * clockwise as drinks are logged and shifts from calm green toward soft amber
  * near the goal - never red. On an alcohol-free day the ring renders full and
  * gently pulsing: AF is depicted as the *fullest* state.
  *
- * The centre shows a plant that grows with total (cumulative) alcohol-free
- * days, so it never regresses after a lapse.
+ * The centre grows a tree, one alcohol-free day at a time, completing in 30 AF
+ * days (see StreakEngine.TREE_DAYS) - finished trees join the Journey forest
+ * and a fresh seed starts. Growth is keyed to *cumulative* AF days, so a lapse
+ * pauses the tree but never shrinks it. The plant idles with a gentle sway and
+ * pops softly when it grows.
  */
 class GrowthRingView @JvmOverloads constructor(
     context: Context,
@@ -47,29 +52,22 @@ class GrowthRingView @JvmOverloads constructor(
     private var targetRatio = 0f
     private var isAfToday = false
     private var overGoal = false
-    private var growthStage = 0
+
+    private var animatedTreeProgress = 0f
+    private var targetTreeProgress = -1f
+    private var treePop = 1f
+    private var swayPhase = 0f
     private var pulseAlpha = 255
 
     private var sweepAnimator: ValueAnimator? = null
-    private var pulseAnimator: ValueAnimator? = null
+    private var treeAnimator: ValueAnimator? = null
+    private var idleAnimator: ValueAnimator? = null
 
-    private val stageDrawables = intArrayOf(
-        R.drawable.ic_growth_stage_0,
-        R.drawable.ic_growth_stage_1,
-        R.drawable.ic_growth_stage_2,
-        R.drawable.ic_growth_stage_3,
-        R.drawable.ic_growth_stage_4
-    )
-
-    fun setState(consumedRatio: Float, isAfToday: Boolean, growthStage: Int, overGoal: Boolean) {
+    fun setState(consumedRatio: Float, isAfToday: Boolean, treeProgress: Float, overGoal: Boolean) {
         this.isAfToday = isAfToday
         this.overGoal = overGoal
-        this.growthStage = growthStage.coerceIn(0, stageDrawables.size - 1)
 
-        val newTarget = when {
-            isAfToday -> 1f
-            else -> consumedRatio.coerceIn(0f, 1f)
-        }
+        val newTarget = if (isAfToday) 1f else consumedRatio.coerceIn(0f, 1f)
         if (newTarget != targetRatio) {
             targetRatio = newTarget
             sweepAnimator?.cancel()
@@ -84,34 +82,66 @@ class GrowthRingView @JvmOverloads constructor(
             }
         }
 
-        if (isAfToday) startPulse() else stopPulse()
+        val newTree = treeProgress.coerceIn(0f, 1f)
+        if (newTree != targetTreeProgress) {
+            val first = targetTreeProgress < 0f
+            val from = if (first) newTree else animatedTreeProgress
+            targetTreeProgress = newTree
+            treeAnimator?.cancel()
+            if (first) {
+                animatedTreeProgress = newTree
+            } else {
+                // Grow (or reset to a fresh seed) with a soft pop
+                treeAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+                    duration = 700
+                    interpolator = DecelerateInterpolator()
+                    val start = from
+                    addUpdateListener { a ->
+                        val t = a.animatedValue as Float
+                        animatedTreeProgress = start + (newTree - start) * t
+                        treePop = 1f + 0.10f * sin(t * Math.PI).toFloat()
+                        invalidate()
+                    }
+                    start()
+                }
+            }
+        }
+
+        startIdle()
         invalidate()
     }
 
-    private fun startPulse() {
-        if (pulseAnimator != null) return
-        pulseAnimator = ValueAnimator.ofInt(160, 255).apply {
-            duration = 1600
-            repeatMode = ValueAnimator.REVERSE
+    /** One animator drives both the sway and the AF pulse. */
+    private fun startIdle() {
+        if (idleAnimator != null) return
+        idleAnimator = ValueAnimator.ofFloat(0f, (2.0 * Math.PI).toFloat()).apply {
+            duration = 5000
             repeatCount = ValueAnimator.INFINITE
+            interpolator = LinearInterpolator()
             addUpdateListener {
-                pulseAlpha = it.animatedValue as Int
+                swayPhase = it.animatedValue as Float
+                pulseAlpha = (207 + 48 * sin(swayPhase.toDouble())).toInt()
                 invalidate()
             }
             start()
         }
     }
 
-    private fun stopPulse() {
-        pulseAnimator?.cancel()
-        pulseAnimator = null
-        pulseAlpha = 255
+    private fun stopIdle() {
+        idleAnimator?.cancel()
+        idleAnimator = null
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         sweepAnimator?.cancel()
-        stopPulse()
+        treeAnimator?.cancel()
+        stopIdle()
+    }
+
+    override fun onVisibilityChanged(changedView: View, visibility: Int) {
+        super.onVisibilityChanged(changedView, visibility)
+        if (visibility == VISIBLE) startIdle() else stopIdle()
     }
 
     private fun color(res: Int): Int = ContextCompat.getColor(context, res)
@@ -173,13 +203,21 @@ class GrowthRingView @JvmOverloads constructor(
             }
         }
 
-        // Centre plant, keyed to cumulative AF days.
-        val drawable = AppCompatResources.getDrawable(context, stageDrawables[growthStage]) ?: return
+        // Centre tree, growing one AF day at a time
         val inner = size - 2 * (pad + stroke)
-        val plantSize = (inner * 0.62f).toInt()
-        val cx = width / 2
-        val cy = height / 2
-        drawable.setBounds(cx - plantSize / 2, cy - plantSize / 2, cx + plantSize / 2, cy + plantSize / 2)
-        drawable.draw(canvas)
+        val plantHeight = inner * 0.60f * treePop
+        val cx = width / 2f
+        val baseY = height / 2f + inner * 0.32f
+        val sway = 1.6f * sin(swayPhase.toDouble()).toFloat() * (0.3f + 0.7f * animatedTreeProgress)
+        TreePainter.draw(
+            canvas, cx, baseY, plantHeight, animatedTreeProgress,
+            TreePainter.Palette(
+                stem = color(R.color.growth_stem),
+                leaf = color(R.color.growth_leaf),
+                leafDark = color(R.color.growth_leaf_dark),
+                soil = color(R.color.growth_soil)
+            ),
+            swayDeg = sway
+        )
     }
 }

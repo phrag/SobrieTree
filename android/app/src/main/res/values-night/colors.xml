@@ -39,6 +39,8 @@
     <color name="ring_progress_end">#D9B24C</color>
     <color name="ring_af_glow">#81C784</color>
     <color name="growth_leaf">#66BB6A</color>
+    <color name="growth_leaf_dark">#388E3C</color>
+    <color name="growth_stem">#8D6E4F</color>
 
     <color name="chart_actual">#4DB6AC</color>
     <color name="chart_baseline">#8D8D8D</color>

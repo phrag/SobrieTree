@@ -194,7 +194,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<GrowthRingView>(R.id.growth_ring).setState(
             consumedRatio = state.metrics.dailyRatio.toFloat(),
             isAfToday = state.isTodayAf,
-            growthStage = state.growthStage,
+            treeProgress = state.treeProgress,
             overGoal = state.metrics.overDailyGoal
         )
 
@@ -209,8 +209,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tv_streak).text =
             "🌱 ${state.streaks.displayStreak}-day streak$bestPart"
         val shieldSuffix = if (state.streaks.shieldsHeld > 0) " · 🛡 ${state.streaks.shieldsHeld}" else ""
+        val forestSuffix = if (state.treesCollected > 0) " · 🌳 ${state.treesCollected}" else ""
         findViewById<TextView>(R.id.tv_total_af).text =
-            "${state.streaks.totalAfDays} alcohol-free days$shieldSuffix"
+            "${state.streaks.totalAfDays} alcohol-free days$shieldSuffix$forestSuffix"
         findViewById<TextView>(R.id.tv_encouragement).text = state.encouragement
 
         val cravingCard = findViewById<View>(R.id.card_craving_support)
