@@ -192,7 +192,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:visibility="gone"
-            android:text="@string/save_as_preset" />
+            android:text="@string/save_to_my_drinks" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switch_favorite"

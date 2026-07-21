@@ -136,7 +136,14 @@
     <string name="choose_from_drinks">Choose from your drinks</string>
     <string name="change_date">Change date</string>
     <string name="save_as_preset">Save as one of my drinks</string>
-    <string name="mark_as_favorite">Mark as favorite</string>
+    <string name="save_to_my_drinks">Save to my drinks</string>
+    <string name="mark_as_favorite">Make it my favorite</string>
+    <string name="log_a_custom_drink">Log a custom drink</string>
+    <string name="edit_my_drinks">Edit my drinks</string>
+    <string name="your_drinks">Your drinks</string>
+    <string name="new_drink">New drink</string>
+    <string name="log_card_hint">Tap one of your drinks, or log a custom one.</string>
+    <string name="drinks_empty">No saved drinks yet — add one to log it in a tap.</string>
     <string name="tile_af_this_week">alcohol-free this week</string>
     <string name="recovery_stage_title">Latest recovery stage</string>
     <string name="recovery_stage_empty_title">Your recovery starts here</string>

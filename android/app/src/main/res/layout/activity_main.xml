@@ -424,9 +424,17 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
+                        android:layout_marginBottom="2dp"
                         android:text="@string/log_a_drink"
                         android:textAppearance="@style/TextAppearance.BrewLog.Title" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:text="@string/log_card_hint"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                        android:textColor="@color/text_secondary" />
 
                     <HorizontalScrollView
                         android:layout_width="match_parent"
@@ -443,46 +451,39 @@
                             app:singleSelection="false" />
                     </HorizontalScrollView>
 
-                    <LinearLayout
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_add_drink_tile"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:minHeight="48dp"
+                        android:minWidth="0dp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:textAllCaps="false"
+                        android:text="@string/log_a_custom_drink"
+                        style="@style/Widget.BrewLog.Button" />
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btn_add_drink_tile"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="8dp"
-                            android:minHeight="48dp"
-                            android:minWidth="0dp"
-                            android:maxLines="1"
-                            android:ellipsize="end"
-                            android:textAllCaps="false"
-                            android:text="@string/add_drink"
-                            style="@style/Widget.BrewLog.Button" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btn_manage_drinks_tile"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="8dp"
-                            android:minHeight="48dp"
-                            android:minWidth="0dp"
-                            android:maxLines="1"
-                            android:ellipsize="end"
-                            android:textAllCaps="false"
-                            android:text="@string/manage"
-                            style="@style/Widget.BrewLog.Button.Outlined" />
-
-                    </LinearLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_manage_drinks_tile"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:minHeight="48dp"
+                        android:minWidth="0dp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:textAllCaps="false"
+                        android:text="@string/edit_my_drinks"
+                        app:icon="@drawable/ic_edit"
+                        app:iconGravity="textStart"
+                        app:iconPadding="8dp"
+                        style="@style/Widget.BrewLog.Button.Text" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_manage_goals_baseline"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="4dp"
                         android:minHeight="48dp"
                         android:minWidth="0dp"
                         android:maxLines="1"
@@ -492,7 +493,7 @@
                         app:icon="@drawable/ic_edit"
                         app:iconGravity="textStart"
                         app:iconPadding="8dp"
-                        style="@style/Widget.BrewLog.Button.Outlined" />
+                        style="@style/Widget.BrewLog.Button.Text" />
 
                 </LinearLayout>
 

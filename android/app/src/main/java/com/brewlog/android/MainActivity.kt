@@ -117,10 +117,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.btn_add_drink_tile).setOnClickListener { showAddBeerDialog() }
+        // Manager mode (no select callback): tapping a drink edits it, never logs one.
         findViewById<View>(R.id.btn_manage_drinks_tile).setOnClickListener {
-            showDrinkManagerDialog { selected ->
-                addBeerEntry(selected.name, selected.abv, selected.volume.toDouble(), "")
-            }
+            showDrinkManagerDialog()
         }
         findViewById<View>(R.id.btn_manage_goals_baseline).setOnClickListener {
             showManageGoalsBaselineDialog()
@@ -534,38 +533,53 @@ class MainActivity : AppCompatActivity() {
         DrinkPresetStore.addPreset(prefs, preset)
 
     private fun showDrinkManagerDialog(
-        onDrinkSelected: (DrinkPreset) -> Unit
+        onDrinkSelected: ((DrinkPreset) -> Unit)? = null
     ) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_drink_manager, null)
         val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
         val rv = dialogView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rv_drinks)
         val addBtn = dialogView.findViewById<MaterialButton>(R.id.btn_add_new_drink)
+        val emptyView = dialogView.findViewById<View>(R.id.tv_drinks_empty)
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
             .create()
 
         var drinks = getDrinkPresets(prefs).toMutableList()
         lateinit var adapter: DrinkManagerAdapter
+
+        fun refreshEmpty() {
+            emptyView.visibility = if (drinks.isEmpty()) View.VISIBLE else View.GONE
+        }
+
+        fun editDrink(drink: DrinkPreset) {
+            showEditDrinkDialog(drink) { updated ->
+                val idx = drinks.indexOfFirst { it.name == drink.name && it.type == drink.type }
+                if (idx != -1) {
+                    drinks[idx] = updated
+                    saveDrinkPresets(prefs, drinks)
+                    adapter.updateDrinks(drinks)
+                }
+            }
+        }
+
         adapter = DrinkManagerAdapter(
             drinks,
-            onSelect = {
-                onDrinkSelected(it)
-                dialog.dismiss()
-            },
-            onEdit = { drink ->
-                showEditDrinkDialog(drink) { updated ->
-                    val idx = drinks.indexOfFirst { it.name == drink.name && it.type == drink.type }
-                    if (idx != -1) {
-                        drinks[idx] = updated
-                        saveDrinkPresets(prefs, drinks)
-                        adapter.updateDrinks(drinks)
-                    }
+            onSelect = { drink ->
+                if (onDrinkSelected != null) {
+                    // Picker mode: tap fills the log form (does not log).
+                    onDrinkSelected(drink)
+                    dialog.dismiss()
+                } else {
+                    // Manager mode: tap edits the saved drink, never logs a consumption.
+                    editDrink(drink)
                 }
             },
+            onEdit = { editDrink(it) },
             onDelete = { drink ->
                 drinks.remove(drink)
                 saveDrinkPresets(prefs, drinks)
                 adapter.updateDrinks(drinks)
+                refreshEmpty()
             },
             onFavorite = { drink ->
                 drinks = drinks.map { it.copy(favorite = it == drink) }.toMutableList()
@@ -575,12 +589,14 @@ class MainActivity : AppCompatActivity() {
         )
         rv.layoutManager = LinearLayoutManager(this)
         rv.adapter = adapter
+        refreshEmpty()
 
         addBtn.setOnClickListener {
             showEditDrinkDialog(null) { newDrink ->
                 drinks.add(newDrink)
                 saveDrinkPresets(prefs, drinks)
                 adapter.updateDrinks(drinks)
+                refreshEmpty()
             }
         }
 
@@ -635,10 +651,17 @@ class MainActivity : AppCompatActivity() {
         val strengthEdit = dialogView.findViewById<android.widget.EditText>(R.id.et_alcohol_percentage)
         val volumeEdit = dialogView.findViewById<android.widget.EditText>(R.id.et_volume_ml)
         val notesEdit = dialogView.findViewById<android.widget.EditText>(R.id.et_notes)
-        val savePresetSwitch = dialogView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switch_save_preset)
-            .apply { visibility = View.VISIBLE }
         val favoriteSwitch = dialogView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switch_favorite)
-            .apply { visibility = View.VISIBLE }
+        // "Save to my drinks" is the single visible toggle; "Make it my favorite"
+        // only appears once the user opts to save, so the form stays uncluttered.
+        val savePresetSwitch = dialogView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switch_save_preset)
+            .apply {
+                visibility = View.VISIBLE
+                setOnCheckedChangeListener { _, checked ->
+                    favoriteSwitch.visibility = if (checked) View.VISIBLE else View.GONE
+                    if (!checked) favoriteSwitch.isChecked = false
+                }
+            }
 
         dialogView.findViewById<MaterialButton>(R.id.btn_choose_drink).apply {
             visibility = View.VISIBLE
