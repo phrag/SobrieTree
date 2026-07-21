@@ -132,7 +132,6 @@
     </string-array>
     <string name="add_beer">Log a drink</string>
     <string name="edit_drink">Edit drink</string>
-    <string name="add_drink">Add drink</string>
     <string name="beer_name">Drink name</string>
     <string name="choose_from_drinks">Choose from your drinks</string>
     <string name="change_date">Change date</string>
