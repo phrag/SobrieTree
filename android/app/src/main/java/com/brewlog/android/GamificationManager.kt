@@ -47,6 +47,8 @@ class GamificationManager(context: Context) {
         val caloriesSaved: Double,
         val nextBadge: Badge?,
         val nextBadgeHint: String?,
+        /** Most recent health-recovery stage reached (today's AF day counts), or null on day zero. */
+        val currentHealthStage: HealthMilestone?,
         val weekDots: List<DayDot>,
         val drinkSizeMl: Double,
         /** Craving-time support message, non-null when now is in the high-risk window. */
@@ -237,6 +239,7 @@ class GamificationManager(context: Context) {
             caloriesSaved = c.savings.caloriesSaved,
             nextBadge = nextBadge,
             nextBadgeHint = nextBadge?.let { BadgeEngine.progressHint(it, inputs) },
+            currentHealthStage = HealthTimeline.current(displayAfDays),
             weekDots = weekDots,
             drinkSizeMl = drinkSize,
             cravingSupport = cravingSupport,

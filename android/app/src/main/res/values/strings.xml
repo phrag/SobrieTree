@@ -130,8 +130,19 @@
         <item>Quick check-in — log today and see your week take shape.</item>
         <item>However today went, logging it is the win. Take 10 seconds.</item>
     </string-array>
-    <string name="add_beer">Add Beer</string>
-    <string name="beer_name">Beer Name</string>
+    <string name="add_beer">Log a drink</string>
+    <string name="edit_drink">Edit drink</string>
+    <string name="add_drink">Add drink</string>
+    <string name="beer_name">Drink name</string>
+    <string name="choose_from_drinks">Choose from your drinks</string>
+    <string name="change_date">Change date</string>
+    <string name="save_as_preset">Save as one of my drinks</string>
+    <string name="mark_as_favorite">Mark as favorite</string>
+    <string name="tile_af_this_week">alcohol-free this week</string>
+    <string name="recovery_stage_title">Latest recovery stage</string>
+    <string name="recovery_stage_empty_title">Your recovery starts here</string>
+    <string name="recovery_stage_empty_desc">Log your first alcohol-free day to begin your body\'s recovery timeline.</string>
+    <string name="view_full_timeline">View full timeline ›</string>
     <string name="alcohol_percentage">Alcohol %</string>
     <string name="volume_ml">Volume (ml)</string>
     <string name="notes">Notes</string>

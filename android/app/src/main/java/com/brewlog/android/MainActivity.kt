@@ -4,7 +4,6 @@ import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -133,7 +132,9 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<View>(R.id.tile_money).setOnClickListener(openJourney)
         findViewById<View>(R.id.tile_calories).setOnClickListener(openJourney)
-        findViewById<View>(R.id.tile_milestone).setOnClickListener(openJourney)
+        findViewById<View>(R.id.tile_af_week).setOnClickListener(openJourney)
+        findViewById<View>(R.id.tile_reduction).setOnClickListener(openJourney)
+        findViewById<View>(R.id.card_recovery).setOnClickListener(openJourney)
 
         BottomNavHelper.wire(this, findViewById(R.id.bottom_nav), R.id.nav_home)
     }
@@ -245,9 +246,36 @@ class MainActivity : AppCompatActivity() {
             }
         }
         findViewById<TextView>(R.id.tv_calories_saved).text = String.format("%,d", state.caloriesSaved.toInt())
-        findViewById<TextView>(R.id.tv_next_milestone).text =
-            state.nextBadge?.let { badge -> "${badge.title} · ${state.nextBadgeHint.orEmpty()}" }
-                ?: "All badges earned!"
+
+        // AF days this week (today's provisional AF day included)
+        val afThisWeek = state.streaks.afDaysThisWeek + if (state.isTodayAf) 1 else 0
+        findViewById<TextView>(R.id.tv_af_week).text = getString(R.string.n_of_7, afThisWeek)
+
+        // Reduction vs. usual this week; never shown in red, never as a negative
+        val reduction = state.metrics.reductionWeeklyPct
+        val reductionView = findViewById<TextView>(R.id.tv_reduction_week)
+        val reductionLabel = findViewById<TextView>(R.id.tv_reduction_week_label)
+        if (reduction >= 0) {
+            reductionView.text = String.format("%.0f%%", reduction)
+            reductionView.setTextColor(ContextCompat.getColor(this, R.color.state_positive))
+            reductionLabel.setText(R.string.less_than_baseline)
+        } else {
+            reductionView.text = String.format("%.0f%%", -reduction)
+            reductionView.setTextColor(ContextCompat.getColor(this, R.color.state_neutral))
+            reductionLabel.setText(R.string.more_than_baseline)
+        }
+
+        // Latest recovery stage reached
+        val recoveryStage = findViewById<TextView>(R.id.tv_recovery_stage)
+        val recoveryDesc = findViewById<TextView>(R.id.tv_recovery_desc)
+        val stage = state.currentHealthStage
+        if (stage != null) {
+            recoveryStage.text = stage.title
+            recoveryDesc.text = stage.description
+        } else {
+            recoveryStage.setText(R.string.recovery_stage_empty_title)
+            recoveryDesc.setText(R.string.recovery_stage_empty_desc)
+        }
 
         renderWeekDots(state)
     }
@@ -568,33 +596,32 @@ class MainActivity : AppCompatActivity() {
         val strengthEdit = dialogView.findViewById<TextInputEditText>(R.id.et_alcohol_percentage)
         val volumeEdit = dialogView.findViewById<TextInputEditText>(R.id.et_volume_ml)
         val costEdit = dialogView.findViewById<TextInputEditText>(R.id.et_cost)
-        val typeSpinner = dialogView.findViewById<android.widget.Spinner>(R.id.spinner_drink_type)
-        val typeNames = DrinkType.values().map { it.displayName }
-        val typeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, typeNames)
-        typeSpinner.adapter = typeAdapter
+        // Editing a saved drink keeps its existing type; new ones default to custom.
+        val presetType = drink?.type ?: DrinkType.CUSTOM
+        dialogView.findViewById<TextView>(R.id.tv_dialog_title)
+            .setText(if (drink == null) R.string.add_drink else R.string.edit_drink)
         if (drink != null) {
             nameEdit.setText(drink.name)
             strengthEdit.setText(drink.strength.toString())
             volumeEdit.setText(drink.volume.toString())
             if (drink.cost > 0) costEdit.setText(String.format("%.2f", drink.cost))
-            typeSpinner.setSelection(DrinkType.values().indexOf(drink.type))
         }
         val dialog = AlertDialog.Builder(this)
-            .setTitle(if (drink == null) "Add Drink" else "Edit Drink")
             .setView(dialogView)
-            .setPositiveButton("Save") { d, _ ->
-                val name = nameEdit.text.toString()
-                val strength = strengthEdit.text.toString().toFloatOrNull() ?: 0f
-                val volume = volumeEdit.text.toString().toIntOrNull() ?: 0
-                val cost = costEdit.text?.toString()?.toFloatOrNull()?.coerceAtLeast(0f) ?: 0f
-                val type = DrinkType.values()[typeSpinner.selectedItemPosition]
-                if (name.isNotEmpty() && strength > 0 && volume > 0) {
-                    onSave(DrinkPreset(name, type, volume, strength, drink?.favorite ?: false, cost))
-                    d.dismiss()
-                }
-            }
-            .setNegativeButton("Cancel") { d, _ -> d.dismiss() }
             .create()
+        dialogView.findViewById<View>(R.id.btn_cancel).setOnClickListener { dialog.dismiss() }
+        dialogView.findViewById<View>(R.id.btn_save).setOnClickListener {
+            val name = nameEdit.text.toString()
+            val strength = strengthEdit.text.toString().toFloatOrNull() ?: 0f
+            val volume = volumeEdit.text.toString().toIntOrNull() ?: 0
+            val cost = costEdit.text?.toString()?.toFloatOrNull()?.coerceAtLeast(0f) ?: 0f
+            if (name.isNotEmpty() && strength > 0 && volume > 0) {
+                onSave(DrinkPreset(name, presetType, volume, strength, drink?.favorite ?: false, cost))
+                dialog.dismiss()
+            } else {
+                Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
+            }
+        }
         dialog.show()
     }
 
@@ -608,26 +635,21 @@ class MainActivity : AppCompatActivity() {
         val strengthEdit = dialogView.findViewById<android.widget.EditText>(R.id.et_alcohol_percentage)
         val volumeEdit = dialogView.findViewById<android.widget.EditText>(R.id.et_volume_ml)
         val notesEdit = dialogView.findViewById<android.widget.EditText>(R.id.et_notes)
-        val typeSpinner = dialogView.findViewById<android.widget.Spinner>(R.id.spinner_drink_type)
         val savePresetSwitch = dialogView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switch_save_preset)
+            .apply { visibility = View.VISIBLE }
         val favoriteSwitch = dialogView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switch_favorite)
-        val typeNames = DrinkType.values().map { it.displayName }
-        val typeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, typeNames)
-        typeSpinner.adapter = typeAdapter
-        typeSpinner.setSelection(0)
+            .apply { visibility = View.VISIBLE }
 
-        val chooseDrinkBtn = MaterialButton(this).apply {
-            text = "Choose Drink"
+        dialogView.findViewById<MaterialButton>(R.id.btn_choose_drink).apply {
+            visibility = View.VISIBLE
             setOnClickListener {
                 showDrinkManagerDialog { drink ->
                     nameEdit.setText(drink.name)
                     volumeEdit.setText(drink.volume.toString())
                     strengthEdit.setText(drink.strength.toString())
-                    typeSpinner.setSelection(DrinkType.values().indexOf(drink.type))
                 }
             }
         }
-        (dialogView as LinearLayout).addView(chooseDrinkBtn, 0)
 
         // Pre-fill with defaults
         volumeEdit.setText(defaultSize.toString())
@@ -645,7 +667,6 @@ class MainActivity : AppCompatActivity() {
             val cost = dialogView.findViewById<android.widget.EditText>(R.id.et_cost)
                 ?.text?.toString()?.toFloatOrNull()?.coerceAtLeast(0f) ?: 0f
             val notes = notesEdit.text.toString()
-            val type = DrinkType.values()[typeSpinner.selectedItemPosition]
             if (name.isNotEmpty() && volumeMl > 0) {
                 addBeerEntry(name, alcoholPercentage, volumeMl, notes)
                 if (savePresetSwitch?.isChecked == true) {
@@ -653,7 +674,7 @@ class MainActivity : AppCompatActivity() {
                         prefs,
                         DrinkPreset(
                             name = name,
-                            type = type,
+                            type = DrinkType.CUSTOM,
                             volume = volumeMl.toInt(),
                             strength = alcoholPercentage.toFloat(),
                             favorite = favoriteSwitch?.isChecked == true,
@@ -675,16 +696,14 @@ class MainActivity : AppCompatActivity() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_beer, null)
 
         // Pre-fill the fields
+        dialogView.findViewById<TextView>(R.id.tv_dialog_title).setText(R.string.edit_drink)
         dialogView.findViewById<android.widget.EditText>(R.id.et_beer_name).setText(entry.name)
         dialogView.findViewById<android.widget.EditText>(R.id.et_alcohol_percentage).setText(entry.alcoholPercentage.toString())
         dialogView.findViewById<android.widget.EditText>(R.id.et_volume_ml).setText(entry.volumeMl.toString())
         dialogView.findViewById<android.widget.EditText>(R.id.et_notes).setText(entry.notes)
 
-        // Add Change Date button at top
-        val changeDateBtn = MaterialButton(this).apply {
-            text = "Change Date"
-            setIconResource(R.drawable.ic_nav_calendar)
-            iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
+        dialogView.findViewById<MaterialButton>(R.id.btn_change_date).apply {
+            visibility = View.VISIBLE
             setOnClickListener {
                 showDatePicker { selected ->
                     try {
@@ -697,7 +716,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        (dialogView as LinearLayout).addView(changeDateBtn, 0)
 
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)

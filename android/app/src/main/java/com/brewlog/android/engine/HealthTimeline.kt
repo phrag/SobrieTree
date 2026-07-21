@@ -96,4 +96,7 @@ object HealthTimeline {
     }
 
     fun next(totalAfDays: Int): HealthMilestone? = milestones.firstOrNull { it.afDays > totalAfDays }
+
+    /** The most recent recovery stage whose AF-day threshold has been reached, if any. */
+    fun current(totalAfDays: Int): HealthMilestone? = milestones.lastOrNull { it.afDays <= totalAfDays }
 }

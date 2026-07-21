@@ -27,7 +27,7 @@
             android:id="@+id/tv_drink_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Beer Name"
+            android:text="Drink name"
             android:textAppearance="@style/TextAppearance.BrewLog.Body"
             android:textColor="@color/text_primary" />
 
@@ -35,7 +35,7 @@
             android:id="@+id/tv_drink_details"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Type • 500ml • 5.0% ABV"
+            android:text="500ml • 5.0% ABV"
             android:textAppearance="@style/TextAppearance.BrewLog.Caption"
             android:textColor="@color/text_secondary" />
     </LinearLayout>

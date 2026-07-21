@@ -95,23 +95,25 @@ class CalendarActivity : AppCompatActivity() {
 
     private fun showInlineEdit(entry: BeerEntry) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_beer, null)
+        dialogView.findViewById<android.widget.TextView>(R.id.tv_dialog_title).setText(R.string.edit_drink)
         dialogView.findViewById<android.widget.EditText>(R.id.et_beer_name).setText(entry.name)
         dialogView.findViewById<android.widget.EditText>(R.id.et_alcohol_percentage).setText(entry.alcoholPercentage.toString())
         dialogView.findViewById<android.widget.EditText>(R.id.et_volume_ml).setText(entry.volumeMl.toString())
         dialogView.findViewById<android.widget.EditText>(R.id.et_notes).setText(entry.notes)
-        androidx.appcompat.app.AlertDialog.Builder(this)
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
             .setView(dialogView)
-            .setPositiveButton("Save") { d, _ ->
-                val name = dialogView.findViewById<android.widget.EditText>(R.id.et_beer_name).text.toString()
-                val strength = dialogView.findViewById<android.widget.EditText>(R.id.et_alcohol_percentage).text.toString().toDoubleOrNull() ?: entry.alcoholPercentage
-                val vol = dialogView.findViewById<android.widget.EditText>(R.id.et_volume_ml).text.toString().toDoubleOrNull() ?: entry.volumeMl
-                val notes = dialogView.findViewById<android.widget.EditText>(R.id.et_notes).text.toString()
-                val r = BrewLogNative.update_beer_entry_jni(entry.id, name, strength, vol, notes)
-                if (r.startsWith("OK")) setDate(LocalDate.parse(entry.date))
-                d.dismiss()
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
+            .create()
+        dialogView.findViewById<android.view.View>(R.id.btn_cancel).setOnClickListener { dialog.dismiss() }
+        dialogView.findViewById<android.view.View>(R.id.btn_save).setOnClickListener {
+            val name = dialogView.findViewById<android.widget.EditText>(R.id.et_beer_name).text.toString()
+            val strength = dialogView.findViewById<android.widget.EditText>(R.id.et_alcohol_percentage).text.toString().toDoubleOrNull() ?: entry.alcoholPercentage
+            val vol = dialogView.findViewById<android.widget.EditText>(R.id.et_volume_ml).text.toString().toDoubleOrNull() ?: entry.volumeMl
+            val notes = dialogView.findViewById<android.widget.EditText>(R.id.et_notes).text.toString()
+            val r = BrewLogNative.update_beer_entry_jni(entry.id, name, strength, vol, notes)
+            if (r.startsWith("OK")) setDate(LocalDate.parse(entry.date))
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
     private fun deleteInline(entry: BeerEntry) {

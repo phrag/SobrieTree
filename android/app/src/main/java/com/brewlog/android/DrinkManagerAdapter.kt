@@ -33,7 +33,7 @@ class DrinkManagerAdapter(
         val drink = drinks[position]
         holder.name.text = drink.name
         val costPart = if (drink.cost > 0) " • ${Money.format(drink.cost.toDouble(), 2)}" else ""
-        holder.details.text = "${drink.type.displayName} • ${drink.volume}ml • ${drink.strength}% ABV$costPart"
+        holder.details.text = "${drink.volume}ml • ${drink.strength}% ABV$costPart"
         holder.favorite.setImageResource(R.drawable.ic_star)
         holder.favorite.imageAlpha = if (drink.favorite) 255 else 70
         holder.favorite.setOnClickListener { onFavorite(drink) }

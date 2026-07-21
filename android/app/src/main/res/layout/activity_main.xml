@@ -198,7 +198,86 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Stat tiles: money, calories, next milestone -->
+            <!-- Progress tiles row 1: alcohol-free days this week, reduction vs. usual -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tile_af_week"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    style="@style/Widget.BrewLog.Card"
+                    app:contentPadding="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_af_week"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                            android:textColor="@color/state_positive"
+                            tools:text="3 / 7" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="@string/tile_af_this_week"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Caption" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tile_reduction"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    style="@style/Widget.BrewLog.Card"
+                    app:contentPadding="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_reduction_week"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                            android:textColor="@color/state_positive"
+                            tools:text="40%" />
+
+                        <TextView
+                            android:id="@+id/tv_reduction_week_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="@string/less_than_baseline"
+                            android:textAppearance="@style/TextAppearance.BrewLog.Caption" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+            <!-- Progress tiles row 2: money and calories not spent -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -247,7 +326,6 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
-                    android:layout_marginEnd="6dp"
                     style="@style/Widget.BrewLog.Card"
                     app:contentPadding="12dp">
 
@@ -276,44 +354,59 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/tile_milestone"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_marginStart="6dp"
-                    style="@style/Widget.BrewLog.Card"
-                    app:contentPadding="12dp">
+            </LinearLayout>
 
-                    <LinearLayout
+            <!-- Latest recovery stage: most recent health milestone reached -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_recovery"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                style="@style/Widget.BrewLog.Card"
+                app:contentPadding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/recovery_stage_title"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                        android:textColor="@color/text_secondary" />
+
+                    <TextView
+                        android:id="@+id/tv_recovery_stage"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                        android:textColor="@color/brand_primary"
+                        android:textStyle="bold"
+                        tools:text="1 week - Energy returns" />
 
-                        <TextView
-                            android:id="@+id/tv_next_milestone"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:maxLines="2"
-                            android:ellipsize="end"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Body2"
-                            android:textColor="@color/brand_primary"
-                            tools:text="2 AF days to Week of Clarity" />
+                    <TextView
+                        android:id="@+id/tv_recovery_desc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Body2"
+                        android:textColor="@color/text_secondary"
+                        tools:text="Better-quality sleep compounds: steadier energy, better hydration and sharper focus." />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="@string/tile_next_badge"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Caption" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/view_full_timeline"
+                        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                        android:textColor="@color/brand_primary" />
 
-                    </LinearLayout>
+                </LinearLayout>
 
-                </com.google.android.material.card.MaterialCardView>
-
-            </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Quick log -->
             <com.google.android.material.card.MaterialCardView

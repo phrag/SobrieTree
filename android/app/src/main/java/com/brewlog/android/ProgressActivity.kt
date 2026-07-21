@@ -46,40 +46,10 @@ class ProgressActivity : AppCompatActivity() {
     }
 
     private fun loadData() {
-        bindStatTiles()
         showRange(currentRangeDays)
     }
 
     private var currentRangeDays = 7
-
-    private fun bindStatTiles() {
-        val state = gamification.homeState()
-
-        val afThisWeek = state.streaks.afDaysThisWeek + if (state.isTodayAf) 1 else 0
-        findViewById<TextView>(R.id.tv_af_week).text = getString(R.string.n_of_7, afThisWeek)
-
-        val reduction = state.metrics.reductionWeeklyPct
-        val reductionView = findViewById<TextView>(R.id.tv_reduction_week)
-        val reductionLabel = findViewById<TextView>(R.id.tv_reduction_week_label)
-        if (reduction >= 0) {
-            reductionView.text = String.format("%.0f%%", reduction)
-            reductionView.setTextColor(ContextCompat.getColor(this, R.color.state_positive))
-            reductionLabel.text = getString(R.string.less_than_baseline)
-        } else {
-            // Above baseline this week: neutral tone, never red
-            reductionView.text = String.format("%.0f%%", -reduction)
-            reductionView.setTextColor(ContextCompat.getColor(this, R.color.state_neutral))
-            reductionLabel.text = getString(R.string.more_than_baseline)
-        }
-
-        val moneyTile = findViewById<View>(R.id.tile_money_progress)
-        if (state.moneyAvailable) {
-            moneyTile.visibility = View.VISIBLE
-            findViewById<TextView>(R.id.tv_money_progress).text = Money.format(state.moneySaved)
-        } else {
-            moneyTile.visibility = View.GONE
-        }
-    }
 
     private fun showRange(days: Int) {
         currentRangeDays = days

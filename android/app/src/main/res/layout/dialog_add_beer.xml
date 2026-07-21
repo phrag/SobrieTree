@@ -1,204 +1,233 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/background"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:fillViewport="true">
 
-    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:padding="24dp">
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/ic_circle_background"
-            android:padding="6dp"
-            android:src="@drawable/ic_add"
-            app:tint="@color/brand_primary" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/add_beer"
-            android:textAppearance="@style/TextAppearance.BrewLog.Headline"
-            android:textColor="@color/text_primary" />
-
-    </LinearLayout>
-
-    <!-- Drink Type Selector -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Drink Type"
-        android:textAppearance="@style/TextAppearance.BrewLog.Body"
-        android:textColor="@color/text_secondary"
-        android:layout_marginBottom="4dp" />
-    <Spinner
-        android:id="@+id/spinner_drink_type"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp" />
-
-    <!-- Beer Name Input -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:hint="@string/beer_name"
-        style="?attr/textInputStyle"
-        app:boxBackgroundMode="filled"
-        app:boxBackgroundColor="@color/input_background"
-        app:hintTextColor="@color/text_hint">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_beer_name"
+        <!-- Header -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            android:maxLines="1"
-            android:textColor="@color/text_on_surface"
-            android:textColorHint="@color/text_hint" />
+            android:layout_marginBottom="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/ic_circle_background"
+                android:padding="6dp"
+                android:src="@drawable/ic_add"
+                app:tint="@color/brand_primary" />
 
-    <!-- Alcohol Percentage Input -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:hint="@string/alcohol_percentage"
-        app:suffixText="%"
-        style="?attr/textInputStyle"
-        app:boxBackgroundMode="filled"
-        app:boxBackgroundColor="@color/input_background"
-        app:hintTextColor="@color/text_hint">
+            <TextView
+                android:id="@+id/tv_dialog_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/add_beer"
+                android:textAppearance="@style/TextAppearance.BrewLog.Headline"
+                android:textColor="@color/text_primary" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_alcohol_percentage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:maxLines="1"
-            android:textColor="@color/text_on_surface"
-            android:textColorHint="@color/text_hint" />
+        </LinearLayout>
 
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <!-- Volume Input -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:hint="@string/volume_ml"
-        app:suffixText="ml"
-        style="?attr/textInputStyle"
-        app:boxBackgroundMode="filled"
-        app:boxBackgroundColor="@color/input_background"
-        app:hintTextColor="@color/text_hint">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_volume_ml"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:maxLines="1"
-            android:textColor="@color/text_on_surface"
-            android:textColorHint="@color/text_hint" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <!-- Cost Input (powers money-saved tracking) -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:hint="@string/drink_cost_hint"
-        style="?attr/textInputStyle"
-        app:boxBackgroundMode="filled"
-        app:boxBackgroundColor="@color/input_background"
-        app:hintTextColor="@color/text_hint">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_cost"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:maxLines="1"
-            android:textColor="@color/text_on_surface"
-            android:textColorHint="@color/text_hint" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <!-- Notes Input -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:hint="@string/notes"
-        style="?attr/textInputStyle"
-        app:boxBackgroundMode="filled"
-        app:boxBackgroundColor="@color/input_background"
-        app:hintTextColor="@color/text_hint">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_notes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textMultiLine"
-            android:maxLines="3"
-            android:textColor="@color/text_on_surface"
-            android:textColorHint="@color/text_hint" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <!-- Save preset options -->
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/switch_save_preset"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="Save as preset" />
-
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/switch_favorite"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="Mark as favorite" />
-
-    <!-- Action Buttons -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
+        <!-- Pick an existing drink (shown in add mode) -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_cancel"
-            android:layout_width="0dp"
-            android:layout_height="56dp"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="1"
-            android:text="@string/cancel"
+            android:id="@+id/btn_choose_drink"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"
+            android:text="@string/choose_from_drinks"
+            app:icon="@drawable/ic_star"
+            app:iconGravity="textStart"
             style="@style/Widget.BrewLog.Button.Outlined" />
 
+        <!-- Move an entry to another day (shown in edit mode) -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_save"
-            android:layout_width="0dp"
-            android:layout_height="56dp"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:text="@string/save"
-            style="@style/Widget.BrewLog.Button" />
+            android:id="@+id/btn_change_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"
+            android:text="@string/change_date"
+            app:icon="@drawable/ic_nav_calendar"
+            app:iconGravity="textStart"
+            style="@style/Widget.BrewLog.Button.Outlined" />
+
+        <!-- Drink name -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="@string/beer_name"
+            style="?attr/textInputStyle"
+            app:boxBackgroundMode="filled"
+            app:boxBackgroundColor="@color/input_background"
+            app:hintTextColor="@color/text_hint">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_beer_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:maxLines="1"
+                android:textColor="@color/text_on_surface"
+                android:textColorHint="@color/text_hint" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Alcohol % and Volume side by side -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:hint="@string/alcohol_percentage"
+                app:suffixText="%"
+                style="?attr/textInputStyle"
+                app:boxBackgroundMode="filled"
+                app:boxBackgroundColor="@color/input_background"
+                app:hintTextColor="@color/text_hint">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_alcohol_percentage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:maxLines="1"
+                    android:textColor="@color/text_on_surface"
+                    android:textColorHint="@color/text_hint" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:hint="@string/volume_ml"
+                app:suffixText="ml"
+                style="?attr/textInputStyle"
+                app:boxBackgroundMode="filled"
+                app:boxBackgroundColor="@color/input_background"
+                app:hintTextColor="@color/text_hint">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_volume_ml"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:maxLines="1"
+                    android:textColor="@color/text_on_surface"
+                    android:textColorHint="@color/text_hint" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+        <!-- Cost (powers money-saved tracking) -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="@string/drink_cost_hint"
+            style="?attr/textInputStyle"
+            app:boxBackgroundMode="filled"
+            app:boxBackgroundColor="@color/input_background"
+            app:hintTextColor="@color/text_hint">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_cost"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                android:textColor="@color/text_on_surface"
+                android:textColorHint="@color/text_hint" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Notes -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="@string/notes"
+            style="?attr/textInputStyle"
+            app:boxBackgroundMode="filled"
+            app:boxBackgroundColor="@color/input_background"
+            app:hintTextColor="@color/text_hint">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_notes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:maxLines="3"
+                android:textColor="@color/text_on_surface"
+                android:textColorHint="@color/text_hint" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Save preset options -->
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_save_preset"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"
+            android:text="@string/save_as_preset" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_favorite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:visibility="gone"
+            android:text="@string/mark_as_favorite" />
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_cancel"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:text="@string/cancel"
+                style="@style/Widget.BrewLog.Button.Outlined" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_save"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="@string/save"
+                style="@style/Widget.BrewLog.Button" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout> 
+</ScrollView>
