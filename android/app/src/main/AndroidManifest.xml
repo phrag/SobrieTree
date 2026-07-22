@@ -48,6 +48,11 @@
             android:exported="false"
             android:theme="@style/Theme.BrewLog" />
 
+        <!-- Handles the "Still alcohol-free" action on the check-in notification -->
+        <receiver
+            android:name=".CheckinActionReceiver"
+            android:exported="false" />
+
         <!-- Serves the downloaded update APK to the system installer -->
         <provider
             android:name="androidx.core.content.FileProvider"

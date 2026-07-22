@@ -82,6 +82,10 @@
     <string name="drink_cost_hint">Cost per drink (optional, for money saved)</string>
     <string name="reminder_channel_name">Daily check-in</string>
     <string name="reminder_channel_description">A single daily reminder to log your day</string>
+    <string name="reminder_affirm_action">Still alcohol-free 🎉</string>
+    <string name="affirm_celebration_title">Nice one 🌱</string>
+    <string name="affirm_celebration_body">Another alcohol-free day in the bank — that\'s %d in a row. Your ring stays full and your tree keeps growing.</string>
+    <string name="affirm_celebration_body_generic">Another alcohol-free day taking root. Your ring stays full tonight — well done.</string>
 
     <!-- Onboarding -->
     <string name="welcome_title">Welcome to BrewLog</string>
