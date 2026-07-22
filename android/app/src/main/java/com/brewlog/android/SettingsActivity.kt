@@ -388,18 +388,27 @@ class SettingsActivity : AppCompatActivity() {
                     packageManager.getPackageInfo(packageName, 0).versionName ?: "0"
                 } catch (_: Exception) { "0" }
                 kotlin.concurrent.thread {
-                    val release = UpdateChecker.fetchLatest(channel)
+                    val outcome = UpdateChecker.check(channel)
                     runOnUiThread {
                         appPrefs.lastUpdateCheck = System.currentTimeMillis()
-                        when {
-                            release == null ->
-                                statusText.text = getString(R.string.update_check_failed)
-                            UpdateChecker.isNewer(release.versionName, currentVersion) -> {
-                                statusText.text =
-                                    getString(R.string.update_available_title) + ": " + release.versionName
-                                promptInstall(release)
+                        when (outcome) {
+                            is UpdateChecker.Outcome.Found -> {
+                                val release = outcome.release
+                                if (UpdateChecker.isNewer(release.versionName, currentVersion)) {
+                                    statusText.text =
+                                        getString(R.string.update_available_title) + ": " + release.versionName
+                                    promptInstall(release)
+                                } else {
+                                    statusText.text = getString(R.string.update_up_to_date)
+                                }
                             }
-                            else -> statusText.text = getString(R.string.update_up_to_date)
+                            UpdateChecker.Outcome.None ->
+                                statusText.text =
+                                    if (channel == UpdateChecker.CHANNEL_STABLE)
+                                        getString(R.string.update_none_stable)
+                                    else getString(R.string.update_none)
+                            UpdateChecker.Outcome.Error ->
+                                statusText.text = getString(R.string.update_check_failed)
                         }
                     }
                 }

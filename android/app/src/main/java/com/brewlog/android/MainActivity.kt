@@ -108,7 +108,9 @@ class MainActivity : AppCompatActivity() {
             packageManager.getPackageInfo(packageName, 0).versionName ?: "0"
         } catch (_: Exception) { "0" }
         kotlin.concurrent.thread {
-            val release = UpdateChecker.fetchLatest(channel) ?: return@thread
+            val outcome = UpdateChecker.check(channel)
+            if (outcome !is UpdateChecker.Outcome.Found) return@thread
+            val release = outcome.release
             if (!UpdateChecker.isNewer(release.versionName, currentVersion)) return@thread
             runOnUiThread { offerUpdate(release) }
         }
