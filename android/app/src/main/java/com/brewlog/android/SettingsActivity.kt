@@ -375,9 +375,26 @@ class SettingsActivity : AppCompatActivity() {
             updatesOptions.visibility =
                 if (appPrefs.updatesEnabled) android.view.View.VISIBLE else android.view.View.GONE
             updatesSwitch.setOnCheckedChangeListener { _, checked ->
-                appPrefs.updatesEnabled = checked
-                updatesOptions.visibility =
-                    if (checked) android.view.View.VISIBLE else android.view.View.GONE
+                if (checked && !appPrefs.updatesEnabled) {
+                    // Enabling the only networked feature: explain the trade-off first.
+                    AlertDialog.Builder(this)
+                        .setTitle(R.string.updates_optin_dialog_title)
+                        .setMessage(R.string.updates_optin_dialog_body)
+                        .setCancelable(false)
+                        .setPositiveButton(R.string.updates_optin_enable) { d, _ ->
+                            appPrefs.updatesEnabled = true
+                            updatesOptions.visibility = android.view.View.VISIBLE
+                            d.dismiss()
+                        }
+                        .setNegativeButton(R.string.cancel) { d, _ ->
+                            updatesSwitch.isChecked = false // re-fires this listener with checked=false
+                            d.dismiss()
+                        }
+                        .show()
+                } else if (!checked) {
+                    appPrefs.updatesEnabled = false
+                    updatesOptions.visibility = android.view.View.GONE
+                }
             }
 
             checkBtn.setOnClickListener {
