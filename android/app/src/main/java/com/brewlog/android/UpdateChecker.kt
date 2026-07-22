@@ -35,38 +35,40 @@ object UpdateChecker {
             "https://api.github.com/repos/$REPO/releases/latest"
 
     /** Fetch the newest release on [channel], or null on any error / no release. */
-    fun fetchLatest(channel: String): Release? = try {
-        val body = httpGet(apiUrl(channel)) ?: return null
-        val obj = JSONObject(body)
-        val assets = obj.optJSONArray("assets")
-        var apkUrl: String? = null
-        var versionFromAsset: String? = null
-        if (assets != null) {
-            for (i in 0 until assets.length()) {
-                val a = assets.getJSONObject(i)
-                val name = a.optString("name")
-                if (!name.endsWith(".apk")) continue
-                val url = a.optString("browser_download_url")
-                val v = Regex("""(\d+\.\d+\.\d+)""").find(name)?.groupValues?.get(1)
-                if (v != null) {
-                    apkUrl = url
-                    versionFromAsset = v
-                } else if (apkUrl == null) {
-                    apkUrl = url // e.g. BrewLog-latest.apk, used only as a fallback
+    fun fetchLatest(channel: String): Release? {
+        return try {
+            val body = httpGet(apiUrl(channel)) ?: return null
+            val obj = JSONObject(body)
+            val assets = obj.optJSONArray("assets")
+            var apkUrl: String? = null
+            var versionFromAsset: String? = null
+            if (assets != null) {
+                for (i in 0 until assets.length()) {
+                    val a = assets.getJSONObject(i)
+                    val name = a.optString("name")
+                    if (!name.endsWith(".apk")) continue
+                    val url = a.optString("browser_download_url")
+                    val v = Regex("""(\d+\.\d+\.\d+)""").find(name)?.groupValues?.get(1)
+                    if (v != null) {
+                        apkUrl = url
+                        versionFromAsset = v
+                    } else if (apkUrl == null) {
+                        apkUrl = url // e.g. BrewLog-latest.apk, used only as a fallback
+                    }
                 }
             }
+            val resolvedApk = apkUrl ?: return null
+            val tagVersion = obj.optString("tag_name").removePrefix("v").removePrefix("V")
+            val version = versionFromAsset ?: tagVersion
+            Release(
+                versionName = version,
+                apkUrl = resolvedApk,
+                notes = obj.optString("body").trim(),
+                htmlUrl = obj.optString("html_url")
+            )
+        } catch (_: Exception) {
+            null
         }
-        if (apkUrl == null) return null
-        val tagVersion = obj.optString("tag_name").removePrefix("v").removePrefix("V")
-        val version = versionFromAsset ?: tagVersion
-        Release(
-            versionName = version,
-            apkUrl = apkUrl!!,
-            notes = obj.optString("body").trim(),
-            htmlUrl = obj.optString("html_url")
-        )
-    } catch (_: Exception) {
-        null
     }
 
     private fun httpGet(urlStr: String): String? {

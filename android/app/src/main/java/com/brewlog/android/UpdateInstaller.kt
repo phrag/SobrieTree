@@ -30,7 +30,7 @@ object UpdateInstaller {
             }
             if (conn.responseCode !in 200..299) return null
             conn.inputStream.use { input ->
-                out.outputStream.use { output -> input.copyTo(output) }
+                out.outputStream().use { output -> input.copyTo(output) }
             }
             out
         } catch (_: Exception) {
