@@ -18,6 +18,14 @@ object EducationLibrary {
 
     val cards: List<EducationCard> = listOf(
         EducationCard(
+            "guidance",
+            "Alcohol & your health: the guidance",
+            "Health authorities agree — less is better, and there is no risk-free level.",
+            "The World Health Organization states that no level of alcohol consumption is safe for our health, and the International Agency for Research on Cancer classifies alcohol as a Group 1 carcinogen — the highest category, alongside tobacco — causally linked to at least seven cancers, including breast and bowel. For those who do drink, the UK Chief Medical Officers' low-risk guidelines (used by the NHS) advise no more than 14 units a week — about 6 pints of average-strength beer or 10 small glasses of wine — spread over three or more days, with several drink-free days each week. Because risk rises with the amount, every drink you skip lowers it.",
+            "WHO/Europe (2023): no safe level. IARC: alcohol is a Group 1 carcinogen. NHS — UK Chief Medical Officers' low-risk drinking guidelines (2016): ≤14 units/week, spread over 3+ days.",
+            setOf("health", "sleep", "money", "weight", "mind")
+        ),
+        EducationCard(
             "sleep_architecture",
             "Why the nightcap backfires",
             "Alcohol makes you fall asleep faster but wrecks the second half of the night.",
@@ -30,7 +38,7 @@ object EducationLibrary {
             "Your liver's comeback story",
             "The liver starts repairing within days of drinking less.",
             "The liver is one of the few organs that regenerates. Fat accumulation in the liver - the first stage of alcohol-related damage - begins reversing within days of cutting back, and studies of month-long breaks show measurable drops in liver fat. For moderate drinkers, liver function markers can return to a healthy range within about six months of drinking less.",
-            "Based on research from alcohol-change studies including the 'Dry January' body of evidence.",
+            "Based on a University of Sussex 'Dry January' study (Alcohol Change UK) and NHS guidance on liver health.",
             setOf("health")
         ),
         EducationCard(
@@ -70,7 +78,7 @@ object EducationLibrary {
             "Decide before the evening does",
             "Planning your drinks in advance beats willpower in the moment.",
             "Willpower is weakest exactly when the round is being ordered. People who decide in advance - which days are alcohol-free, how many drinks on the others - cut consumption far more reliably than people who 'play it by ear'. Use your weekly goal as the plan, and treat alcohol-free days as appointments.",
-            "Based on pre-commitment techniques used in behaviour-change programmes like Sunnyside.",
+            "Based on behavioural-science research on pre-commitment and NIAAA guidance on planning ahead to drink less.",
             setOf("mind", "health")
         ),
         EducationCard(

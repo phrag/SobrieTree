@@ -153,7 +153,9 @@
 
     <!-- App updates (opt-in; the only feature that uses the network) -->
     <string name="updates_title">App updates</string>
-    <string name="updates_description">Off by default — this is the only feature that uses the internet. When on, BrewLog checks GitHub for a newer build and lets you install it; you always confirm the install yourself.</string>
+    <string name="updates_description">BrewLog has no network access of its own — it never connects to the internet. To update, open the releases page in your browser, then download and install the latest build yourself.</string>
+    <string name="update_view_release">View latest release</string>
+    <string name="update_open_failed">Couldn\'t open a browser on this device.</string>
     <string name="updates_enable_label">Check for updates</string>
     <string name="updates_optin_dialog_title">Turn on update checks?</string>
     <string name="updates_optin_dialog_body">This is the only feature that ever uses the internet. When on, BrewLog contacts GitHub over a secure connection to see if a newer build exists — nothing else. No account, no analytics, no tracking, and your drinking data never leaves your phone.\n\nIf your device lets you control network access per app, allow it for BrewLog so update checks can reach GitHub.</string>

@@ -31,6 +31,7 @@ import java.io.OutputStream
 
 class SettingsActivity : AppCompatActivity() {
     private val prefsName = "brewlog_prefs"
+    private val RELEASES_URL = "https://github.com/phrag/BrewLog/releases"
 
     // Flushes the text-field settings to prefs; reassigned in onCreate. Called
     // from onPause so a typed-but-not-blurred value is still saved on exit.
@@ -109,7 +110,6 @@ class SettingsActivity : AppCompatActivity() {
         val exportBtn = findViewById<MaterialButton>(R.id.btn_export)
         val importBtn = findViewById<MaterialButton>(R.id.btn_import)
         val deleteAllBtn = findViewById<MaterialButton>(R.id.btn_delete_all)
-        val infoGuidelines = findViewById<TextView>(R.id.tv_info_guidelines)
         val redoSetupBtn = findViewById<MaterialButton>(R.id.btn_redo_initial_setup)
         val versionText = findViewById<TextView>(R.id.tv_version)
         val startOfWeekDropdown = findViewById<AutoCompleteTextView>(R.id.et_start_of_week)
@@ -362,104 +362,18 @@ class SettingsActivity : AppCompatActivity() {
             versionText?.text = "Version: ${pInfo.versionName}"
         } catch (_: Exception) { }
 
-        // App updates (opt-in; the only feature that touches the network)
-        run {
-            val updatesSwitch = findViewById<SwitchMaterial>(R.id.switch_updates)
-            val updatesOptions = findViewById<android.view.View>(R.id.group_update_options)
-            val channelDropdown = findViewById<AutoCompleteTextView>(R.id.et_update_channel)
-            val checkBtn = findViewById<MaterialButton>(R.id.btn_check_updates)
-            val statusText = findViewById<TextView>(R.id.tv_update_status)
-
-            val channelValues = listOf(UpdateChecker.CHANNEL_STABLE, UpdateChecker.CHANNEL_LATEST)
-            val channelLabels = listOf(
-                getString(R.string.update_channel_stable),
-                getString(R.string.update_channel_latest)
-            )
-            channelDropdown.setAdapter(
-                ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, channelLabels)
-            )
-            val channelIndex = channelValues.indexOf(appPrefs.updateChannel).coerceAtLeast(0)
-            channelDropdown.setText(channelLabels[channelIndex], false)
-            channelDropdown.setOnItemClickListener { _, _, position, _ ->
-                appPrefs.updateChannel = channelValues[position]
-                channelDropdown.setText(channelLabels[position], false)
-            }
-            channelDropdown.setOnClickListener { channelDropdown.showDropDown() }
-
-            updatesSwitch.isChecked = appPrefs.updatesEnabled
-            updatesOptions.visibility =
-                if (appPrefs.updatesEnabled) android.view.View.VISIBLE else android.view.View.GONE
-            updatesSwitch.setOnCheckedChangeListener { _, checked ->
-                if (checked && !appPrefs.updatesEnabled) {
-                    // Enabling the only networked feature: explain the trade-off first.
-                    AlertDialog.Builder(this)
-                        .setTitle(R.string.updates_optin_dialog_title)
-                        .setMessage(R.string.updates_optin_dialog_body)
-                        .setCancelable(false)
-                        .setPositiveButton(R.string.updates_optin_enable) { d, _ ->
-                            appPrefs.updatesEnabled = true
-                            updatesOptions.visibility = android.view.View.VISIBLE
-                            d.dismiss()
-                        }
-                        .setNegativeButton(R.string.cancel) { d, _ ->
-                            updatesSwitch.isChecked = false // re-fires this listener with checked=false
-                            d.dismiss()
-                        }
-                        .show()
-                } else if (!checked) {
-                    appPrefs.updatesEnabled = false
-                    updatesOptions.visibility = android.view.View.GONE
-                }
-            }
-
-            checkBtn.setOnClickListener {
-                statusText.visibility = android.view.View.VISIBLE
-                statusText.text = getString(R.string.update_checking)
-                val channel = appPrefs.updateChannel
-                val currentVersion = try {
-                    packageManager.getPackageInfo(packageName, 0).versionName ?: "0"
-                } catch (_: Exception) { "0" }
-                kotlin.concurrent.thread {
-                    val outcome = UpdateChecker.check(channel)
-                    runOnUiThread {
-                        appPrefs.lastUpdateCheck = System.currentTimeMillis()
-                        when (outcome) {
-                            is UpdateChecker.Outcome.Found -> {
-                                val release = outcome.release
-                                if (UpdateChecker.isNewer(release.versionName, currentVersion)) {
-                                    statusText.text =
-                                        getString(R.string.update_available_title) + ": " + release.versionName
-                                    promptInstall(release)
-                                } else {
-                                    statusText.text = getString(R.string.update_up_to_date)
-                                }
-                            }
-                            UpdateChecker.Outcome.None ->
-                                statusText.text =
-                                    if (channel == UpdateChecker.CHANNEL_STABLE)
-                                        getString(R.string.update_none_stable)
-                                    else getString(R.string.update_none)
-                            UpdateChecker.Outcome.Error ->
-                                statusText.text = getString(R.string.update_check_failed)
-                        }
-                    }
-                }
+        // App updates: BrewLog has no network access of its own, so updates open
+        // in the browser where you download and install the latest build yourself.
+        findViewById<MaterialButton>(R.id.btn_view_release).setOnClickListener {
+            try {
+                startActivity(
+                    Intent(Intent.ACTION_VIEW, android.net.Uri.parse(RELEASES_URL))
+                )
+            } catch (_: Exception) {
+                Toast.makeText(this, getString(R.string.update_open_failed), Toast.LENGTH_SHORT).show()
             }
         }
 
-        // Show low-risk guideline info based on current defaults
-        try {
-            val gramsPerDrink = (defaultSize.toDouble() * (defaultStrength.toDouble() / 100.0) * 0.8)
-            if (gramsPerDrink > 0) {
-                val approxDailyFemale = (12.0 / gramsPerDrink).coerceAtLeast(0.0)
-                val approxDailyMale = (24.0 / gramsPerDrink).coerceAtLeast(0.0)
-                infoGuidelines?.text =
-                    "Guideline (approx.): ${approxDailyFemale.toInt()} drink/day (lower) to ${approxDailyMale.toInt()} drinks/day (upper). Consider 2 alcohol‑free days/week.\nSource: national low‑risk guidance."
-            } else {
-                infoGuidelines?.text = "Guideline: keep daily goals modest and include alcohol‑free days each week."
-            }
-        } catch (_: Exception) { }
-        
         // Export button
         exportBtn.setOnClickListener {
             try {
@@ -508,40 +422,7 @@ class SettingsActivity : AppCompatActivity() {
             })
         }
         
-        // Guidelines click handler
-        infoGuidelines.setOnClickListener {
-            Toast.makeText(this, "Source: National health guidelines for low-risk alcohol consumption", Toast.LENGTH_LONG).show()
-        }
-        
         BottomNavHelper.wire(this, findViewById(R.id.bottom_nav), R.id.nav_settings)
-    }
-
-    /** Confirm, then download the release APK and hand it to the system installer. */
-    private fun promptInstall(release: UpdateChecker.Release) {
-        val notes = release.notes.take(400).trim()
-        val message = buildString {
-            append("Version ${release.versionName} is available.")
-            if (notes.isNotBlank()) append("\n\n$notes")
-        }
-        AlertDialog.Builder(this)
-            .setTitle(R.string.update_available_title)
-            .setMessage(message)
-            .setPositiveButton(R.string.update_action_update) { d, _ ->
-                d.dismiss()
-                Toast.makeText(this, getString(R.string.update_downloading), Toast.LENGTH_SHORT).show()
-                kotlin.concurrent.thread {
-                    val apk = UpdateInstaller.downloadApk(this, release.apkUrl)
-                    runOnUiThread {
-                        if (apk != null) {
-                            UpdateInstaller.installApk(this, apk)
-                        } else {
-                            Toast.makeText(this, getString(R.string.update_download_failed), Toast.LENGTH_LONG).show()
-                        }
-                    }
-                }
-            }
-            .setNegativeButton(R.string.update_action_later, null)
-            .show()
     }
 
     private fun exportToFile(uri: Uri) {

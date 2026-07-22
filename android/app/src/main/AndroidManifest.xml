@@ -5,14 +5,13 @@
     <!-- Local-only opt-in daily check-in reminder -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- Opt-in over-the-air updates only. The app makes no network requests
-         unless the user turns updates on in Settings; off by default. -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-
-    <!-- Privacy guard: BrewLog never uses Bluetooth, nearby-device, Wi-Fi, or
-         location access. Explicitly strip these from the merged manifest so a
-         future third-party library can never introduce them. -->
+    <!-- Privacy guard: BrewLog has NO network access of its own. Updates open in
+         your browser, not in-app. These entries strip network/install/Bluetooth/
+         nearby/location permissions from the merged manifest so neither this app
+         nor any third-party library can ever hold them. -->
+    <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" tools:node="remove" />
     <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES" tools:node="remove" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" tools:node="remove" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" tools:node="remove" />
@@ -62,17 +61,6 @@
         <receiver
             android:name=".CheckinActionReceiver"
             android:exported="false" />
-
-        <!-- Serves the downloaded update APK to the system installer -->
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.updateprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
     </application>
 
 </manifest> 
