@@ -71,6 +71,11 @@ class AppPrefs(context: Context) {
         get() = prefs.getFloat("price_per_drink", 0f)
         set(value) = prefs.edit().putFloat("price_per_drink", value).apply()
 
+    /** What the user used to spend on alcohol per week, in their currency. Powers money saved. */
+    var baselineWeeklySpend: Float
+        get() = prefs.getFloat("baseline_weekly_spend", 0f)
+        set(value) = prefs.edit().putFloat("baseline_weekly_spend", value).apply()
+
     /** ISO 4217 currency code (e.g. "EUR"); null = follow the device locale. */
     var currencyCode: String?
         get() = prefs.getString("currency_code", null)

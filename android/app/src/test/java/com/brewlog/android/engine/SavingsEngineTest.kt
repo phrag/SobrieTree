@@ -33,6 +33,32 @@ class SavingsEngineTest {
     }
 
     @Test
+    fun `stated weekly spend drives money saved regardless of per-drink price`() {
+        val ledger = DayLedger(emptyList(), start, today)          // 9 completed days, nothing logged
+        val r = SavingsEngine.compute(
+            emptyList(), ledger, 1000.0, 5.0, 500.0,
+            pricePerDrink = 0.0, baselineWeeklySpend = 70.0
+        )
+        // 70/week -> 10/day * 9 completed days = 90 expected, nothing spent -> 90 saved
+        assertEquals(90.0, r.moneySaved, 0.001)
+        assertTrue(r.moneyAvailable)
+    }
+
+    @Test
+    fun `weekly spend baseline subtracts what was actually spent`() {
+        val ipa = com.brewlog.android.BeerEntry("1", "IPA", 6.5, 330.0, start.toString(), "")
+        val costs = listOf(SavingsEngine.DrinkCost("IPA", 330.0, 7.5))
+        val ledger = DayLedger(listOf(ipa), start, today)
+        val r = SavingsEngine.compute(
+            listOf(ipa), ledger, 1000.0, 5.0, 500.0,
+            pricePerDrink = 0.0, presetCosts = costs, baselineWeeklySpend = 70.0
+        )
+        // 90 expected - 7.5 actually spent = 82.5 saved
+        assertEquals(7.5, r.moneySpent, 0.001)
+        assertEquals(82.5, r.moneySaved, 0.001)
+    }
+
+    @Test
     fun `day one shows zero not phantom savings`() {
         val ledger = DayLedger(emptyList(), start, start)          // no completed days yet
         val r = SavingsEngine.compute(emptyList(), ledger, 1000.0, 5.0, 500.0, 4.0)

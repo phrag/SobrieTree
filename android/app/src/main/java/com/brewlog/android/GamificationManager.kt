@@ -136,7 +136,9 @@ class GamificationManager(context: Context) {
             },
             // The baseline is denominated in the favorite drink, so use its cost when set
             baselineCostPerDrink = favorite?.cost?.takeIf { it > 0 }?.toDouble()
-                ?: prefs.pricePerDrink.toDouble()
+                ?: prefs.pricePerDrink.toDouble(),
+            // Preferred when set: what the user says they used to spend per week
+            baselineWeeklySpend = prefs.baselineWeeklySpend.toDouble()
         )
         return Computed(ledger, entries, metrics, streaks, savings)
     }

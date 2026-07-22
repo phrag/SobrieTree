@@ -178,6 +178,10 @@ class SettingsActivity : AppCompatActivity() {
         if (appPrefs.pricePerDrink > 0) {
             priceEdit.setText(String.format("%.2f", appPrefs.pricePerDrink))
         }
+        val weeklySpendEdit = findViewById<TextInputEditText>(R.id.et_baseline_weekly_spend)
+        if (appPrefs.baselineWeeklySpend > 0) {
+            weeklySpendEdit.setText(String.format("%.2f", appPrefs.baselineWeeklySpend))
+        }
 
         // Instant-apply for the text fields: each commits on blur / IME Done, and
         // once more in onPause. Invalid or blank input reverts to the stored value
@@ -208,11 +212,22 @@ class SettingsActivity : AppCompatActivity() {
             if (v != null) appPrefs.pricePerDrink = v
             else priceEdit.setText(if (appPrefs.pricePerDrink > 0) String.format("%.2f", appPrefs.pricePerDrink) else "")
         }
+        fun persistWeeklySpend() {
+            val raw = weeklySpendEdit.text?.toString().orEmpty()
+            if (raw.isBlank()) {
+                appPrefs.baselineWeeklySpend = 0f
+                return
+            }
+            val v = raw.toFloatOrNull()?.coerceAtLeast(0f)
+            if (v != null) appPrefs.baselineWeeklySpend = v
+            else weeklySpendEdit.setText(if (appPrefs.baselineWeeklySpend > 0) String.format("%.2f", appPrefs.baselineWeeklySpend) else "")
+        }
         commitOnBlurAndDone(beerSizeEdit) { persistBeerSize() }
         commitOnBlurAndDone(beerStrengthEdit) { persistBeerStrength() }
         commitOnBlurAndDone(eodEdit) { persistEndOfDay() }
         commitOnBlurAndDone(priceEdit) { persistPrice() }
-        flushSettings = { persistBeerSize(); persistBeerStrength(); persistEndOfDay(); persistPrice() }
+        commitOnBlurAndDone(weeklySpendEdit) { persistWeeklySpend() }
+        flushSettings = { persistBeerSize(); persistBeerStrength(); persistEndOfDay(); persistPrice(); persistWeeklySpend() }
 
         // Edit goals & baseline directly from Settings
         findViewById<MaterialButton>(R.id.btn_edit_goals).setOnClickListener {

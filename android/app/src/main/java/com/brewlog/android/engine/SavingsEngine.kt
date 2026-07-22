@@ -12,8 +12,12 @@ import kotlin.math.abs
  * expected and the actual side, so savings never appear out of thin air the
  * moment a new day starts; numbers move when a day closes.
  *
- * Money uses real per-drink costs where the user has set them on a preset,
- * falling back to the global price, then to the average of priced presets.
+ * Money saved is anchored to what the user says they *used* to spend: when a
+ * baseline weekly spend is set, expected spend is simply that figure pro-rated
+ * over the tracked days — a number the user trusts, independent of fluctuating
+ * per-drink prices (a pub round vs. a cheap beer at home). Actual spend still
+ * comes from logged drink costs. Without a weekly figure it falls back to the
+ * older per-drink-price model. Both saved counters are floored at zero.
  */
 object SavingsEngine {
 
@@ -67,14 +71,17 @@ object SavingsEngine {
         pricePerDrink: Double,
         presetCosts: List<DrinkCost> = emptyList(),
         /** Cost of one baseline drink; callers pass the favorite preset's cost when set. */
-        baselineCostPerDrink: Double = pricePerDrink
+        baselineCostPerDrink: Double = pricePerDrink,
+        /** What the user says they used to spend on alcohol per week; preferred when > 0. */
+        baselineWeeklySpend: Double = 0.0
     ): Result {
         // Completed days only - today joins the ledger when it closes.
         val daysTracked = ledger.completedDays.size
 
         val effectiveBaselineCost = if (baselineCostPerDrink > 0) baselineCostPerDrink else averagePresetCost(presetCosts)
-        val moneyAvailable = drinkSizeMl > 0 &&
-            (effectiveBaselineCost > 0 || pricePerDrink > 0 || presetCosts.any { it.cost > 0 })
+        val usesWeeklySpend = baselineWeeklySpend > 0
+        val moneyAvailable = usesWeeklySpend ||
+            (drinkSizeMl > 0 && (effectiveBaselineCost > 0 || pricePerDrink > 0 || presetCosts.any { it.cost > 0 }))
 
         var actualSpend = 0.0
         var actualKcal = 0.0
@@ -86,8 +93,15 @@ object SavingsEngine {
             actualKcal += entry.volumeMl * (entry.alcoholPercentage / 100.0) * KCAL_PER_ML_ALCOHOL
         }
 
-        val moneySaved = if (moneyAvailable && effectiveBaselineCost > 0) {
-            val expectedSpend = (baselineDailyMl / drinkSizeMl) * effectiveBaselineCost * daysTracked
+        // Prefer the user's stated weekly spend, pro-rated over the tracked days;
+        // otherwise fall back to the per-drink-price estimate.
+        val expectedSpend = when {
+            usesWeeklySpend -> (baselineWeeklySpend / 7.0) * daysTracked
+            effectiveBaselineCost > 0 && drinkSizeMl > 0 ->
+                (baselineDailyMl / drinkSizeMl) * effectiveBaselineCost * daysTracked
+            else -> 0.0
+        }
+        val moneySaved = if (moneyAvailable && expectedSpend > 0) {
             (expectedSpend - actualSpend).coerceAtLeast(0.0)
         } else 0.0
 

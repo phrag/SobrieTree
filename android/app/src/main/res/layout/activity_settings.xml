@@ -138,6 +138,22 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
+                        android:hint="@string/baseline_weekly_spend_hint"
+                        app:helperText="@string/baseline_weekly_spend_helper"
+                        style="@style/Widget.BrewLog.TextInputLayout">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_baseline_weekly_spend"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberDecimal" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
                         android:hint="@string/price_per_drink_hint"
                         style="@style/Widget.BrewLog.TextInputLayout">
 
