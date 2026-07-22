@@ -346,7 +346,66 @@ class SettingsActivity : AppCompatActivity() {
             val pInfo = packageManager.getPackageInfo(packageName, 0)
             versionText?.text = "Version: ${pInfo.versionName}"
         } catch (_: Exception) { }
-        
+
+        // App updates (opt-in; the only feature that touches the network)
+        run {
+            val updatesSwitch = findViewById<SwitchMaterial>(R.id.switch_updates)
+            val updatesOptions = findViewById<android.view.View>(R.id.group_update_options)
+            val channelDropdown = findViewById<AutoCompleteTextView>(R.id.et_update_channel)
+            val checkBtn = findViewById<MaterialButton>(R.id.btn_check_updates)
+            val statusText = findViewById<TextView>(R.id.tv_update_status)
+
+            val channelValues = listOf(UpdateChecker.CHANNEL_STABLE, UpdateChecker.CHANNEL_LATEST)
+            val channelLabels = listOf(
+                getString(R.string.update_channel_stable),
+                getString(R.string.update_channel_latest)
+            )
+            channelDropdown.setAdapter(
+                ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, channelLabels)
+            )
+            val channelIndex = channelValues.indexOf(appPrefs.updateChannel).coerceAtLeast(0)
+            channelDropdown.setText(channelLabels[channelIndex], false)
+            channelDropdown.setOnItemClickListener { _, _, position, _ ->
+                appPrefs.updateChannel = channelValues[position]
+                channelDropdown.setText(channelLabels[position], false)
+            }
+            channelDropdown.setOnClickListener { channelDropdown.showDropDown() }
+
+            updatesSwitch.isChecked = appPrefs.updatesEnabled
+            updatesOptions.visibility =
+                if (appPrefs.updatesEnabled) android.view.View.VISIBLE else android.view.View.GONE
+            updatesSwitch.setOnCheckedChangeListener { _, checked ->
+                appPrefs.updatesEnabled = checked
+                updatesOptions.visibility =
+                    if (checked) android.view.View.VISIBLE else android.view.View.GONE
+            }
+
+            checkBtn.setOnClickListener {
+                statusText.visibility = android.view.View.VISIBLE
+                statusText.text = getString(R.string.update_checking)
+                val channel = appPrefs.updateChannel
+                val currentVersion = try {
+                    packageManager.getPackageInfo(packageName, 0).versionName ?: "0"
+                } catch (_: Exception) { "0" }
+                kotlin.concurrent.thread {
+                    val release = UpdateChecker.fetchLatest(channel)
+                    runOnUiThread {
+                        appPrefs.lastUpdateCheck = System.currentTimeMillis()
+                        when {
+                            release == null ->
+                                statusText.text = getString(R.string.update_check_failed)
+                            UpdateChecker.isNewer(release.versionName, currentVersion) -> {
+                                statusText.text =
+                                    getString(R.string.update_available_title) + ": " + release.versionName
+                                promptInstall(release)
+                            }
+                            else -> statusText.text = getString(R.string.update_up_to_date)
+                        }
+                    }
+                }
+            }
+        }
+
         // Show low-risk guideline info based on current defaults
         try {
             val gramsPerDrink = (defaultSize.toDouble() * (defaultStrength.toDouble() / 100.0) * 0.8)
@@ -415,7 +474,35 @@ class SettingsActivity : AppCompatActivity() {
         
         BottomNavHelper.wire(this, findViewById(R.id.bottom_nav), R.id.nav_settings)
     }
-    
+
+    /** Confirm, then download the release APK and hand it to the system installer. */
+    private fun promptInstall(release: UpdateChecker.Release) {
+        val notes = release.notes.take(400).trim()
+        val message = buildString {
+            append("Version ${release.versionName} is available.")
+            if (notes.isNotBlank()) append("\n\n$notes")
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.update_available_title)
+            .setMessage(message)
+            .setPositiveButton(R.string.update_action_update) { d, _ ->
+                d.dismiss()
+                Toast.makeText(this, getString(R.string.update_downloading), Toast.LENGTH_SHORT).show()
+                kotlin.concurrent.thread {
+                    val apk = UpdateInstaller.downloadApk(this, release.apkUrl)
+                    runOnUiThread {
+                        if (apk != null) {
+                            UpdateInstaller.installApk(this, apk)
+                        } else {
+                            Toast.makeText(this, getString(R.string.update_download_failed), Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            }
+            .setNegativeButton(R.string.update_action_later, null)
+            .show()
+    }
+
     private fun exportToFile(uri: Uri) {
         try {
             val csvData = exportToCsv()

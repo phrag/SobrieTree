@@ -144,6 +144,23 @@
     <string name="new_drink">New drink</string>
     <string name="log_card_hint">Tap one of your drinks, or log a custom one.</string>
     <string name="drinks_empty">No saved drinks yet — add one to log it in a tap.</string>
+
+    <!-- App updates (opt-in; the only feature that uses the network) -->
+    <string name="updates_title">App updates</string>
+    <string name="updates_description">Off by default — this is the only feature that uses the internet. When on, BrewLog checks GitHub for a newer build and lets you install it; you always confirm the install yourself.</string>
+    <string name="updates_enable_label">Check for updates</string>
+    <string name="update_channel_label">Update channel</string>
+    <string name="update_channel_stable">Stable releases</string>
+    <string name="update_channel_latest">Latest builds</string>
+    <string name="update_check_now">Check for updates now</string>
+    <string name="update_checking">Checking for updates…</string>
+    <string name="update_up_to_date">You\'re on the latest version.</string>
+    <string name="update_check_failed">Couldn\'t check right now. Try again later.</string>
+    <string name="update_available_title">Update available</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_download_failed">Download failed. Try again later.</string>
+    <string name="update_action_update">Update</string>
+    <string name="update_action_later">Later</string>
     <string name="tile_af_this_week">alcohol-free this week</string>
     <string name="recovery_stage_title">Latest recovery stage</string>
     <string name="recovery_stage_empty_title">Your recovery starts here</string>

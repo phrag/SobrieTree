@@ -126,6 +126,25 @@ class AppPrefs(context: Context) {
         get() = prefs.getStringSet("milestones_celebrated", emptySet()) ?: emptySet()
         set(value) = prefs.edit().putStringSet("milestones_celebrated", value).apply()
 
+    /**
+     * Opt-in over-the-air update checks. Off by default — this is the only
+     * feature that ever uses the network, so the app stays fully offline
+     * unless the user turns this on.
+     */
+    var updatesEnabled: Boolean
+        get() = prefs.getBoolean("updates_enabled", false)
+        set(value) = prefs.edit().putBoolean("updates_enabled", value).apply()
+
+    /** "stable" = full releases only; "latest" = rolling pre-release builds. */
+    var updateChannel: String
+        get() = prefs.getString("update_channel", "latest") ?: "latest"
+        set(value) = prefs.edit().putString("update_channel", value).apply()
+
+    /** Epoch millis of the last update check, used to throttle the on-open check. */
+    var lastUpdateCheck: Long
+        get() = prefs.getLong("last_update_check", 0L)
+        set(value) = prefs.edit().putLong("last_update_check", value).apply()
+
     companion object {
         const val NAME = "brewlog_prefs"
     }

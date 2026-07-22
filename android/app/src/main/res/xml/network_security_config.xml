@@ -5,7 +5,8 @@
             <certificates src="system" />
         </trust-anchors>
     </base-config>
-    <!-- No domain-config entries: app performs no network requests by design -->
+    <!-- HTTPS only (no cleartext). The app makes no network requests unless the
+         user opts into updates; that flow talks only to GitHub over HTTPS. -->
 </network-security-config>
 
 

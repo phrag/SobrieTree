@@ -90,6 +90,50 @@ class MainActivity : AppCompatActivity() {
         SecureWindow.apply(this)
         // Also re-checks for badges earned by days passing since the last visit
         try { loadData() } catch (_: Exception) {}
+        try { maybeCheckForUpdates() } catch (_: Exception) {}
+    }
+
+    /**
+     * Opt-in, throttled background update check. Does nothing (and touches no
+     * network) unless the user enabled updates; runs at most once a day.
+     */
+    private fun maybeCheckForUpdates() {
+        val prefs = AppPrefs(this)
+        if (!prefs.updatesEnabled) return
+        val now = System.currentTimeMillis()
+        if (now - prefs.lastUpdateCheck < 24L * 60 * 60 * 1000) return
+        prefs.lastUpdateCheck = now
+        val channel = prefs.updateChannel
+        val currentVersion = try {
+            packageManager.getPackageInfo(packageName, 0).versionName ?: "0"
+        } catch (_: Exception) { "0" }
+        kotlin.concurrent.thread {
+            val release = UpdateChecker.fetchLatest(channel) ?: return@thread
+            if (!UpdateChecker.isNewer(release.versionName, currentVersion)) return@thread
+            runOnUiThread { offerUpdate(release) }
+        }
+    }
+
+    private fun offerUpdate(release: UpdateChecker.Release) {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.update_available_title)
+            .setMessage("Version ${release.versionName} is available.")
+            .setPositiveButton(R.string.update_action_update) { d, _ ->
+                d.dismiss()
+                Toast.makeText(this, getString(R.string.update_downloading), Toast.LENGTH_SHORT).show()
+                kotlin.concurrent.thread {
+                    val apk = UpdateInstaller.downloadApk(this, release.apkUrl)
+                    runOnUiThread {
+                        if (apk != null) {
+                            UpdateInstaller.installApk(this, apk)
+                        } else {
+                            Toast.makeText(this, getString(R.string.update_download_failed), Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            }
+            .setNegativeButton(R.string.update_action_later, null)
+            .show()
     }
 
     private fun setupRecyclerView() {
