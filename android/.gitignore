@@ -1,0 +1,6 @@
+
+# Signing material — never commit
+*.jks
+*.keystore
+keystore.properties
+keystore.b64

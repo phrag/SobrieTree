@@ -17,23 +17,41 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Signing is driven by secrets, never committed. Provide EITHER a gitignored
+    // android/keystore.properties (local) OR SIGNING_* env vars (CI secrets). If
+    // neither is present, builds fall back to the default debug key so CI still
+    // produces an APK — those interim builds are not upgrade-stable.
+    def keystorePropsFile = rootProject.file("keystore.properties")
+    def signingProps = new Properties()
+    if (keystorePropsFile.exists()) {
+        signingProps.load(new FileInputStream(keystorePropsFile))
+    }
+    def storeFilePath = signingProps.getProperty("storeFile") ?: System.getenv("SIGNING_STORE_FILE")
+    def storePw = signingProps.getProperty("storePassword") ?: System.getenv("SIGNING_STORE_PASSWORD")
+    def keyAliasVal = signingProps.getProperty("keyAlias") ?: System.getenv("SIGNING_KEY_ALIAS")
+    def keyPw = signingProps.getProperty("keyPassword") ?: System.getenv("SIGNING_KEY_PASSWORD")
+    def hasReleaseSigning = storeFilePath && file(storeFilePath).exists() && storePw && keyAliasVal && keyPw
+
     signingConfigs {
-        release {
-            storeFile file("brewlog-release-key.jks")
-            storePassword "***REMOVED***"
-            keyAlias "brewlog"
-            keyPassword "***REMOVED***"
+        if (hasReleaseSigning) {
+            release {
+                storeFile file(storeFilePath)
+                storePassword storePw
+                keyAlias keyAliasVal
+                keyPassword keyPw
+            }
         }
     }
 
     buildTypes {
-        // Debug uses the release key too so CI builds upgrade-install
-        // over an existing release install (same signature required)
+        // Debug is signed with the release key when one is configured, so CI
+        // builds upgrade-install over an existing release install (same
+        // signature). Without a configured key it uses the default debug key.
         debug {
-            signingConfig signingConfigs.release
+            if (hasReleaseSigning) signingConfig signingConfigs.release
         }
         release {
-            signingConfig signingConfigs.release
+            if (hasReleaseSigning) signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
