@@ -1,8 +1,8 @@
-# BrewLog
+# TreeTotal
 
 **Drink less. Grow something. Keep it private.**
 
-BrewLog is an offline-first Android companion for drinking less. It turns cutting back into a calm daily practice — you log what you drink, watch alcohol-free days grow a tree (and real health gains), and see honest progress against your own goal. No account, no cloud, no ads, and — unless you explicitly opt in to update checks — no internet at all.
+TreeTotal is an offline-first Android companion for drinking less. It turns cutting back into a calm daily practice — you log what you drink, watch alcohol-free days grow a tree (and real health gains), and see honest progress against your own goal. No account, no cloud, no ads, and — unless you explicitly opt in to update checks — no internet at all.
 
 Three ideas run through the whole app:
 
@@ -14,7 +14,7 @@ Three ideas run through the whole app:
 
 ## 🌱 Growing, not grading
 
-BrewLog rewards the days you skip and never punishes the days you don't.
+TreeTotal rewards the days you skip and never punishes the days you don't.
 
 - **Growth Ring home screen** — today's drinks form a soft ring around a seedling. On an alcohol-free day the ring fills and the plant grows.
 - **A forest you collect** — the seedling matures into trees you keep. In your first month you earn a tree every week (four smaller trees); after that, a larger tree for each alcohol-free month. Your forest is a picture of how far you've come.
@@ -32,7 +32,7 @@ BrewLog rewards the days you skip and never punishes the days you don't.
 
 ## 🤝 Support when it's hard
 
-- **Craving-time nudges** — tell BrewLog when you usually start drinking and it sends a supportive, local-only notification just before, strongest in your first days and easing as new habits settle.
+- **Craving-time nudges** — tell TreeTotal when you usually start drinking and it sends a supportive, local-only notification just before, strongest in your first days and easing as new habits settle.
 - **Shame-free encouragement** — a quiet evening is celebrated; a heavy day gets a plan, not a scolding. The tone adapts to *your* reasons for cutting back.
 - **Optional daily check-in** reminder (off by default).
 
@@ -47,11 +47,11 @@ BrewLog rewards the days you skip and never punishes the days you don't.
 
 ## 🔄 Optional auto-updates (opt-in)
 
-Because BrewLog installs outside app stores, Settings has an **opt-in** updater:
+Because TreeTotal installs outside app stores, Settings has an **opt-in** updater:
 
 - **Off by default.** Turn it on in **Settings → App updates**.
 - **Two channels** — **Stable releases** or **Latest builds** (the newest CI build).
-- BrewLog checks the public GitHub Releases for a newer version, at most once a day, and offers to download and install it. **You always confirm the install** in the system dialog — nothing installs silently.
+- TreeTotal checks the public GitHub Releases for a newer version, at most once a day, and offers to download and install it. **You always confirm the install** in the system dialog — nothing installs silently.
 
 This is the one feature that requires the `INTERNET` permission; with updates off, the app makes no network requests whatsoever.
 
@@ -61,16 +61,16 @@ This is the one feature that requires the `INTERNET` permission; with updates of
 
 The latest build is published publicly on every green CI run — a direct APK download, not a login-gated artifact:
 
-**→ [`BrewLog-latest.apk`](https://github.com/phrag/BrewLog/releases/download/latest/BrewLog-latest.apk)** &nbsp;·&nbsp; [all releases](https://github.com/phrag/BrewLog/releases)
+**→ [`TreeTotal-latest.apk`](https://github.com/phrag/BrewLog/releases/download/latest/TreeTotal-latest.apk)** &nbsp;·&nbsp; [all releases](https://github.com/phrag/BrewLog/releases)
 
 You may need to allow "Install unknown apps" for your browser or file manager. Once installed, you can let the app keep itself updated via the opt-in updater above.
 
 ## Architecture
 
-BrewLog is native Android (Kotlin + XML Views + Material 3) on top of a small Rust core.
+TreeTotal is native Android (Kotlin + XML Views + Material 3) on top of a small Rust core.
 
 - **UI** — Activities with a five-tab bottom navigation (Home, Progress, Journey, Calendar, Settings). Custom canvas views render the growth ring, trees, and forest.
-- **Engine** (`com.brewlog.android.engine`) — a pure-Kotlin, JVM-testable layer with no Android dependencies; all gamification is derived here or stored in `SharedPreferences`:
+- **Engine** (`com.treetotal.android.engine`) — a pure-Kotlin, JVM-testable layer with no Android dependencies; all gamification is derived here or stored in `SharedPreferences`:
   - `DayLedger` (completed vs. in-progress days), `StreakEngine` (streaks, shields, tree/forest growth), `SavingsEngine` (money & calories vs. baseline, completed days only), `MetricsEngine`, `BadgeCatalog`, `EncouragementEngine`, `HealthTimeline`, `EducationLibrary`, `HighRiskSupport`.
   - `GamificationManager` composes these into the state the UI binds to.
 - **Native core** (`rust/src/lib.rs`) — the data store, exposed to Kotlin over JNI and backed by SQLite on-device.
@@ -91,7 +91,7 @@ cd ../android
 ./gradlew assembleDebug
 ```
 
-The debug APK lands at `android/app/build/outputs/apk/debug/BrewLog-<version>.apk`. Debug builds are signed with the release key so they install as an upgrade over release builds.
+The debug APK lands at `android/app/build/outputs/apk/debug/TreeTotal-<version>.apk`. Debug builds are signed with the release key so they install as an upgrade over release builds.
 
 ### Tests
 
@@ -102,14 +102,14 @@ cd rust    && cargo test --all              # Rust core tests
 
 ### Continuous integration
 
-Every push runs `.github/workflows/ci.yml` on GitHub Actions, which builds the Rust core with `cargo-ndk`, assembles the debug APK, runs the Android and Rust tests, checks Rust formatting/clippy and Android Lint, uploads the `BrewLog-apk` artifact, and publishes the APK to the rolling **`latest`** public release.
+Every push runs `.github/workflows/ci.yml` on GitHub Actions, which builds the Rust core with `cargo-ndk`, assembles the debug APK, runs the Android and Rust tests, checks Rust formatting/clippy and Android Lint, uploads the `TreeTotal-apk` artifact, and publishes the APK to the rolling **`latest`** public release.
 
 ## Project structure
 
 ```
-brewlog/
+treetotal/
 ├── android/
-│   └── app/src/main/java/com/brewlog/android/
+│   └── app/src/main/java/com/treetotal/android/
 │       ├── MainActivity.kt          # Home: growth ring, tiles, recovery stage, logging
 │       ├── ProgressActivity.kt      # Progress trend chart
 │       ├── JourneyActivity.kt       # Recovery timeline, badges, savings, reads

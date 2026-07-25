@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/Theme.BrewLog"
+    android:theme="@style/Theme.TreeTotal"
     tools:context=".MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:text="@string/start_setup"
-                style="@style/Widget.BrewLog.Button.Outlined"
+                style="@style/Widget.TreeTotal.Button.Outlined"
                 android:visibility="gone" />
 
             <!-- Hero: growth ring + today status -->
@@ -53,7 +53,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.BrewLog.Card">
+                style="@style/Widget.TreeTotal.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -67,7 +67,7 @@
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
-                        <com.brewlog.android.GrowthRingView
+                        <com.treetotal.android.GrowthRingView
                             android:id="@+id/growth_ring"
                             android:layout_width="140dp"
                             android:layout_height="140dp"
@@ -87,7 +87,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/today"
-                                android:textAppearance="@style/TextAppearance.BrewLog.Caption" />
+                                android:textAppearance="@style/TextAppearance.TreeTotal.Caption" />
 
                             <TextView
                                 android:id="@+id/tv_ring_progress"
@@ -100,7 +100,7 @@
                                 app:autoSizeMinTextSize="15sp"
                                 app:autoSizeMaxTextSize="24sp"
                                 app:autoSizeStepGranularity="1sp"
-                                android:textAppearance="@style/TextAppearance.BrewLog.Headline"
+                                android:textAppearance="@style/TextAppearance.TreeTotal.Headline"
                                 tools:text="Alcohol-free so far" />
 
                             <TextView
@@ -108,7 +108,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:textAppearance="@style/TextAppearance.BrewLog.Body2"
+                                android:textAppearance="@style/TextAppearance.TreeTotal.Body2"
                                 android:textColor="@color/state_positive"
                                 tools:text="🌱 5-day streak · best 8" />
 
@@ -117,7 +117,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
-                                android:textAppearance="@style/TextAppearance.BrewLog.Body2"
+                                android:textAppearance="@style/TextAppearance.TreeTotal.Body2"
                                 tools:text="23 alcohol-free days · 🛡 2" />
 
                         </LinearLayout>
@@ -129,7 +129,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Encourage"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Encourage"
                         tools:text="Nothing logged today — your ring is full and your body is repairing." />
 
                     <!-- This week: 7 day dots populated in code -->
@@ -180,7 +180,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/high_risk_card_label"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                            android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
                             android:textColor="@color/brand_primary" />
 
                         <TextView
@@ -188,7 +188,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Encourage"
+                            android:textAppearance="@style/TextAppearance.TreeTotal.Encourage"
                             android:textColor="@color/text_primary"
                             tools:text="This is usually when the pull is strongest. It passes in about 20 minutes." />
 
@@ -212,7 +212,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
-                    style="@style/Widget.BrewLog.Card"
+                    style="@style/Widget.TreeTotal.Card"
                     app:contentPadding="12dp">
 
                     <LinearLayout
@@ -225,7 +225,7 @@
                             android:id="@+id/tv_af_week"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                            android:textAppearance="@style/TextAppearance.TreeTotal.Title"
                             android:textColor="@color/state_positive"
                             tools:text="3 / 7" />
 
@@ -234,7 +234,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="@string/tile_af_this_week"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Caption" />
+                            android:textAppearance="@style/TextAppearance.TreeTotal.Caption" />
 
                     </LinearLayout>
 
@@ -246,7 +246,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
-                    style="@style/Widget.BrewLog.Card"
+                    style="@style/Widget.TreeTotal.Card"
                     app:contentPadding="12dp">
 
                     <LinearLayout
@@ -259,7 +259,7 @@
                             android:id="@+id/tv_reduction_week"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                            android:textAppearance="@style/TextAppearance.TreeTotal.Title"
                             android:textColor="@color/state_positive"
                             tools:text="40%" />
 
@@ -269,7 +269,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="@string/less_than_baseline"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Caption" />
+                            android:textAppearance="@style/TextAppearance.TreeTotal.Caption" />
 
                     </LinearLayout>
 
@@ -291,7 +291,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
-                    style="@style/Widget.BrewLog.Card"
+                    style="@style/Widget.TreeTotal.Card"
                     app:contentPadding="12dp">
 
                     <LinearLayout
@@ -304,7 +304,7 @@
                             android:id="@+id/tv_money_saved"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                            android:textAppearance="@style/TextAppearance.TreeTotal.Title"
                             android:textColor="@color/state_positive"
                             tools:text="120" />
 
@@ -314,7 +314,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="@string/tile_money_saved"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Caption" />
+                            android:textAppearance="@style/TextAppearance.TreeTotal.Caption" />
 
                     </LinearLayout>
 
@@ -326,7 +326,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
-                    style="@style/Widget.BrewLog.Card"
+                    style="@style/Widget.TreeTotal.Card"
                     app:contentPadding="12dp">
 
                     <LinearLayout
@@ -339,7 +339,7 @@
                             android:id="@+id/tv_calories_saved"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                            android:textAppearance="@style/TextAppearance.TreeTotal.Title"
                             android:textColor="@color/state_positive"
                             tools:text="4,300" />
 
@@ -348,7 +348,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="@string/tile_calories_avoided"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Caption" />
+                            android:textAppearance="@style/TextAppearance.TreeTotal.Caption" />
 
                     </LinearLayout>
 
@@ -362,7 +362,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.BrewLog.Card"
+                style="@style/Widget.TreeTotal.Card"
                 app:contentPadding="16dp">
 
                 <LinearLayout
@@ -374,7 +374,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/recovery_stage_title"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
                         android:textColor="@color/text_secondary" />
 
                     <TextView
@@ -382,7 +382,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Body"
                         android:textColor="@color/brand_primary"
                         android:textStyle="bold"
                         tools:text="1 week - Energy returns" />
@@ -392,7 +392,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Body2"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Body2"
                         android:textColor="@color/text_secondary"
                         tools:text="Better-quality sleep compounds: steadier energy, better hydration and sharper focus." />
 
@@ -401,7 +401,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="@string/view_full_timeline"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
                         android:textColor="@color/brand_primary" />
 
                 </LinearLayout>
@@ -413,7 +413,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.BrewLog.Card">
+                style="@style/Widget.TreeTotal.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -426,14 +426,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="2dp"
                         android:text="@string/log_a_drink"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Title" />
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Title" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
                         android:text="@string/log_card_hint"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
                         android:textColor="@color/text_secondary" />
 
                     <HorizontalScrollView
@@ -461,7 +461,7 @@
                         android:ellipsize="end"
                         android:textAllCaps="false"
                         android:text="@string/log_a_custom_drink"
-                        style="@style/Widget.BrewLog.Button" />
+                        style="@style/Widget.TreeTotal.Button" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_manage_drinks_tile"
@@ -477,7 +477,7 @@
                         app:icon="@drawable/ic_edit"
                         app:iconGravity="textStart"
                         app:iconPadding="8dp"
-                        style="@style/Widget.BrewLog.Button.Text" />
+                        style="@style/Widget.TreeTotal.Button.Text" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_manage_goals_baseline"
@@ -493,7 +493,7 @@
                         app:icon="@drawable/ic_edit"
                         app:iconGravity="textStart"
                         app:iconPadding="8dp"
-                        style="@style/Widget.BrewLog.Button.Text" />
+                        style="@style/Widget.TreeTotal.Button.Text" />
 
                 </LinearLayout>
 
@@ -503,7 +503,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/Widget.BrewLog.Card">
+                style="@style/Widget.TreeTotal.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -516,7 +516,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
                         android:text="@string/recent_entries"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Title" />
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Title" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recycler_view"
@@ -533,7 +533,7 @@
                         android:layout_marginBottom="8dp"
                         android:gravity="center"
                         android:text="@string/no_entries_yet"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Body"
                         android:visibility="gone" />
 
                 </LinearLayout>

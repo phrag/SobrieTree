@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "�� Building BrewLog App"
+echo "�� Building TreeTotal App"
 
 # Install Android target for Rust (if not already installed)
 rustup target add aarch64-linux-android
@@ -13,7 +13,7 @@ else
   echo "ℹ️ cargo-ndk not found; falling back to direct cargo build (NDK setup required)"
   cargo build --release --target aarch64-linux-android
   mkdir -p ../android/app/src/main/jniLibs/arm64-v8a/
-  cp target/aarch64-linux-android/release/libbrewlog_core.so ../android/app/src/main/jniLibs/arm64-v8a/ 2>/dev/null || true
+  cp target/aarch64-linux-android/release/libtreetotal_core.so ../android/app/src/main/jniLibs/arm64-v8a/ 2>/dev/null || true
 fi
 
 # Copy library files to Android
@@ -32,9 +32,9 @@ fi
 ./gradlew assembleRelease || ./gradlew assembleDebug
 
 # Prefer Release artifact named by outputs config; fall back to Debug
-REL_APK="app/build/outputs/apk/release/BrewLog-${VERSION}.apk"
+REL_APK="app/build/outputs/apk/release/TreeTotal-${VERSION}.apk"
 DBG_APK="app/build/outputs/apk/debug/app-debug.apk"
-DEST="../BrewLog-${VERSION}.apk"
+DEST="../TreeTotal-${VERSION}.apk"
 if [ -f "$REL_APK" ]; then
   cp -f "$REL_APK" "$DEST"
   echo "📦 Copied APK to $(pwd)/$DEST"

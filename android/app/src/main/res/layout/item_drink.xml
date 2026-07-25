@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Drink name"
-            android:textAppearance="@style/TextAppearance.BrewLog.Body"
+            android:textAppearance="@style/TextAppearance.TreeTotal.Body"
             android:textColor="@color/text_primary" />
 
         <TextView
@@ -36,7 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="500ml • 5.0% ABV"
-            android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+            android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
             android:textColor="@color/text_secondary" />
     </LinearLayout>
 

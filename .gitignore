@@ -46,3 +46,6 @@ Thumbs.db
 
 Package
 *debug.apk
+
+# built APKs should not be committed
+/*.apk

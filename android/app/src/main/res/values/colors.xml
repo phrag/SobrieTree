@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- ============================================================
-         BrewLog design tokens - calm, health-focused identity.
+         TreeTotal design tokens - calm, health-focused identity.
          Rule: no red for consumption states; error is reserved for
          destructive actions and input validation only.
          ============================================================ -->

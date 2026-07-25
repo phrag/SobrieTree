@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Set your favorite drink"
-        android:textAppearance="@style/TextAppearance.BrewLog.Title"
+        android:textAppearance="@style/TextAppearance.TreeTotal.Title"
         android:textColor="@color/text_primary"
         android:layout_marginBottom="8dp"/>
         
@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="This will be your default drink for quick adding and goal calculations."
-        android:textAppearance="@style/TextAppearance.BrewLog.Caption"
+        android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
         android:textColor="@color/text_secondary"
         android:layout_marginBottom="16dp"/>
 
@@ -98,7 +98,7 @@
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:text="Save favorite and add one"
-        style="@style/Widget.BrewLog.Button"/>
+        style="@style/Widget.TreeTotal.Button"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_save_only"
@@ -106,7 +106,7 @@
         android:layout_height="52dp"
         android:layout_marginTop="8dp"
         android:text="Save favorite"
-        style="@style/Widget.BrewLog.Button.Outlined"/>
+        style="@style/Widget.TreeTotal.Button.Outlined"/>
 
 </LinearLayout>
 

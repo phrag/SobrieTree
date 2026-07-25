@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/add_beer"
-                android:textAppearance="@style/TextAppearance.BrewLog.Headline"
+                android:textAppearance="@style/TextAppearance.TreeTotal.Headline"
                 android:textColor="@color/text_primary" />
 
         </LinearLayout>
@@ -50,7 +50,7 @@
             android:text="@string/choose_from_drinks"
             app:icon="@drawable/ic_star"
             app:iconGravity="textStart"
-            style="@style/Widget.BrewLog.Button.Outlined" />
+            style="@style/Widget.TreeTotal.Button.Outlined" />
 
         <!-- Move an entry to another day (shown in edit mode) -->
         <com.google.android.material.button.MaterialButton
@@ -62,7 +62,7 @@
             android:text="@string/change_date"
             app:icon="@drawable/ic_nav_calendar"
             app:iconGravity="textStart"
-            style="@style/Widget.BrewLog.Button.Outlined" />
+            style="@style/Widget.TreeTotal.Button.Outlined" />
 
         <!-- Drink name -->
         <com.google.android.material.textfield.TextInputLayout
@@ -215,7 +215,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
                 android:text="@string/cancel"
-                style="@style/Widget.BrewLog.Button.Outlined" />
+                style="@style/Widget.TreeTotal.Button.Outlined" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_save"
@@ -224,7 +224,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
                 android:text="@string/save"
-                style="@style/Widget.BrewLog.Button" />
+                style="@style/Widget.TreeTotal.Button" />
 
         </LinearLayout>
 

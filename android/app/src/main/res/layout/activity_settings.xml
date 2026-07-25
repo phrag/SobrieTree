@@ -15,7 +15,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/app_bar_background"
             app:title="Settings"
-            app:titleTextAppearance="@style/TextAppearance.BrewLog.Title"
+            app:titleTextAppearance="@style/TextAppearance.TreeTotal.Title"
             app:titleTextColor="@color/app_bar_content" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -36,7 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.BrewLog.Card">
+                style="@style/Widget.TreeTotal.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -48,7 +48,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Drink defaults"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Title"
                         android:textColor="@color/text_primary"
                         android:layout_marginBottom="16dp" />
 
@@ -58,7 +58,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:hint="Default Beer Size (ml)"
-                        style="@style/Widget.BrewLog.TextInputLayout">
+                        style="@style/Widget.TreeTotal.TextInputLayout">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_beer_size"
@@ -75,7 +75,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:hint="Default Alcohol %"
-                        style="@style/Widget.BrewLog.TextInputLayout">
+                        style="@style/Widget.TreeTotal.TextInputLayout">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_beer_strength"
@@ -91,7 +91,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:hint="End of Day Hour (0-23)"
-                        style="@style/Widget.BrewLog.TextInputLayout">
+                        style="@style/Widget.TreeTotal.TextInputLayout">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_end_of_day"
@@ -119,7 +119,7 @@
                             android:id="@+id/currency_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            style="@style/Widget.BrewLog.TextInputLayout">
+                            style="@style/Widget.TreeTotal.TextInputLayout">
 
                             <AutoCompleteTextView
                                 android:id="@+id/et_currency"
@@ -140,7 +140,7 @@
                         android:layout_marginBottom="16dp"
                         android:hint="@string/baseline_weekly_spend_hint"
                         app:helperText="@string/baseline_weekly_spend_helper"
-                        style="@style/Widget.BrewLog.TextInputLayout">
+                        style="@style/Widget.TreeTotal.TextInputLayout">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_baseline_weekly_spend"
@@ -155,7 +155,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:hint="@string/price_per_drink_hint"
-                        style="@style/Widget.BrewLog.TextInputLayout">
+                        style="@style/Widget.TreeTotal.TextInputLayout">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_price_per_drink"
@@ -174,7 +174,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.BrewLog.Card">
+                style="@style/Widget.TreeTotal.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -186,7 +186,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/goals_settings_title"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Title"
                         android:textColor="@color/text_primary"
                         android:layout_marginBottom="8dp" />
 
@@ -194,7 +194,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/goals_settings_description"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Body2"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Body2"
                         android:layout_marginBottom="12dp" />
 
                     <com.google.android.material.button.MaterialButton
@@ -206,7 +206,7 @@
                         app:icon="@drawable/ic_edit"
                         app:iconGravity="textStart"
                         app:iconPadding="8dp"
-                        style="@style/Widget.BrewLog.Button.Outlined" />
+                        style="@style/Widget.TreeTotal.Button.Outlined" />
 
                 </LinearLayout>
 
@@ -217,7 +217,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.BrewLog.Card">
+                style="@style/Widget.TreeTotal.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -229,7 +229,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="App Settings"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Title"
                         android:textColor="@color/text_primary"
                         android:layout_marginBottom="16dp" />
 
@@ -250,7 +250,7 @@
                             android:id="@+id/theme_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            style="@style/Widget.BrewLog.TextInputLayout">
+                            style="@style/Widget.TreeTotal.TextInputLayout">
 
                             <AutoCompleteTextView
                                 android:id="@+id/et_theme"
@@ -304,7 +304,7 @@
                             android:id="@+id/start_of_week_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            style="@style/Widget.BrewLog.TextInputLayout">
+                            style="@style/Widget.TreeTotal.TextInputLayout">
 
                             <AutoCompleteTextView
                                 android:id="@+id/et_start_of_week"
@@ -347,7 +347,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/start_date_hint"
-                                android:textAppearance="@style/TextAppearance.BrewLog.Caption" />
+                                android:textAppearance="@style/TextAppearance.TreeTotal.Caption" />
 
                         </LinearLayout>
 
@@ -355,7 +355,7 @@
                             android:id="@+id/tv_start_date"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                            android:textAppearance="@style/TextAppearance.TreeTotal.Body"
                             android:textColor="@color/brand_primary" />
 
                     </LinearLayout>
@@ -369,7 +369,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.BrewLog.Card">
+                style="@style/Widget.TreeTotal.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -381,7 +381,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/reminder_settings_title"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Title"
                         android:textColor="@color/text_primary"
                         android:layout_marginBottom="8dp" />
 
@@ -389,7 +389,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/reminder_settings_description"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Body2"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Body2"
                         android:layout_marginBottom="12dp" />
 
                     <LinearLayout
@@ -433,7 +433,7 @@
                             android:id="@+id/tv_reminder_time"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                            android:textAppearance="@style/TextAppearance.TreeTotal.Body"
                             android:textColor="@color/brand_primary"
                             android:text="20:00" />
 
@@ -448,7 +448,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.BrewLog.Card">
+                style="@style/Widget.TreeTotal.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -460,7 +460,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/high_risk_settings_title"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Title"
                         android:textColor="@color/text_primary"
                         android:layout_marginBottom="8dp" />
 
@@ -468,7 +468,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/high_risk_settings_description"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Body2"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Body2"
                         android:layout_marginBottom="12dp" />
 
                     <LinearLayout
@@ -512,7 +512,7 @@
                             android:id="@+id/tv_high_risk_time"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                            android:textAppearance="@style/TextAppearance.TreeTotal.Body"
                             android:textColor="@color/brand_primary"
                             android:text="18:00" />
 
@@ -527,7 +527,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.BrewLog.Card">
+                style="@style/Widget.TreeTotal.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -539,7 +539,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/updates_title"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Title"
                         android:textColor="@color/text_primary"
                         android:layout_marginBottom="8dp" />
 
@@ -547,7 +547,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/updates_description"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Body2"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Body2"
                         android:layout_marginBottom="12dp" />
 
                     <com.google.android.material.button.MaterialButton
@@ -559,7 +559,7 @@
                         app:icon="@drawable/ic_download"
                         app:iconGravity="textStart"
                         app:iconPadding="8dp"
-                        style="@style/Widget.BrewLog.Button.Outlined" />
+                        style="@style/Widget.TreeTotal.Button.Outlined" />
 
                 </LinearLayout>
 
@@ -570,7 +570,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.BrewLog.Card">
+                style="@style/Widget.TreeTotal.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -582,7 +582,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Data Management"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Title"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Title"
                         android:textColor="@color/text_primary"
                         android:layout_marginBottom="16dp" />
 
@@ -595,7 +595,7 @@
                         app:icon="@drawable/ic_upload"
                         app:iconGravity="textStart"
                         app:iconPadding="8dp"
-                        style="@style/Widget.BrewLog.Button.Outlined" />
+                        style="@style/Widget.TreeTotal.Button.Outlined" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_import"
@@ -606,7 +606,7 @@
                         app:icon="@drawable/ic_download"
                         app:iconGravity="textStart"
                         app:iconPadding="8dp"
-                        style="@style/Widget.BrewLog.Button.Outlined" />
+                        style="@style/Widget.TreeTotal.Button.Outlined" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_delete_all"
@@ -617,7 +617,7 @@
                         app:icon="@drawable/ic_delete"
                         app:iconGravity="textStart"
                         app:iconPadding="8dp"
-                        style="@style/Widget.BrewLog.Button.Outlined" />
+                        style="@style/Widget.TreeTotal.Button.Outlined" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_redo_initial_setup"
@@ -627,7 +627,7 @@
                         app:icon="@drawable/ic_edit"
                         app:iconGravity="textStart"
                         app:iconPadding="8dp"
-                        style="@style/Widget.BrewLog.Button.Outlined" />
+                        style="@style/Widget.TreeTotal.Button.Outlined" />
 
                 </LinearLayout>
 
@@ -638,7 +638,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.BrewLog.Card">
+                style="@style/Widget.TreeTotal.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -651,7 +651,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Version: 0.0.3-dev"
-                        android:textAppearance="@style/TextAppearance.BrewLog.Body2"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Body2"
                         android:textColor="@color/text_secondary" />
 
                 </LinearLayout>

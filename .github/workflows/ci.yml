@@ -130,18 +130,18 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: BrewLog-apk
-          path: android/app/build/outputs/apk/debug/BrewLog-*.apk
+          name: TreeTotal-apk
+          path: android/app/build/outputs/apk/debug/TreeTotal-*.apk
 
       # Publish the built APK directly (not a login-gated zip) to a rolling
       # "latest" pre-release, so it's downloadable from the Releases page with a
       # stable URL that always points at the most recent build:
-      #   https://github.com/<owner>/<repo>/releases/download/latest/BrewLog-latest.apk
+      #   https://github.com/<owner>/<repo>/releases/download/latest/TreeTotal-latest.apk
       # Only publish to the public release when a real signing key is configured,
       # so we never ship an interim debug-key-signed APK to users.
       - name: Stage a stable-named APK
         if: success() && env.SIGNING_KEYSTORE_BASE64 != ''
-        run: cp android/app/build/outputs/apk/debug/BrewLog-*.apk BrewLog-latest.apk
+        run: cp android/app/build/outputs/apk/debug/TreeTotal-*.apk TreeTotal-latest.apk
 
       - name: Publish rolling "latest" release
         if: success() && env.SIGNING_KEYSTORE_BASE64 != ''
@@ -155,10 +155,10 @@ jobs:
 
             - Commit: ${{ github.sha }}
             - Branch: ${{ github.ref_name }}
-            - Direct download (always latest): https://github.com/${{ github.repository }}/releases/download/latest/BrewLog-latest.apk
+            - Direct download (always latest): https://github.com/${{ github.repository }}/releases/download/latest/TreeTotal-latest.apk
           files: |
-            BrewLog-latest.apk
-            android/app/build/outputs/apk/debug/BrewLog-*.apk
+            TreeTotal-latest.apk
+            android/app/build/outputs/apk/debug/TreeTotal-*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

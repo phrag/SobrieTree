@@ -12,14 +12,14 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:text="@string/motivation_title"
-        android:textAppearance="@style/TextAppearance.BrewLog.Headline" />
+        android:textAppearance="@style/TextAppearance.TreeTotal.Headline" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:text="@string/motivation_subtitle"
-        android:textAppearance="@style/TextAppearance.BrewLog.Body2" />
+        android:textAppearance="@style/TextAppearance.TreeTotal.Body2" />
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/chips_motivation"
@@ -79,6 +79,6 @@
         android:layout_height="56dp"
         android:textAllCaps="false"
         android:text="@string/continue_label"
-        style="@style/Widget.BrewLog.Button" />
+        style="@style/Widget.TreeTotal.Button" />
 
 </LinearLayout>

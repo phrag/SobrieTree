@@ -1,10 +1,10 @@
 [package]
-name = "brewlog-core"
+name = "treetotal-core"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "brewlog_core"
+name = "treetotal_core"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]

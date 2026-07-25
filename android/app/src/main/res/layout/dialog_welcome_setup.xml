@@ -22,7 +22,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="4dp"
         android:text="@string/welcome_title"
-        android:textAppearance="@style/TextAppearance.BrewLog.Headline" />
+        android:textAppearance="@style/TextAppearance.TreeTotal.Headline" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -30,7 +30,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="16dp"
         android:text="@string/app_tagline"
-        android:textAppearance="@style/TextAppearance.BrewLog.Body"
+        android:textAppearance="@style/TextAppearance.TreeTotal.Body"
         android:textColor="@color/brand_primary" />
 
     <TextView
@@ -39,7 +39,7 @@
         android:layout_marginBottom="20dp"
         android:gravity="center"
         android:text="@string/welcome_message"
-        android:textAppearance="@style/TextAppearance.BrewLog.Body" />
+        android:textAppearance="@style/TextAppearance.TreeTotal.Body" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -66,7 +66,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/welcome_feature_track"
-                android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                android:textAppearance="@style/TextAppearance.TreeTotal.Body"
                 android:textColor="@color/text_primary" />
 
         </LinearLayout>
@@ -90,7 +90,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/welcome_feature_grow"
-                android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                android:textAppearance="@style/TextAppearance.TreeTotal.Body"
                 android:textColor="@color/text_primary" />
 
         </LinearLayout>
@@ -113,7 +113,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/welcome_feature_private"
-                android:textAppearance="@style/TextAppearance.BrewLog.Body"
+                android:textAppearance="@style/TextAppearance.TreeTotal.Body"
                 android:textColor="@color/text_primary" />
 
         </LinearLayout>
@@ -126,6 +126,6 @@
         android:layout_height="56dp"
         android:textAllCaps="false"
         android:text="@string/start_setup"
-        style="@style/Widget.BrewLog.Button" />
+        style="@style/Widget.TreeTotal.Button" />
 
 </LinearLayout>

@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.brewlog.android'
+    namespace 'com.treetotal.android'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.brewlog.android"
+        applicationId "com.treetotal.android"
         minSdk 24
         targetSdk 34
         versionCode 22
@@ -80,7 +80,7 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
-            outputFileName = "BrewLog-${variant.versionName}.apk"
+            outputFileName = "TreeTotal-${variant.versionName}.apk"
         }
     }
 }
