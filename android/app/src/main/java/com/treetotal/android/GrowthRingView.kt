@@ -17,10 +17,11 @@ import kotlin.math.sin
 /**
  * The app's signature visual.
  *
- * An arc ring shows today's consumption against the daily goal: it sweeps
- * clockwise as drinks are logged and shifts from calm green toward soft amber
- * near the goal - never red. On an alcohol-free day the ring renders full and
- * gently pulsing: AF is depicted as the *fullest* state.
+ * An arc ring shows what is *left* of today's allowance: it starts full and
+ * retracts as drinks are logged, shifting from calm green toward soft amber as
+ * it runs low - never red. Depletion (rather than filling) keeps the app's
+ * language honest: an untouched day is the fullest ring, and logging spends it.
+ * On an alcohol-free day the ring renders full and gently pulsing.
  *
  * The centre grows a tree, one alcohol-free day at a time, completing in 30 AF
  * days (see StreakEngine.TREE_DAYS) - finished trees join the Journey forest
@@ -48,8 +49,9 @@ class GrowthRingView @JvmOverloads constructor(
     }
     private val arcBounds = RectF()
 
+    /** Share of today's allowance still unspent (1 = untouched, 0 = goal reached). */
     private var animatedRatio = 0f
-    private var targetRatio = 0f
+    private var targetRatio = -1f
     private var isAfToday = false
     private var overGoal = false
 
@@ -67,18 +69,26 @@ class GrowthRingView @JvmOverloads constructor(
         this.isAfToday = isAfToday
         this.overGoal = overGoal
 
-        val newTarget = if (isAfToday) 1f else consumedRatio.coerceIn(0f, 1f)
+        // The ring draws what's LEFT, so logging a drink retracts it.
+        val newTarget = if (isAfToday) 1f else (1f - consumedRatio).coerceIn(0f, 1f)
         if (newTarget != targetRatio) {
+            val first = targetRatio < 0f
             targetRatio = newTarget
             sweepAnimator?.cancel()
-            sweepAnimator = ValueAnimator.ofFloat(animatedRatio, targetRatio).apply {
-                duration = 350
-                interpolator = DecelerateInterpolator()
-                addUpdateListener {
-                    animatedRatio = it.animatedValue as Float
-                    invalidate()
+            if (first) {
+                // Show the true remaining ring on the first bind rather than
+                // animating up from empty, which would read as "filling".
+                animatedRatio = newTarget
+            } else {
+                sweepAnimator = ValueAnimator.ofFloat(animatedRatio, targetRatio).apply {
+                    duration = 350
+                    interpolator = DecelerateInterpolator()
+                    addUpdateListener {
+                        animatedRatio = it.animatedValue as Float
+                        invalidate()
+                    }
+                    start()
                 }
-                start()
             }
         }
 
@@ -185,16 +195,17 @@ class GrowthRingView @JvmOverloads constructor(
                 canvas.drawArc(arcBounds, -90f, 360f, false, progressPaint)
             }
             overGoal -> {
-                // Muted amber full ring plus a small overflow tick - calm, not alarming.
+                // Spent: the ring is empty. Mark the overflow with one small amber
+                // tick rather than a full ring - calm, not alarming, never red.
                 progressPaint.color = color(R.color.state_caution)
-                progressPaint.alpha = 190
-                canvas.drawArc(arcBounds, -90f, 360f, false, progressPaint)
-                progressPaint.alpha = 255
+                progressPaint.alpha = 235
                 canvas.drawArc(arcBounds, -98f, 6f, false, progressPaint)
             }
             else -> {
-                // Green sweeping toward soft amber from 70% of the goal onward.
-                val t = ((animatedRatio - 0.7f) / 0.3f).coerceIn(0f, 1f)
+                // What's left, retracting clockwise from the top. Green shifts to
+                // soft amber once 70% of the day's allowance is spent.
+                val spent = 1f - animatedRatio
+                val t = ((spent - 0.7f) / 0.3f).coerceIn(0f, 1f)
                 progressPaint.color = lerpColor(color(R.color.ring_progress_start), color(R.color.ring_progress_end), t)
                 progressPaint.alpha = 255
                 if (animatedRatio > 0f) {

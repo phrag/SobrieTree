@@ -16,7 +16,7 @@ Three ideas run through the whole app:
 
 TreeTotal rewards the days you skip and never punishes the days you don't.
 
-- **Growth Ring home screen** — today's drinks form a soft ring around a seedling. On an alcohol-free day the ring fills and the plant grows.
+- **Growth Ring home screen** — a soft ring around a seedling holds today's allowance. It starts full and retracts as you log drinks, so an untouched day is the fullest ring. On an alcohol-free day it stays full and gently pulses while the plant grows.
 - **A forest you collect** — the seedling matures into trees you keep. In your first month you earn a tree every week (four smaller trees); after that, a larger tree for each alcohol-free month. Your forest is a picture of how far you've come.
 - **Latest recovery stage** — the Home screen shows the most recent milestone your body has reached (better sleep, steadier blood pressure, liver recovery…), drawn from an evidence-based recovery timeline that runs from your first dry day out to a year.
 - **Forgiving streaks** — you earn a shield every seven alcohol-free days, and a shield quietly bridges a single slip so one off day never erases weeks of progress.
