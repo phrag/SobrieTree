@@ -1,130 +1,170 @@
-# TreeTotal
+# 🌳 TreeTotal
 
-**Drink less. Grow something. Keep it private.**
+**Drink less. Grow a forest. Tell no one.**
 
-TreeTotal is an offline-first Android companion for drinking less. It turns cutting back into a calm daily practice — you log what you drink, watch alcohol-free days grow a tree (and real health gains), and see honest progress against your own goal. No account, no cloud, no ads, and — unless you explicitly opt in to update checks — no internet at all.
+TreeTotal is an Android app for cutting back on alcohol. It keeps a calm, honest record of what you drink, turns the days you skip into a forest you can see growing, and explains what those days are doing for your body — using guidance from the WHO and NHS rather than vibes.
 
-Three ideas run through the whole app:
-
-- **Private** — your drinking data never leaves your phone.
-- **Growing** — every alcohol-free day grows a tree, a streak, and your body's recovery.
-- **Drinking less** — measured gently against your own baseline, and never with shame.
+It runs entirely on your phone. No account. No cloud. No analytics. No ads. It doesn't even hold the permission needed to reach the internet.
 
 ---
 
-## 🌱 Growing, not grading
+## What it's like to use
 
-TreeTotal rewards the days you skip and never punishes the days you don't.
+### The ring empties, it doesn't fill
 
-- **Growth Ring home screen** — a soft ring around a seedling holds today's allowance. It starts full and retracts as you log drinks, so an untouched day is the fullest ring. On an alcohol-free day it stays full and gently pulses while the plant grows.
-- **A forest you collect** — the seedling matures into trees you keep. In your first month you earn a tree every week (four smaller trees); after that, a larger tree for each alcohol-free month. Your forest is a picture of how far you've come.
-- **Latest recovery stage** — the Home screen shows the most recent milestone your body has reached (better sleep, steadier blood pressure, liver recovery…), drawn from an evidence-based recovery timeline that runs from your first dry day out to a year.
-- **Forgiving streaks** — you earn a shield every seven alcohol-free days, and a shield quietly bridges a single slip so one off day never erases weeks of progress.
-- **Badges** for alcohol-free totals, streak lengths, and money saved. Cumulative counts only ever move forward.
+Home is a single ring around a young tree. The ring holds **today's allowance**: it starts full and **retracts each time you log a drink**. An untouched day is the fullest ring — so the visual rewards the absence of drinking rather than the act of logging it.
 
-## 📉 Drinking less, measured honestly
+As the ring runs low it warms from green toward soft amber. Go past your goal and it simply empties, leaving one small amber tick. Nothing ever turns red, and nothing ever scolds you.
 
-- **At-a-glance tiles on Home** — alcohol-free days this week, your reduction versus your usual, and the money and calories you haven't spent (completed days only, so numbers never appear out of thin air).
-- **One-tap logging** — tap a saved drink to log it instantly, or log a custom one. Logging and *managing* your saved drinks are kept firmly separate, so you never log a drink by accident while editing.
-- **Flexible goals** — set a daily amount, or a weekly amount if you don't drink every day.
-- **Progress charts** of your real pattern against baseline and goal (7 days / 4 weeks / 3 months).
-- **Calendar** to review and edit past days, and a **journey start date** you choose.
+### Alcohol-free days grow trees you keep
 
-## 🤝 Support when it's hard
+Skip a day and the seedling at the centre grows. In your first month a tree completes **every 7 alcohol-free days** — four quicker wins when motivation is most fragile — and after that each **30 alcohol-free days** grows a larger tree. Finished trees join the forest on your Journey tab and never disappear.
 
-- **Craving-time nudges** — tell TreeTotal when you usually start drinking and it sends a supportive, local-only notification just before, strongest in your first days and easing as new habits settle.
-- **Shame-free encouragement** — a quiet evening is celebrated; a heavy day gets a plan, not a scolding. The tone adapts to *your* reasons for cutting back.
-- **Optional daily check-in** reminder (off by default).
+Growth is keyed to your *cumulative* alcohol-free days, so a slip pauses a tree but never shrinks it.
 
-## 🔒 Private by design
+### Streaks that forgive
 
-- **No account, no sign-in, no cloud.** All data lives in the app's private storage; uninstalling wipes it.
-- **No analytics, trackers, ads, or third-party SDKs.**
-- **No location, contacts, camera, or microphone** permissions.
-- **Offline by default.** The *only* feature that can touch the network is the optional update check below — it is off unless you turn it on, and when on it talks to nobody but GitHub over HTTPS.
+Every 7 alcohol-free days earns you a **shield**. If you have a shield, a single off day is quietly bridged and your streak survives. One bad evening shouldn't erase three good weeks, so it doesn't.
+
+### Your body's recovery, in plain language
+
+Home shows the **latest recovery stage** you've reached — better sleep, steadier blood pressure, liver repair — pulled from a timeline that runs from your first dry day out to a year. The Journey tab has the full list plus short, cited reads on sleep, hangxiety, calories, cravings, and how to decline a drink without a speech.
+
+Health claims are attributed to real authorities (WHO, IARC, NHS / UK Chief Medical Officers, NIAAA), not to the app.
+
+### Honest numbers, not flattering ones
+
+- **Alcohol-free days this week**, and your **reduction against your own baseline**.
+- **Money kept** — you tell TreeTotal roughly what you *used* to spend per week, and it subtracts what you've actually logged spending. Anchoring to a figure you already know beats guessing a per-drink price when a pub round and a beer at home cost wildly different amounts.
+- **Calories avoided**, with a rough burger equivalent.
+
+Only **completed** days count toward savings, so numbers never appear out of thin air at midnight.
+
+### Support at the hard hour
+
+Tell TreeTotal when you usually start drinking and it sends one supportive, local-only nudge just before — strongest in your first days, easing as the habit settles. The optional daily check-in notification includes a **"Still alcohol-free 🎉"** button that logs the win and celebrates it without opening the app.
+
+### Logging that stays out of your way
+
+Tap a saved drink to log it in one touch, or log a custom one. Managing your saved drinks is a **separate** screen from logging them, so you can never record a drink by accident while editing your list. There's a calendar for fixing past days, flexible goals (daily *or* weekly), a journey start date you choose, configurable currency, and an end-of-day cut-off so late nights land on the right day.
+
+---
+
+## 🔒 Privacy
+
+Privacy here is structural, not a promise in a settings screen.
+
+- **The app cannot reach the network.** It does not hold the `INTERNET` permission — the manifest explicitly strips it, along with network-state, install-packages, Bluetooth, nearby-devices and location. No request can be made, by TreeTotal or by any library inside it.
+- **The only permission it holds is notifications**, and only if you turn reminders on.
+- **No account, no sign-in, no cloud, no analytics, no trackers, no ads, no third-party SDKs.**
+- **Everything lives in the app's private storage.** Uninstalling erases it.
 - **Prevent-screenshots** toggle for extra discretion.
-- **Your data, your call** — export or import everything as CSV, or wipe it with **Delete All Data**.
+- **Export or import everything as CSV**, or wipe it with Delete All Data.
 
-## 🔄 Optional auto-updates (opt-in)
+### Updating
 
-Because TreeTotal installs outside app stores, Settings has an **opt-in** updater:
-
-- **Off by default.** Turn it on in **Settings → App updates**.
-- **Two channels** — **Stable releases** or **Latest builds** (the newest CI build).
-- TreeTotal checks the public GitHub Releases for a newer version, at most once a day, and offers to download and install it. **You always confirm the install** in the system dialog — nothing installs silently.
-
-This is the one feature that requires the `INTERNET` permission; with updates off, the app makes no network requests whatsoever.
+Because the app has no network access, it can't update itself. **Settings → App updates → View latest release** opens the releases page in *your browser*, where you download and install the new build yourself. It's a manual step, deliberately: it's what lets the app hold zero network permissions.
 
 ---
 
 ## Install
 
-The latest build is published publicly on every green CI run — a direct APK download, not a login-gated artifact:
+Grab the APK from the [releases page](https://github.com/phrag/BrewLog/releases) — CI publishes a rolling `latest` release with `TreeTotal-latest.apk` (plus a version-stamped copy) on every green build.
 
-**→ [`TreeTotal-latest.apk`](https://github.com/phrag/BrewLog/releases/download/latest/TreeTotal-latest.apk)** &nbsp;·&nbsp; [all releases](https://github.com/phrag/BrewLog/releases)
+You'll need to allow "Install unknown apps" for your browser or file manager.
 
-You may need to allow "Install unknown apps" for your browser or file manager. Once installed, you can let the app keep itself updated via the opt-in updater above.
+> TreeTotal is a fresh app identity (`com.treetotal.android`). If you used the earlier BrewLog builds, this installs alongside rather than upgrading them.
+
+---
 
 ## Architecture
 
-TreeTotal is native Android (Kotlin + XML Views + Material 3) on top of a small Rust core.
+Native Android — Kotlin, XML views, Material 3 — over a small Rust core.
 
-- **UI** — Activities with a five-tab bottom navigation (Home, Progress, Journey, Calendar, Settings). Custom canvas views render the growth ring, trees, and forest.
-- **Engine** (`com.treetotal.android.engine`) — a pure-Kotlin, JVM-testable layer with no Android dependencies; all gamification is derived here or stored in `SharedPreferences`:
-  - `DayLedger` (completed vs. in-progress days), `StreakEngine` (streaks, shields, tree/forest growth), `SavingsEngine` (money & calories vs. baseline, completed days only), `MetricsEngine`, `BadgeCatalog`, `EncouragementEngine`, `HealthTimeline`, `EducationLibrary`, `HighRiskSupport`.
-  - `GamificationManager` composes these into the state the UI binds to.
-- **Native core** (`rust/src/lib.rs`) — the data store, exposed to Kotlin over JNI and backed by SQLite on-device.
+**UI** — five tabs (Home, Progress, Journey, Calendar, Settings). The ring, trees, and forest are custom `Canvas` views drawn procedurally; there are no image assets to keep in sync.
 
-The engine takes plain data in and returns plain results, so its behaviour is covered by fast JVM unit tests that need no device or emulator.
+**Engine** (`com.treetotal.android.engine`) — pure Kotlin, zero Android imports, so it runs under plain JVM unit tests with no device or emulator:
+
+| Component | Responsibility |
+|---|---|
+| `DayLedger` | Completed vs. in-progress days, tracking window, end-of-day cut-off |
+| `StreakEngine` | Streaks, shields, tree and forest growth |
+| `SavingsEngine` | Money and calories vs. baseline, completed days only |
+| `MetricsEngine` | Daily/weekly ratios, reduction against baseline |
+| `BadgeCatalog` · `EncouragementEngine` | Badges, and copy that adapts to your motivations |
+| `HealthTimeline` · `EducationLibrary` | Recovery milestones and cited reads |
+| `HighRiskSupport` | Craving-window intensity and messaging |
+
+`GamificationManager` composes these into the single state object the UI binds to. Gamification state is derived or kept in `SharedPreferences`; the Rust core owns the entries.
+
+**Native core** (`rust/src/lib.rs`) — SQLite storage exposed to Kotlin over JNI.
+
+---
 
 ## Build
 
-Requirements: JDK 17+, the Android SDK (with NDK + CMake), the Rust toolchain, and `cargo-ndk` (`cargo install cargo-ndk`).
+Requires JDK 17+, the Android SDK (NDK + CMake), the Rust toolchain, and `cargo-ndk`.
 
 ```bash
-# 1. Build the Rust core into jniLibs
+# 1. Rust core → jniLibs
 cd rust
 cargo ndk -t arm64-v8a -o ../android/app/src/main/jniLibs build --release
 
-# 2. Build the Android app
+# 2. Android app
 cd ../android
 ./gradlew assembleDebug
 ```
 
-The debug APK lands at `android/app/build/outputs/apk/debug/TreeTotal-<version>.apk`. Debug builds are signed with the release key so they install as an upgrade over release builds.
+Output: `android/app/build/outputs/apk/debug/TreeTotal-<version>.apk`.
 
 ### Tests
 
 ```bash
-cd android && ./gradlew testDebugUnitTest   # Android unit tests (incl. the engine layer)
-cd rust    && cargo test --all              # Rust core tests
+cd android && ./gradlew testDebugUnitTest   # includes the engine layer
+cd rust    && cargo test --all
 ```
+
+### Signing
+
+No keystore or password lives in this repository. Signing config is read from **either** a gitignored `android/keystore.properties` **or** `SIGNING_*` environment variables (CI secrets):
+
+```properties
+storeFile=/absolute/path/to/treetotal-release.jks
+storePassword=…
+keyAlias=treetotal
+keyPassword=…
+```
+
+With no key configured the build falls back to the debug key and CI skips publishing, so an unsigned build can never reach the releases page.
 
 ### Continuous integration
 
-Every push runs `.github/workflows/ci.yml` on GitHub Actions, which builds the Rust core with `cargo-ndk`, assembles the debug APK, runs the Android and Rust tests, checks Rust formatting/clippy and Android Lint, uploads the `TreeTotal-apk` artifact, and publishes the APK to the rolling **`latest`** public release.
+`.github/workflows/ci.yml` runs on every push: builds the Rust core with `cargo-ndk`, assembles the APK, runs the Android and Rust test suites, checks `cargo fmt` / `clippy` and Android Lint, uploads the APK artifact, and — when signing secrets are present — publishes the rolling `latest` release.
+
+---
 
 ## Project structure
 
 ```
-treetotal/
-├── android/
-│   └── app/src/main/java/com/treetotal/android/
-│       ├── MainActivity.kt          # Home: growth ring, tiles, recovery stage, logging
-│       ├── ProgressActivity.kt      # Progress trend chart
-│       ├── JourneyActivity.kt       # Recovery timeline, badges, savings, reads
-│       ├── CalendarActivity.kt      # Review and edit past days
-│       ├── SettingsActivity.kt      # Goals, currency, reminders, privacy, updates
-│       ├── UpdateChecker.kt         # Opt-in GitHub release check (the only network code)
-│       ├── UpdateInstaller.kt       # Downloads and hands the APK to the system installer
-│       ├── GamificationManager.kt   # Composes engine state for the UI
-│       └── engine/                  # Pure-Kotlin, JVM-tested logic
-├── rust/
-│   ├── src/lib.rs                   # JNI core API over SQLite
-│   └── Cargo.toml
-├── .github/workflows/ci.yml         # Build + test + lint + APK artifact + latest release
-└── README.md
+├── android/app/src/main/java/com/treetotal/android/
+│   ├── MainActivity.kt          # Home: ring, tiles, recovery stage, logging
+│   ├── ProgressActivity.kt      # Trend chart vs. baseline and goal
+│   ├── JourneyActivity.kt       # Forest, recovery timeline, badges, savings, reads
+│   ├── CalendarActivity.kt      # Review and edit past days
+│   ├── SettingsActivity.kt      # Goals, spend, currency, reminders, privacy
+│   ├── GrowthRingView.kt        # The depleting ring
+│   ├── TreePainter.kt / ForestView.kt
+│   ├── GamificationManager.kt   # Engine state → UI state
+│   └── engine/                  # Pure-Kotlin, JVM-tested logic
+├── rust/src/lib.rs              # JNI + SQLite core
+└── .github/workflows/ci.yml
 ```
+
+---
+
+## A note on scope
+
+TreeTotal is a tracking and motivation tool, not treatment. It follows the WHO position that no level of alcohol is risk-free and the NHS low-risk guideline of no more than 14 units a week spread over three or more days. If alcohol is causing you harm, or you experience physical withdrawal, please talk to a doctor — stopping suddenly can be dangerous without support.
 
 ## License
 

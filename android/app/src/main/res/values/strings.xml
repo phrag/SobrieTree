@@ -15,7 +15,6 @@
     <string name="tile_money_saved">saved</string>
     <string name="tile_set_price">Set spend</string>
     <string name="tile_calories_avoided">calories avoided</string>
-    <string name="tile_next_badge">next badge</string>
     <string name="log_a_drink">Log a drink</string>
     <string name="add_drink">Add drink</string>
     <string name="manage">Manage</string>
@@ -57,7 +56,6 @@
     <string name="got_it">Got it</string>
 
     <!-- Progress screen -->
-    <string name="af_days_this_week">AF days this week</string>
     <string name="less_than_baseline">less than baseline this week</string>
     <string name="more_than_baseline">more than baseline this week</string>
     <string name="n_of_7">%d of 7</string>
@@ -141,7 +139,6 @@
     <string name="beer_name">Drink name</string>
     <string name="choose_from_drinks">Choose from your drinks</string>
     <string name="change_date">Change date</string>
-    <string name="save_as_preset">Save as one of my drinks</string>
     <string name="save_to_my_drinks">Save to my drinks</string>
     <string name="mark_as_favorite">Make it my favorite</string>
     <string name="log_a_custom_drink">Log a custom drink</string>
@@ -156,24 +153,6 @@
     <string name="updates_description">TreeTotal has no network access of its own — it never connects to the internet. To update, open the releases page in your browser, then download and install the latest build yourself.</string>
     <string name="update_view_release">View latest release</string>
     <string name="update_open_failed">Couldn\'t open a browser on this device.</string>
-    <string name="updates_enable_label">Check for updates</string>
-    <string name="updates_optin_dialog_title">Turn on update checks?</string>
-    <string name="updates_optin_dialog_body">This is the only feature that ever uses the internet. When on, TreeTotal contacts GitHub over a secure connection to see if a newer build exists — nothing else. No account, no analytics, no tracking, and your drinking data never leaves your phone.\n\nIf your device lets you control network access per app, allow it for TreeTotal so update checks can reach GitHub.</string>
-    <string name="updates_optin_enable">Turn on</string>
-    <string name="update_channel_label">Update channel</string>
-    <string name="update_channel_stable">Stable releases</string>
-    <string name="update_channel_latest">Latest builds</string>
-    <string name="update_check_now">Check for updates now</string>
-    <string name="update_checking">Checking for updates…</string>
-    <string name="update_up_to_date">You\'re on the latest version.</string>
-    <string name="update_check_failed">Couldn\'t reach the update server. Check your connection and try again.</string>
-    <string name="update_none_stable">No stable release yet. Switch the channel to “Latest builds” to get the newest build.</string>
-    <string name="update_none">No build found on this channel yet.</string>
-    <string name="update_available_title">Update available</string>
-    <string name="update_downloading">Downloading update…</string>
-    <string name="update_download_failed">Download failed. Try again later.</string>
-    <string name="update_action_update">Update</string>
-    <string name="update_action_later">Later</string>
     <string name="tile_af_this_week">alcohol-free this week</string>
     <string name="recovery_stage_title">Latest recovery stage</string>
     <string name="recovery_stage_empty_title">Your recovery starts here</string>
@@ -186,22 +165,7 @@
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
-    <string name="daily_goal">Daily Goal</string>
-    <string name="weekly_goal">Weekly Goal</string>
-    <string name="set_goals">Set Goals</string>
     <string name="baseline">Baseline</string>
-    <string name="progress">Progress</string>
     <string name="today">Today</string>
-    <string name="this_week">This Week</string>
-    <string name="total_consumption">Total Consumption</string>
-    <string name="average_daily">Average Daily</string>
-    <string name="average_weekly">Average Weekly</string>
-    <string name="reduction_percentage">Reduction %</string>
     <string name="no_entries">No entries found</string>
-    <string name="error_occurred">An error occurred</string>
-    <string name="invalid_input">Invalid input</string>
-    <string name="goal_set_successfully">Goal set successfully</string>
-    <string name="entry_added">Entry added successfully</string>
-    <string name="entry_updated">Entry updated successfully</string>
-    <string name="entry_deleted">Entry deleted successfully</string>
 </resources> 
