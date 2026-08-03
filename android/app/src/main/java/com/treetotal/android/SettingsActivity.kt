@@ -386,7 +386,10 @@ class SettingsActivity : AppCompatActivity() {
         // Import button
         importBtn.setOnClickListener {
             try {
-                importFileLauncher.launch(arrayOf("text/csv", "text/plain"))
+                // Exported CSVs often arrive tagged as octet-stream or
+                // comma-separated-values; a narrow filter greys them out in the
+                // picker, which looks like "import is broken".
+                importFileLauncher.launch(arrayOf("*/*"))
             } catch (e: Exception) {
                 Toast.makeText(this, "Import failed: ${e.message}", Toast.LENGTH_SHORT).show()
             }
@@ -443,8 +446,21 @@ class SettingsActivity : AppCompatActivity() {
                 inputStream.bufferedReader().readText()
             } ?: throw Exception("Could not read file")
             
-            importFromCsv(csvData)
-            Toast.makeText(this, "Data imported successfully", Toast.LENGTH_SHORT).show()
+            val result = importFromCsv(csvData)
+            val message = buildString {
+                append("Imported ${result.imported} ${if (result.imported == 1) "entry" else "entries"}.")
+                if (result.skipped > 0) append("\n\n${result.skipped} row(s) were skipped as unreadable.")
+                if (result.abvFilled > 0) {
+                    append("\n\n${result.abvFilled} had no alcohol % recorded, so your default of ")
+                    append("${result.defaultAbv}% was used — otherwise those days would have counted ")
+                    append("as alcohol-free. You can correct any of them in the Calendar.")
+                }
+            }
+            AlertDialog.Builder(this)
+                .setTitle("Import complete")
+                .setMessage(message)
+                .setPositiveButton(R.string.got_it, null)
+                .show()
         } catch (e: Exception) {
             Toast.makeText(this, "Import failed: ${e.message}", Toast.LENGTH_SHORT).show()
         }
@@ -464,12 +480,17 @@ class SettingsActivity : AppCompatActivity() {
             for (i in 0 until entries.length()) {
                 val entry = entries.getJSONObject(i)
                 val date = entry.optString("date", "")
-                val name = entry.optString("name", "").replace(",", ";") // Replace commas to avoid CSV issues
-                val alcohol = entry.optDouble("alcoholPercentage", 0.0)
-                val volume = entry.optDouble("volume_ml", 0.0) // Fixed field name
-                val notes = entry.optString("notes", "").replace(",", ";").replace("\n", " ") // Clean notes
-                
-                csv.appendLine("$date,$name,$alcohol,$volume,$notes")
+                val name = entry.optString("name", "")
+                // The native layer serialises snake_case; accept camelCase too.
+                // Reading the wrong key silently exported 0% for every entry.
+                val alcohol = entry.optDouble("alcohol_percentage", entry.optDouble("alcoholPercentage", 0.0))
+                val volume = entry.optDouble("volume_ml", entry.optDouble("volumeMl", 0.0))
+                val notes = entry.optString("notes", "").replace("\n", " ")
+
+                csv.appendLine(
+                    listOf(date, name, alcohol.toString(), volume.toString(), notes)
+                        .joinToString(",") { csvField(it) }
+                )
             }
         } catch (e: Exception) {
             throw Exception("Failed to export data: ${e.message}")
@@ -478,47 +499,91 @@ class SettingsActivity : AppCompatActivity() {
         return csv.toString()
     }
     
-    private fun importFromCsv(csvData: String) {
-        try {
-            val lines = csvData.split("\n")
-            if (lines.isEmpty() || lines[0] != "Date,Name,Alcohol%,Volume(ml),Notes") {
-                throw Exception("Invalid CSV format")
-            }
-            
-            var importedCount = 0
-            for (i in 1 until lines.size) {
-                val line = lines[i].trim()
-                if (line.isEmpty()) continue
-                
-                val parts = line.split(",")
-                if (parts.size >= 5) {
-                    val date = parts[0]
-                    val name = parts[1].replace(";", ",")
-                    val alcohol = parts[2].toDoubleOrNull() ?: 0.0
-                    val volume = parts[3].toDoubleOrNull() ?: 0.0
-                    val notes = parts[4].replace(";", ",")
-                    
-                    // Add entry using native backend
-                    val result = TreeTotalNative.add_beer_entry_full_jni(
-                        java.util.UUID.randomUUID().toString(),
-                        name,
-                        alcohol,
-                        volume,
-                        date,
-                        notes
-                    )
-                    
-                    if (result == "OK") {
-                        importedCount++
-                    }
+    /** Quote a CSV field only when it needs it, doubling any embedded quotes. */
+    private fun csvField(value: String): String =
+        if (value.any { it == ',' || it == '"' || it == '\n' })
+            "\"" + value.replace("\"", "\"\"") + "\""
+        else value
+
+    /** Split one CSV line, honouring quoted fields. */
+    private fun splitCsvLine(line: String): List<String> {
+        val fields = ArrayList<String>()
+        val cur = StringBuilder()
+        var inQuotes = false
+        var i = 0
+        while (i < line.length) {
+            val c = line[i]
+            when {
+                inQuotes && c == '"' && i + 1 < line.length && line[i + 1] == '"' -> {
+                    cur.append('"'); i++
                 }
+                c == '"' -> inQuotes = !inQuotes
+                c == ',' && !inQuotes -> { fields.add(cur.toString()); cur.setLength(0) }
+                else -> cur.append(c)
             }
-            
-            if (importedCount == 0) {
-                throw Exception("No valid entries found to import")
-            }
-        } catch (e: Exception) {
-            throw Exception("Failed to import data: ${e.message}")
+            i++
         }
+        fields.add(cur.toString())
+        return fields
+    }
+
+    data class ImportResult(
+        val imported: Int,
+        val skipped: Int,
+        /** Rows whose alcohol % was missing/zero and were filled with the default. */
+        val abvFilled: Int,
+        val defaultAbv: Float
+    )
+
+    /**
+     * Import entries from a CSV export. Deliberately forgiving: a byte-order
+     * mark, CRLF endings, a missing or differently-worded header, quoted fields
+     * and the older ";"-escaped format are all accepted, and a single bad row
+     * never aborts the rest of the file.
+     */
+    private fun importFromCsv(csvData: String): ImportResult {
+        val defaultAbv = AppPrefs(this).defaultDrinkStrength
+        val lines = csvData.removePrefix("﻿").split(Regex("\r?\n"))
+
+        var imported = 0
+        var skipped = 0
+        var abvFilled = 0
+
+        for ((index, raw) in lines.withIndex()) {
+            val line = raw.trim()
+            if (line.isEmpty()) continue
+            // Skip a header row wherever it appears, rather than demanding an exact match.
+            if (index == 0 && line.substringBefore(',').trim().equals("date", ignoreCase = true)) continue
+
+            val parts = splitCsvLine(line)
+            if (parts.size < 4) { skipped++; continue }
+
+            val date = parts[0].trim()
+            val name = parts[1].trim().replace(";", ",").ifBlank { "Drink" }
+            val volume = parts[3].trim().toDoubleOrNull() ?: 0.0
+            // A drink logged without a usable alcohol % would otherwise count as an
+            // alcohol-free day and quietly distort streaks and savings, so fall back
+            // to the user's default strength and report how often that happened.
+            val parsedAbv = parts[2].trim().toDoubleOrNull() ?: 0.0
+            val alcohol = if (parsedAbv > 0.0) parsedAbv else defaultAbv.toDouble()
+            if (parsedAbv <= 0.0) abvFilled++
+            val notes = parts.getOrElse(4) { "" }.replace(";", ",")
+
+            val validDate = try { LocalDate.parse(date); true } catch (_: Exception) { false }
+            if (!validDate || volume <= 0.0) { skipped++; continue }
+
+            val result = TreeTotalNative.add_beer_entry_full_jni(
+                java.util.UUID.randomUUID().toString(), name, alcohol, volume, date, notes
+            )
+            if (result == "OK") imported++ else skipped++
+        }
+
+        if (imported == 0) {
+            throw Exception(
+                if (skipped > 0) "No usable rows found ($skipped skipped). Expected: Date,Name,Alcohol%,Volume(ml),Notes"
+                else "The file contained no entries."
+            )
+        }
+        return ImportResult(imported, skipped, abvFilled, defaultAbv)
     }
 }
