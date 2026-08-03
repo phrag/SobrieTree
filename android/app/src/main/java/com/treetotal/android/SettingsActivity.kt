@@ -31,7 +31,7 @@ import java.io.OutputStream
 
 class SettingsActivity : AppCompatActivity() {
     private val prefsName = "treetotal_prefs"
-    private val RELEASES_URL = "https://github.com/phrag/BrewLog/releases"
+    private val RELEASES_URL = "https://github.com/phrag/TreeTotal/releases"
 
     // Flushes the text-field settings to prefs; reassigned in onCreate. Called
     // from onPause so a typed-but-not-blurred value is still saved on exit.

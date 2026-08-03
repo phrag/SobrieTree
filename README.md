@@ -69,7 +69,7 @@ Because the app has no network access, it can't update itself. **Settings → Ap
 
 ## Install
 
-Grab the APK from the [releases page](https://github.com/phrag/BrewLog/releases) — CI publishes a rolling `latest` release with `TreeTotal-latest.apk` (plus a version-stamped copy) on every green build.
+Grab the APK from the [releases page](https://github.com/phrag/TreeTotal/releases) — CI publishes a rolling `latest` release with [`TreeTotal-latest.apk`](https://github.com/phrag/TreeTotal/releases/download/latest/TreeTotal-latest.apk) (plus a version-stamped copy) on every green build.
 
 You'll need to allow "Install unknown apps" for your browser or file manager.
 
