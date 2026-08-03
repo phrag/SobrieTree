@@ -543,7 +543,7 @@ class SettingsActivity : AppCompatActivity() {
      */
     private fun importFromCsv(csvData: String): ImportResult {
         val defaultAbv = AppPrefs(this).defaultDrinkStrength
-        val lines = csvData.removePrefix("﻿").split(Regex("\r?\n"))
+        val lines = csvData.removePrefix("\uFEFF").split(Regex("\r?\n"))
 
         var imported = 0
         var skipped = 0
