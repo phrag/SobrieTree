@@ -456,11 +456,36 @@ class SettingsActivity : AppCompatActivity() {
                     append("as alcohol-free. You can correct any of them in the Calendar.")
                 }
             }
-            AlertDialog.Builder(this)
-                .setTitle("Import complete")
-                .setMessage(message)
-                .setPositiveButton(R.string.got_it, null)
-                .show()
+            // Streaks, trees and savings only count days from the journey start
+            // onward, so imported history that predates it would silently do
+            // nothing. Offer to move the start back rather than leaving the user
+            // wondering why the forest never grew.
+            val appPrefs = AppPrefs(this)
+            val journeyStart = appPrefs.baselineSetDate
+            val rewindTo = result.earliestDate
+                ?.takeIf { journeyStart != null && it < journeyStart }
+
+            val builder = AlertDialog.Builder(this).setTitle("Import complete")
+            if (rewindTo != null && journeyStart != null) {
+                val fmt = DateTimeFormatter.ofPattern("MMM d, yyyy")
+                builder.setMessage(
+                    message + "\n\nYour imported history starts ${rewindTo.format(fmt)}, but your " +
+                        "journey currently starts ${journeyStart.format(fmt)} — so those earlier days " +
+                        "won't count toward your streak, trees or savings. Move your journey start back?"
+                )
+                builder.setPositiveButton("Move to ${rewindTo.format(fmt)}") { _, _ ->
+                    appPrefs.baselineSetDate = rewindTo
+                    Toast.makeText(
+                        this, "Journey start moved to ${rewindTo.format(fmt)}", Toast.LENGTH_LONG
+                    ).show()
+                    recreate()
+                }
+                builder.setNegativeButton("Keep current", null)
+            } else {
+                builder.setMessage(message)
+                builder.setPositiveButton(R.string.got_it, null)
+            }
+            builder.show()
         } catch (e: Exception) {
             Toast.makeText(this, "Import failed: ${e.message}", Toast.LENGTH_SHORT).show()
         }
@@ -532,7 +557,9 @@ class SettingsActivity : AppCompatActivity() {
         val skipped: Int,
         /** Rows whose alcohol % was missing/zero and were filled with the default. */
         val abvFilled: Int,
-        val defaultAbv: Float
+        val defaultAbv: Float,
+        /** Earliest date successfully imported, used to offer moving the journey start back. */
+        val earliestDate: LocalDate? = null
     )
 
     /**
@@ -548,6 +575,7 @@ class SettingsActivity : AppCompatActivity() {
         var imported = 0
         var skipped = 0
         var abvFilled = 0
+        var earliest: LocalDate? = null
 
         for ((index, raw) in lines.withIndex()) {
             val line = raw.trim()
@@ -569,13 +597,16 @@ class SettingsActivity : AppCompatActivity() {
             if (parsedAbv <= 0.0) abvFilled++
             val notes = parts.getOrElse(4) { "" }.replace(";", ",")
 
-            val validDate = try { LocalDate.parse(date); true } catch (_: Exception) { false }
-            if (!validDate || volume <= 0.0) { skipped++; continue }
+            val parsedDate = try { LocalDate.parse(date) } catch (_: Exception) { null }
+            if (parsedDate == null || volume <= 0.0) { skipped++; continue }
 
             val result = TreeTotalNative.add_beer_entry_full_jni(
                 java.util.UUID.randomUUID().toString(), name, alcohol, volume, date, notes
             )
-            if (result == "OK") imported++ else skipped++
+            if (result == "OK") {
+                imported++
+                if (earliest == null || parsedDate < earliest) earliest = parsedDate
+            } else skipped++
         }
 
         if (imported == 0) {
@@ -584,6 +615,6 @@ class SettingsActivity : AppCompatActivity() {
                 else "The file contained no entries."
             )
         }
-        return ImportResult(imported, skipped, abvFilled, defaultAbv)
+        return ImportResult(imported, skipped, abvFilled, defaultAbv, earliest)
     }
 }
