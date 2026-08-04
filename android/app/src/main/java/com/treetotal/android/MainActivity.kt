@@ -133,6 +133,12 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.tile_calories).setOnClickListener(openJourney)
         findViewById<View>(R.id.tile_af_week).setOnClickListener(openJourney)
         findViewById<View>(R.id.tile_reduction).setOnClickListener(openJourney)
+        // These two are about the consumption trend, so they open Progress
+        val openProgress = View.OnClickListener {
+            startActivity(Intent(this, ProgressActivity::class.java))
+        }
+        findViewById<View>(R.id.tile_fewer_week).setOnClickListener(openProgress)
+        findViewById<View>(R.id.tile_avg_week).setOnClickListener(openProgress)
         findViewById<View>(R.id.card_recovery).setOnClickListener(openJourney)
 
         BottomNavHelper.wire(this, findViewById(R.id.bottom_nav), R.id.nav_home)
@@ -189,6 +195,11 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Failed to load data", Toast.LENGTH_SHORT).show()
         }
     }
+
+    /** Whole numbers stay clean; fractions keep one decimal ("6", "8.4"). */
+    private fun formatDrinks(value: Double): String =
+        if (value == Math.floor(value)) value.toInt().toString()
+        else String.format("%.1f", value)
 
     private fun bindHomeState(state: GamificationManager.HomeState) {
         findViewById<GrowthRingView>(R.id.growth_ring).setState(
@@ -263,6 +274,18 @@ class MainActivity : AppCompatActivity() {
             reductionView.setTextColor(ContextCompat.getColor(this, R.color.state_neutral))
             reductionLabel.setText(R.string.more_than_baseline)
         }
+
+        // Drinks avoided so far this week, versus a pro-rated usual week
+        val tileDrinkSize = state.drinkSizeMl.takeIf { it > 0 } ?: 500.0
+        findViewById<TextView>(R.id.tv_fewer_week).text =
+            formatDrinks(state.metrics.fewerThanUsualThisWeekMl / tileDrinkSize)
+
+        // Long-run weekly average, dry days included — comparable to the
+        // 14-units-a-week guidance rather than a hard-to-read per-day figure.
+        findViewById<TextView>(R.id.tv_avg_week).text =
+            if (state.metrics.hasClosedDays)
+                formatDrinks(state.metrics.avgPerWeekAllTimeMl / tileDrinkSize)
+            else "—"
 
         // Latest recovery stage reached
         val recoveryStage = findViewById<TextView>(R.id.tv_recovery_stage)

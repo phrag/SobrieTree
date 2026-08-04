@@ -27,6 +27,52 @@ class MetricsEngineTest {
     }
 
     @Test
+    fun `fewer than usual this week pro-rates the baseline to days elapsed`() {
+        // Fri 10 Jul: Mon-Fri = 5 days elapsed. Baseline 1000/day -> usual 5000 so far.
+        val entries = listOf(
+            TestFixtures.entry(LocalDate.of(2026, 7, 6)),          // 500
+            TestFixtures.entry(LocalDate.of(2026, 7, 10))          // 500
+        )
+        val ledger = DayLedger(entries, start, today)
+        val m = MetricsEngine.compute(ledger, 0.0, 0.0, 1000.0)
+        // 5000 usual - 1000 actual = 4000 ml fewer
+        assertEquals(4000.0, m.fewerThanUsualThisWeekMl, 0.001)
+    }
+
+    @Test
+    fun `fewer than usual never goes negative when drinking above baseline`() {
+        val entries = (6..10).flatMap { day ->
+            (0..3).map { TestFixtures.entry(LocalDate.of(2026, 7, day)) }
+        }
+        val ledger = DayLedger(entries, start, today)
+        val m = MetricsEngine.compute(ledger, 0.0, 0.0, 500.0)
+        assertEquals(0.0, m.fewerThanUsualThisWeekMl, 0.001)
+    }
+
+    @Test
+    fun `all-time average spreads drinking across dry days`() {
+        // 39 closed days (1 Jun..9 Jul); two drinking days of 500ml each.
+        val entries = listOf(
+            TestFixtures.entry(LocalDate.of(2026, 6, 5)),
+            TestFixtures.entry(LocalDate.of(2026, 6, 6))
+        )
+        val ledger = DayLedger(entries, start, today)
+        val m = MetricsEngine.compute(ledger, 0.0, 0.0, 1000.0)
+        assertEquals(39, ledger.completedDays.size)
+        assertEquals(1000.0 / 39.0, m.avgPerDayAllTimeMl, 0.001)
+        assertEquals(1000.0 / 39.0 * 7.0, m.avgPerWeekAllTimeMl, 0.001)
+        assertTrue(m.hasClosedDays)
+    }
+
+    @Test
+    fun `all-time average reports no history on day one`() {
+        val ledger = DayLedger(emptyList(), today, today)   // nothing has closed yet
+        val m = MetricsEngine.compute(ledger, 0.0, 0.0, 1000.0)
+        assertFalse(m.hasClosedDays)
+        assertEquals(0.0, m.avgPerWeekAllTimeMl, 0.001)
+    }
+
+    @Test
     fun `goal falls back to baseline when unset`() {
         val ledger = DayLedger(emptyList(), start, today)
         val m = MetricsEngine.compute(ledger, 0.0, 0.0, 1500.0)
