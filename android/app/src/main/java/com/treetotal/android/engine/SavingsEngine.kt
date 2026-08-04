@@ -31,6 +31,8 @@ object SavingsEngine {
         val moneySaved: Double,
         /** What was actually spent on logged drinks over completed days. */
         val moneySpent: Double,
+        /** What the baseline implies you'd have spent over the same days. */
+        val moneyExpected: Double,
         /** False until the user has set any price (per-preset or global). */
         val moneyAvailable: Boolean,
         val caloriesSaved: Double,
@@ -111,6 +113,7 @@ object SavingsEngine {
         return Result(
             moneySaved = moneySaved,
             moneySpent = actualSpend,
+            moneyExpected = expectedSpend,
             moneyAvailable = moneyAvailable,
             caloriesSaved = caloriesSaved,
             burgersEquivalent = (caloriesSaved / 550.0).toInt()

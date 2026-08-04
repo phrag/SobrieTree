@@ -50,6 +50,7 @@
     <string name="savings_title">What you\'ve saved</string>
     <string name="money_row">💰 %1$s saved since your baseline</string>
     <string name="money_row_with_spent">💰 %1$s saved since your baseline · %2$s spent</string>
+    <string name="money_row_detail">💰 %1$s saved · you\'ve spent %2$s of the %3$s your usual rate would have cost so far</string>
     <string name="money_row_unset">💰 Set what you used to spend per week (Settings) to see money saved</string>
     <string name="calories_row">🔥 %,d calories avoided</string>
     <string name="calories_row_with_burgers">🔥 %1$,d calories avoided — about %2$d burgers</string>

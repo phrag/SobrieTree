@@ -59,6 +59,27 @@ class SavingsEngineTest {
     }
 
     @Test
+    fun `savings floor at zero but the comparison is still reported`() {
+        // 70/week over 9 completed days = 90 expected. Spend more than that and
+        // saved floors at 0, yet expected/spent stay visible so the UI can explain why.
+        val entries = (0..8).flatMap { day ->
+            (0..3).map {
+                com.treetotal.android.BeerEntry("$day-$it", "IPA", 5.0, 500.0, start.plusDays(day.toLong()).toString(), "")
+            }
+        }
+        val ledger = DayLedger(entries, start, today)
+        val costs = listOf(SavingsEngine.DrinkCost("IPA", 500.0, 5.0))
+        val r = SavingsEngine.compute(
+            entries, ledger, 1000.0, 5.0, 500.0,
+            pricePerDrink = 0.0, presetCosts = costs, baselineWeeklySpend = 70.0
+        )
+        assertEquals(90.0, r.moneyExpected, 0.001)   // 36 drinks x 5.0 = 180 spent
+        assertEquals(180.0, r.moneySpent, 0.001)
+        assertEquals(0.0, r.moneySaved, 0.001)       // floored, never negative
+        assertTrue(r.moneyAvailable)
+    }
+
+    @Test
     fun `day one shows zero not phantom savings`() {
         val ledger = DayLedger(emptyList(), start, start)          // no completed days yet
         val r = SavingsEngine.compute(emptyList(), ledger, 1000.0, 5.0, 500.0, 4.0)

@@ -82,6 +82,8 @@ class GamificationManager(context: Context) {
         val badges: List<BadgeState>,
         val moneySaved: Double,
         val moneySpent: Double,
+        /** What the baseline implies would have been spent over the same days. */
+        val moneyExpected: Double,
         val moneyAvailable: Boolean,
         val caloriesSaved: Double,
         val burgersEquivalent: Int,
@@ -318,6 +320,7 @@ class GamificationManager(context: Context) {
             badges = badges,
             moneySaved = c.savings.moneySaved,
             moneySpent = c.savings.moneySpent,
+            moneyExpected = c.savings.moneyExpected,
             moneyAvailable = c.savings.moneyAvailable,
             caloriesSaved = c.savings.caloriesSaved,
             burgersEquivalent = c.savings.burgersEquivalent,
