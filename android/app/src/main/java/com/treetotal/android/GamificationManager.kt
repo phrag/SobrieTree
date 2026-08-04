@@ -136,6 +136,9 @@ class GamificationManager(context: Context) {
             presetCosts = presets.map {
                 SavingsEngine.DrinkCost(it.name, it.volume.toDouble(), it.cost.toDouble())
             },
+            // An unrecognised drink (an import, a one-off) is priced from the favorite
+            // before the blanket fallback price in Settings
+            favoriteCost = favorite?.cost?.takeIf { it > 0 }?.toDouble() ?: 0.0,
             // The baseline is denominated in the favorite drink, so use its cost when set
             baselineCostPerDrink = favorite?.cost?.takeIf { it > 0 }?.toDouble()
                 ?: prefs.pricePerDrink.toDouble(),

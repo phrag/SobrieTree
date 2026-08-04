@@ -47,20 +47,31 @@ object SavingsEngine {
     }
 
     /**
-     * Cost of a single logged entry: matched preset cost, else the global
-     * price scaled by volume, else the average preset cost scaled by volume.
+     * Cost of a single logged entry, in order of how well the price is known:
+     * the exact matching preset's cost, else the favorite drink's price, else
+     * the global fallback price, else the average preset cost - the last three
+     * scaled by volume against a standard drink.
+     *
+     * The favorite outranks the global fallback deliberately: a drink the user
+     * priced themselves is a better guess for an unrecognised entry (an import,
+     * a one-off) than a blanket figure they may have set once and forgotten.
      */
     fun entryCost(
         entry: BeerEntry,
         presetCosts: List<DrinkCost>,
         drinkSizeMl: Double,
-        pricePerDrink: Double
+        pricePerDrink: Double,
+        favoriteCost: Double = 0.0
     ): Double {
         val preset = presetCosts.firstOrNull {
             it.cost > 0 && it.name.equals(entry.name, ignoreCase = true) && abs(it.volumeMl - entry.volumeMl) < 1.0
         }
         if (preset != null) return preset.cost
-        val perDrink = if (pricePerDrink > 0) pricePerDrink else averagePresetCost(presetCosts)
+        val perDrink = when {
+            favoriteCost > 0 -> favoriteCost
+            pricePerDrink > 0 -> pricePerDrink
+            else -> averagePresetCost(presetCosts)
+        }
         return if (perDrink > 0 && drinkSizeMl > 0) perDrink * (entry.volumeMl / drinkSizeMl) else 0.0
     }
 
@@ -72,6 +83,8 @@ object SavingsEngine {
         drinkSizeMl: Double,
         pricePerDrink: Double,
         presetCosts: List<DrinkCost> = emptyList(),
+        /** The favorite drink's price, used before the global fallback for unmatched entries. */
+        favoriteCost: Double = 0.0,
         /** Cost of one baseline drink; callers pass the favorite preset's cost when set. */
         baselineCostPerDrink: Double = pricePerDrink,
         /** What the user says they used to spend on alcohol per week; preferred when > 0. */
@@ -91,7 +104,7 @@ object SavingsEngine {
             if (entry.alcoholPercentage <= 0) continue
             val date = try { LocalDate.parse(entry.date) } catch (_: Exception) { continue }
             if (date < ledger.trackingStart || date >= ledger.todayEffective) continue
-            actualSpend += entryCost(entry, presetCosts, drinkSizeMl, pricePerDrink)
+            actualSpend += entryCost(entry, presetCosts, drinkSizeMl, pricePerDrink, favoriteCost)
             actualKcal += entry.volumeMl * (entry.alcoholPercentage / 100.0) * KCAL_PER_ML_ALCOHOL
         }
 

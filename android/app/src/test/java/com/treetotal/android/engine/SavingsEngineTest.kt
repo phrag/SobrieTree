@@ -131,6 +131,45 @@ class SavingsEngineTest {
     }
 
     @Test
+    fun `favorite price outranks the global fallback for unmatched entries`() {
+        val costs = listOf(SavingsEngine.DrinkCost("IPA", 500.0, 7.5))
+        // Unmatched name: priced from the favorite (1.30 per 500ml drink), not the 9.0 fallback
+        val imported = com.treetotal.android.BeerEntry("1", "Augustiner Bottle (€1.30)", 5.2, 500.0, start.toString(), "")
+        assertEquals(1.3, SavingsEngine.entryCost(imported, costs, 500.0, 9.0, favoriteCost = 1.3), 0.001)
+        // Still scaled by volume against a standard drink
+        val big = com.treetotal.android.BeerEntry("2", "Unknown", 5.0, 750.0, start.toString(), "")
+        assertEquals(1.95, SavingsEngine.entryCost(big, costs, 500.0, 9.0, favoriteCost = 1.3), 0.001)
+        // An exact preset match still wins over the favorite
+        val ipa = com.treetotal.android.BeerEntry("3", "IPA", 6.5, 500.0, start.toString(), "")
+        assertEquals(7.5, SavingsEngine.entryCost(ipa, costs, 500.0, 9.0, favoriteCost = 1.3), 0.001)
+        // No favorite price: the global fallback applies as before
+        assertEquals(9.0, SavingsEngine.entryCost(imported, costs, 500.0, 9.0), 0.001)
+    }
+
+    @Test
+    fun `imported drinks are priced from the favorite instead of zeroing savings`() {
+        // 14 completed days at 50/week = 100 expected. Two unmatched imports a day
+        // at the favorite's 1.30 would have cost 9.0 each under the old fallback.
+        val today = start.plusDays(14)
+        val entries = (0..13).flatMap { day ->
+            (0..1).map {
+                com.treetotal.android.BeerEntry(
+                    "$day-$it", "Augustiner Bottle (€1.30)", 5.2, 500.0, start.plusDays(day.toLong()).toString(), ""
+                )
+            }
+        }
+        val ledger = DayLedger(entries, start, today)
+        val costs = listOf(SavingsEngine.DrinkCost("Augustiner", 500.0, 1.3))
+        val r = SavingsEngine.compute(
+            entries, ledger, 1000.0, 5.0, 500.0,
+            pricePerDrink = 9.0, presetCosts = costs, favoriteCost = 1.3, baselineWeeklySpend = 50.0
+        )
+        assertEquals(100.0, r.moneyExpected, 0.001)
+        assertEquals(36.4, r.moneySpent, 0.001)     // 28 x 1.30, not 28 x 9.00
+        assertEquals(63.6, r.moneySaved, 0.001)     // would have floored at 0 before
+    }
+
+    @Test
     fun `spend and savings use per-preset costs`() {
         // Baseline 2 drinks/day priced at the favorite's cost of 5.0 -> expected 90 over 9 days
         val entries = (0..3).map {
