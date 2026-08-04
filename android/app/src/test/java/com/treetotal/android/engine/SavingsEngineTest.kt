@@ -13,10 +13,10 @@ class SavingsEngineTest {
 
     @Test
     fun `money saved over completed days only`() {
-        // Baseline 2 drinks/day (1000ml), drank 5 drinks on completed days, price 4.0
+        // Baseline 2 drinks/day (1000ml), drank 5 drinks on completed days, favorite priced 4.0
         val entries = (0..4).map { TestFixtures.entry(start.plusDays(it.toLong())) }
         val ledger = DayLedger(entries, start, today)
-        val r = SavingsEngine.compute(entries, ledger, 1000.0, 5.0, 500.0, 4.0)
+        val r = SavingsEngine.compute(entries, ledger, 1000.0, 5.0, 500.0, favoriteCost = 4.0)
         // expected 2*9=18 drinks, actual 5 -> save 13 * 4 = 52
         assertEquals(52.0, r.moneySaved, 0.001)
         assertTrue(r.moneyAvailable)
@@ -26,7 +26,7 @@ class SavingsEngineTest {
     fun `todays entries are excluded until the day closes`() {
         val entries = listOf(TestFixtures.entry(today))            // only today
         val ledger = DayLedger(entries, start, today)
-        val r = SavingsEngine.compute(entries, ledger, 1000.0, 5.0, 500.0, 4.0)
+        val r = SavingsEngine.compute(entries, ledger, 1000.0, 5.0, 500.0, favoriteCost = 4.0)
         assertEquals(0.0, r.moneySpent, 0.001)                     // not counted yet
         // expected 18 drinks over 9 completed days, none logged -> full savings
         assertEquals(72.0, r.moneySaved, 0.001)
@@ -37,7 +37,7 @@ class SavingsEngineTest {
         val ledger = DayLedger(emptyList(), start, today)          // 9 completed days, nothing logged
         val r = SavingsEngine.compute(
             emptyList(), ledger, 1000.0, 5.0, 500.0,
-            pricePerDrink = 0.0, baselineWeeklySpend = 70.0
+            baselineWeeklySpend = 70.0
         )
         // 70/week -> 10/day * 9 completed days = 90 expected, nothing spent -> 90 saved
         assertEquals(90.0, r.moneySaved, 0.001)
@@ -51,7 +51,7 @@ class SavingsEngineTest {
         val ledger = DayLedger(listOf(ipa), start, today)
         val r = SavingsEngine.compute(
             listOf(ipa), ledger, 1000.0, 5.0, 500.0,
-            pricePerDrink = 0.0, presetCosts = costs, baselineWeeklySpend = 70.0
+            presetCosts = costs, baselineWeeklySpend = 70.0
         )
         // 90 expected - 7.5 actually spent = 82.5 saved
         assertEquals(7.5, r.moneySpent, 0.001)
@@ -71,7 +71,7 @@ class SavingsEngineTest {
         val costs = listOf(SavingsEngine.DrinkCost("IPA", 500.0, 5.0))
         val r = SavingsEngine.compute(
             entries, ledger, 1000.0, 5.0, 500.0,
-            pricePerDrink = 0.0, presetCosts = costs, baselineWeeklySpend = 70.0
+            presetCosts = costs, baselineWeeklySpend = 70.0
         )
         assertEquals(90.0, r.moneyExpected, 0.001)   // 36 drinks x 5.0 = 180 spent
         assertEquals(180.0, r.moneySpent, 0.001)
@@ -82,17 +82,26 @@ class SavingsEngineTest {
     @Test
     fun `day one shows zero not phantom savings`() {
         val ledger = DayLedger(emptyList(), start, start)          // no completed days yet
-        val r = SavingsEngine.compute(emptyList(), ledger, 1000.0, 5.0, 500.0, 4.0)
+        val r = SavingsEngine.compute(emptyList(), ledger, 1000.0, 5.0, 500.0, favoriteCost = 4.0)
         assertEquals(0.0, r.moneySaved, 0.001)
         assertEquals(0.0, r.caloriesSaved, 0.001)
     }
 
     @Test
-    fun `money hidden without any price`() {
+    fun `money hidden without a weekly spend or any priced drink`() {
         val ledger = DayLedger(emptyList(), start, today)
-        val r = SavingsEngine.compute(emptyList(), ledger, 1000.0, 5.0, 500.0, 0.0)
+        val r = SavingsEngine.compute(emptyList(), ledger, 1000.0, 5.0, 500.0)
         assertFalse(r.moneyAvailable)
         assertEquals(0.0, r.moneySaved, 0.001)
+    }
+
+    @Test
+    fun `calories saved computed from abv over completed days`() {
+        val ledger = DayLedger(emptyList(), start, today)
+        val r = SavingsEngine.compute(emptyList(), ledger, 1000.0, 5.0, 500.0)
+        // expected kcal = 1000 * 0.05 * 0.789*7 * 9 days = 2485.35, actual 0
+        assertEquals(2485.35, r.caloriesSaved, 0.5)
+        assertEquals(4, r.burgersEquivalent)
     }
 
     @Test
@@ -101,55 +110,30 @@ class SavingsEngineTest {
             (0..3).map { TestFixtures.entry(start.plusDays(day.toLong())) }
         }
         val ledger = DayLedger(entries, start, today)
-        val r = SavingsEngine.compute(entries, ledger, 500.0, 5.0, 500.0, 4.0)
+        val r = SavingsEngine.compute(entries, ledger, 500.0, 5.0, 500.0, favoriteCost = 4.0)
         assertEquals(0.0, r.moneySaved, 0.001)
         assertEquals(0.0, r.caloriesSaved, 0.001)
     }
 
     @Test
-    fun `calories saved computed from abv over completed days`() {
-        val ledger = DayLedger(emptyList(), start, today)
-        val r = SavingsEngine.compute(emptyList(), ledger, 1000.0, 5.0, 500.0, 0.0)
-        // expected kcal = 1000 * 0.05 * 0.789*7 * 9 days = 2485.35, actual 0
-        assertEquals(2485.35, r.caloriesSaved, 0.5)
-        assertEquals(4, r.burgersEquivalent)
-    }
-
-    @Test
-    fun `preset cost wins over fallback price for matching entries`() {
-        val ipa = com.treetotal.android.BeerEntry("1", "IPA", 6.5, 330.0, start.toString(), "")
+    fun `entry price resolves preset then favorite then average`() {
         val costs = listOf(SavingsEngine.DrinkCost("IPA", 330.0, 7.5))
+        val ipa = com.treetotal.android.BeerEntry("1", "IPA", 6.5, 330.0, start.toString(), "")
         // Matched by name+volume: exact preset cost
-        assertEquals(7.5, SavingsEngine.entryCost(ipa, costs, 500.0, 4.0), 0.001)
-        // Unmatched entry: global price scaled by volume (750/500 * 4)
+        assertEquals(7.5, SavingsEngine.entryCost(ipa, costs, 500.0, favoriteCost = 1.3), 0.001)
+        // Unmatched entry: the favorite's price, scaled by volume (750/500 * 1.3)
         val wine = com.treetotal.android.BeerEntry("2", "Wine", 12.0, 750.0, start.toString(), "")
-        assertEquals(6.0, SavingsEngine.entryCost(wine, costs, 500.0, 4.0), 0.001)
-        // No global price: falls back to average preset cost scaled by volume (750/500 * 7.5)
-        assertEquals(11.25, SavingsEngine.entryCost(wine, costs, 500.0, 0.0), 0.001)
+        assertEquals(1.95, SavingsEngine.entryCost(wine, costs, 500.0, favoriteCost = 1.3), 0.001)
+        // No favorite price: the average of the priced drinks (750/500 * 7.5)
+        assertEquals(11.25, SavingsEngine.entryCost(wine, costs, 500.0), 0.001)
         // No price info at all: zero
-        assertEquals(0.0, SavingsEngine.entryCost(wine, emptyList(), 500.0, 0.0), 0.001)
-    }
-
-    @Test
-    fun `favorite price outranks the global fallback for unmatched entries`() {
-        val costs = listOf(SavingsEngine.DrinkCost("IPA", 500.0, 7.5))
-        // Unmatched name: priced from the favorite (1.30 per 500ml drink), not the 9.0 fallback
-        val imported = com.treetotal.android.BeerEntry("1", "Augustiner Bottle (€1.30)", 5.2, 500.0, start.toString(), "")
-        assertEquals(1.3, SavingsEngine.entryCost(imported, costs, 500.0, 9.0, favoriteCost = 1.3), 0.001)
-        // Still scaled by volume against a standard drink
-        val big = com.treetotal.android.BeerEntry("2", "Unknown", 5.0, 750.0, start.toString(), "")
-        assertEquals(1.95, SavingsEngine.entryCost(big, costs, 500.0, 9.0, favoriteCost = 1.3), 0.001)
-        // An exact preset match still wins over the favorite
-        val ipa = com.treetotal.android.BeerEntry("3", "IPA", 6.5, 500.0, start.toString(), "")
-        assertEquals(7.5, SavingsEngine.entryCost(ipa, costs, 500.0, 9.0, favoriteCost = 1.3), 0.001)
-        // No favorite price: the global fallback applies as before
-        assertEquals(9.0, SavingsEngine.entryCost(imported, costs, 500.0, 9.0), 0.001)
+        assertEquals(0.0, SavingsEngine.entryCost(wine, emptyList(), 500.0), 0.001)
     }
 
     @Test
     fun `imported drinks are priced from the favorite instead of zeroing savings`() {
-        // 14 completed days at 50/week = 100 expected. Two unmatched imports a day
-        // at the favorite's 1.30 would have cost 9.0 each under the old fallback.
+        // 14 completed days at 50/week = 100 expected. Imported names match no saved
+        // drink, so they take the favorite's 1.30 rather than nothing or a stray figure.
         val today = start.plusDays(14)
         val entries = (0..13).flatMap { day ->
             (0..1).map {
@@ -162,11 +146,11 @@ class SavingsEngineTest {
         val costs = listOf(SavingsEngine.DrinkCost("Augustiner", 500.0, 1.3))
         val r = SavingsEngine.compute(
             entries, ledger, 1000.0, 5.0, 500.0,
-            pricePerDrink = 9.0, presetCosts = costs, favoriteCost = 1.3, baselineWeeklySpend = 50.0
+            presetCosts = costs, favoriteCost = 1.3, baselineWeeklySpend = 50.0
         )
         assertEquals(100.0, r.moneyExpected, 0.001)
-        assertEquals(36.4, r.moneySpent, 0.001)     // 28 x 1.30, not 28 x 9.00
-        assertEquals(63.6, r.moneySaved, 0.001)     // would have floored at 0 before
+        assertEquals(36.4, r.moneySpent, 0.001)     // 28 x 1.30
+        assertEquals(63.6, r.moneySaved, 0.001)
     }
 
     @Test
@@ -179,7 +163,7 @@ class SavingsEngineTest {
         val costs = listOf(SavingsEngine.DrinkCost("IPA", 330.0, 7.5))
         val r = SavingsEngine.compute(
             entries, ledger, 1000.0, 5.0, 500.0,
-            pricePerDrink = 0.0, presetCosts = costs, baselineCostPerDrink = 5.0
+            presetCosts = costs, favoriteCost = 5.0
         )
         assertEquals(30.0, r.moneySpent, 0.001)          // 4 x 7.5
         assertEquals(60.0, r.moneySaved, 0.001)          // 90 expected - 30 spent
@@ -191,11 +175,10 @@ class SavingsEngineTest {
         val ledger = DayLedger(emptyList(), start, today)
         val costs = listOf(SavingsEngine.DrinkCost("IPA", 330.0, 7.5))
         val r = SavingsEngine.compute(
-            emptyList(), ledger, 1000.0, 5.0, 500.0,
-            pricePerDrink = 0.0, presetCosts = costs, baselineCostPerDrink = 0.0
+            emptyList(), ledger, 1000.0, 5.0, 500.0, presetCosts = costs
         )
         assertTrue(r.moneyAvailable)
-        // Baseline cost falls back to the average preset cost: 2 drinks * 9 days * 7.5
-        assertEquals(135.0, r.moneySaved, 0.001)
+        // No favorite price: baseline cost falls back to the average preset cost
+        assertEquals(135.0, r.moneySaved, 0.001)         // 2 drinks * 9 days * 7.5
     }
 }

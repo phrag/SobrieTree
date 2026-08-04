@@ -173,11 +173,8 @@ class SettingsActivity : AppCompatActivity() {
             Money.applyFrom(appPrefs)
         }
 
-        // Price per drink (fallback when a drink has no cost; powers money-saved)
-        val priceEdit = findViewById<TextInputEditText>(R.id.et_price_per_drink)
-        if (appPrefs.pricePerDrink > 0) {
-            priceEdit.setText(String.format("%.2f", appPrefs.pricePerDrink))
-        }
+        // The single money input: everything "money saved" compares against.
+        // Per-drink prices live on the drinks themselves, not here.
         val weeklySpendEdit = findViewById<TextInputEditText>(R.id.et_baseline_weekly_spend)
         if (appPrefs.baselineWeeklySpend > 0) {
             weeklySpendEdit.setText(String.format("%.2f", appPrefs.baselineWeeklySpend))
@@ -185,8 +182,8 @@ class SettingsActivity : AppCompatActivity() {
 
         // Instant-apply for the text fields: each commits on blur / IME Done, and
         // once more in onPause. Invalid or blank input reverts to the stored value
-        // (except price, where blank legitimately means "no price"), so we never
-        // persist garbage and never nag with a per-keystroke error.
+        // (except weekly spend, where blank legitimately means "not set"), so we
+        // never persist garbage and never nag with a per-keystroke error.
         fun persistBeerSize() {
             val v = beerSizeEdit.text.toString().toIntOrNull()?.coerceAtLeast(1)
             if (v != null) prefs.edit().putInt("default_beer_size", v).apply()
@@ -202,16 +199,6 @@ class SettingsActivity : AppCompatActivity() {
             if (v != null) prefs.edit().putInt("end_of_day_hour", v).apply()
             else eodEdit.setText(prefs.getInt("end_of_day_hour", 3).toString())
         }
-        fun persistPrice() {
-            val raw = priceEdit.text?.toString().orEmpty()
-            if (raw.isBlank()) {
-                appPrefs.pricePerDrink = 0f
-                return
-            }
-            val v = raw.toFloatOrNull()?.coerceAtLeast(0f)
-            if (v != null) appPrefs.pricePerDrink = v
-            else priceEdit.setText(if (appPrefs.pricePerDrink > 0) String.format("%.2f", appPrefs.pricePerDrink) else "")
-        }
         fun persistWeeklySpend() {
             val raw = weeklySpendEdit.text?.toString().orEmpty()
             if (raw.isBlank()) {
@@ -225,9 +212,8 @@ class SettingsActivity : AppCompatActivity() {
         commitOnBlurAndDone(beerSizeEdit) { persistBeerSize() }
         commitOnBlurAndDone(beerStrengthEdit) { persistBeerStrength() }
         commitOnBlurAndDone(eodEdit) { persistEndOfDay() }
-        commitOnBlurAndDone(priceEdit) { persistPrice() }
         commitOnBlurAndDone(weeklySpendEdit) { persistWeeklySpend() }
-        flushSettings = { persistBeerSize(); persistBeerStrength(); persistEndOfDay(); persistPrice(); persistWeeklySpend() }
+        flushSettings = { persistBeerSize(); persistBeerStrength(); persistEndOfDay(); persistWeeklySpend() }
 
         // Edit goals & baseline directly from Settings
         findViewById<MaterialButton>(R.id.btn_edit_goals).setOnClickListener {

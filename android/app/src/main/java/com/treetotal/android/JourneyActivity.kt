@@ -76,20 +76,24 @@ class JourneyActivity : AppCompatActivity() {
         badgeAdapter.update(state.badges)
         educationAdapter.update(state.educationCards)
 
-        findViewById<TextView>(R.id.tv_money_row).text = when {
-            // Show the whole sum when there's a baseline to compare against: a bare
-            // "0 saved" is unreadable when it just means spend met the baseline.
-            state.moneyAvailable && state.moneyExpected > 0 ->
+        // Headline is the one number that matters; the line under it shows the two
+        // figures it came from, so "0 saved" is never a mystery.
+        val moneyHeadline = findViewById<TextView>(R.id.tv_money_row)
+        val moneyDetail = findViewById<TextView>(R.id.tv_money_detail)
+        if (state.moneyAvailable) {
+            moneyHeadline.text = getString(R.string.money_row, Money.format(state.moneySaved))
+            moneyDetail.text = if (state.moneyExpected > 0) {
                 getString(
                     R.string.money_row_detail,
-                    Money.format(state.moneySaved),
-                    Money.format(state.moneySpent),
-                    Money.format(state.moneyExpected)
+                    Money.format(state.moneyExpected),
+                    Money.format(state.moneySpent)
                 )
-            state.moneyAvailable && state.moneySpent > 0 ->
-                getString(R.string.money_row_with_spent, Money.format(state.moneySaved), Money.format(state.moneySpent))
-            state.moneyAvailable -> getString(R.string.money_row, Money.format(state.moneySaved))
-            else -> getString(R.string.money_row_unset)
+            } else {
+                getString(R.string.money_row_pending)
+            }
+        } else {
+            moneyHeadline.setText(R.string.money_row_unset)
+            moneyDetail.setText(R.string.money_row_unset_detail)
         }
         findViewById<TextView>(R.id.tv_calories_row).text =
             if (state.burgersEquivalent > 0) {

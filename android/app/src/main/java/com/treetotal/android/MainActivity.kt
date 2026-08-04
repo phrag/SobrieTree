@@ -512,9 +512,6 @@ class MainActivity : AppCompatActivity() {
         etName.setText("Beer")
         etVol.setText(defaultSize.toString())
         etStr.setText(defaultStrength.toString())
-        if (AppPrefs(this).pricePerDrink > 0) {
-            etCost.setText(String.format("%.2f", AppPrefs(this).pricePerDrink))
-        }
 
         fun saveFavorite(addOne: Boolean) {
             val name = etName.text?.toString()?.trim().orEmpty()

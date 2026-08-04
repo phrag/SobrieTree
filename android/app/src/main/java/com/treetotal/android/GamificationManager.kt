@@ -132,16 +132,12 @@ class GamificationManager(context: Context) {
             baselineDailyMl = prefs.baselineDailyMl,
             defaultAbv = prefs.defaultDrinkStrength.toDouble(),
             drinkSizeMl = drinkSize,
-            pricePerDrink = prefs.pricePerDrink.toDouble(),
             presetCosts = presets.map {
                 SavingsEngine.DrinkCost(it.name, it.volume.toDouble(), it.cost.toDouble())
             },
-            // An unrecognised drink (an import, a one-off) is priced from the favorite
-            // before the blanket fallback price in Settings
+            // The baseline is denominated in the favorite drink, so its price stands in
+            // both for one baseline drink and for any entry that matches no saved drink
             favoriteCost = favorite?.cost?.takeIf { it > 0 }?.toDouble() ?: 0.0,
-            // The baseline is denominated in the favorite drink, so use its cost when set
-            baselineCostPerDrink = favorite?.cost?.takeIf { it > 0 }?.toDouble()
-                ?: prefs.pricePerDrink.toDouble(),
             // Preferred when set: what the user says they used to spend per week
             baselineWeeklySpend = prefs.baselineWeeklySpend.toDouble()
         )

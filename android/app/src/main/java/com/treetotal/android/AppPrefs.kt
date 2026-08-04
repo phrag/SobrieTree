@@ -66,11 +66,6 @@ class AppPrefs(context: Context) {
         get() = prefs.getStringSet("motivation", emptySet()) ?: emptySet()
         set(value) = prefs.edit().putStringSet("motivation", value).apply()
 
-    /** Price of one typical drink in the user's own currency; 0 = not set, hides money stats. */
-    var pricePerDrink: Float
-        get() = prefs.getFloat("price_per_drink", 0f)
-        set(value) = prefs.edit().putFloat("price_per_drink", value).apply()
-
     /** What the user used to spend on alcohol per week, in their currency. Powers money saved. */
     var baselineWeeklySpend: Float
         get() = prefs.getFloat("baseline_weekly_spend", 0f)

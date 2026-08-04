@@ -12,12 +12,16 @@ import kotlin.math.abs
  * expected and the actual side, so savings never appear out of thin air the
  * moment a new day starts; numbers move when a day closes.
  *
- * Money saved is anchored to what the user says they *used* to spend: when a
- * baseline weekly spend is set, expected spend is simply that figure pro-rated
- * over the tracked days — a number the user trusts, independent of fluctuating
- * per-drink prices (a pub round vs. a cheap beer at home). Actual spend still
- * comes from logged drink costs. Without a weekly figure it falls back to the
- * older per-drink-price model. Both saved counters are floored at zero.
+ * Money saved answers one question - "what would I have spent by now?" minus
+ * "what did I actually spend?" - from two inputs the user already understands:
+ *
+ *  - the weekly spend they say they used to have, pro-rated over tracked days
+ *    (falling back to baseline drinks x the favorite's price if they skipped it)
+ *  - the price on each saved drink, for what they actually spent
+ *
+ * There is deliberately no third "global price" knob: an extra number that
+ * silently outranks the prices the user set themselves made the total
+ * unexplainable.
  */
 object SavingsEngine {
 
@@ -33,7 +37,7 @@ object SavingsEngine {
         val moneySpent: Double,
         /** What the baseline implies you'd have spent over the same days. */
         val moneyExpected: Double,
-        /** False until the user has set any price (per-preset or global). */
+        /** False until the user has set a weekly spend or priced a drink. */
         val moneyAvailable: Boolean,
         val caloriesSaved: Double,
         /** Rough burger equivalents of the saved calories (550 kcal each). */
@@ -49,29 +53,20 @@ object SavingsEngine {
     /**
      * Cost of a single logged entry, in order of how well the price is known:
      * the exact matching preset's cost, else the favorite drink's price, else
-     * the global fallback price, else the average preset cost - the last three
-     * scaled by volume against a standard drink.
-     *
-     * The favorite outranks the global fallback deliberately: a drink the user
-     * priced themselves is a better guess for an unrecognised entry (an import,
-     * a one-off) than a blanket figure they may have set once and forgotten.
+     * the average of the priced drinks - the last two scaled by volume against
+     * a standard drink.
      */
     fun entryCost(
         entry: BeerEntry,
         presetCosts: List<DrinkCost>,
         drinkSizeMl: Double,
-        pricePerDrink: Double,
         favoriteCost: Double = 0.0
     ): Double {
         val preset = presetCosts.firstOrNull {
             it.cost > 0 && it.name.equals(entry.name, ignoreCase = true) && abs(it.volumeMl - entry.volumeMl) < 1.0
         }
         if (preset != null) return preset.cost
-        val perDrink = when {
-            favoriteCost > 0 -> favoriteCost
-            pricePerDrink > 0 -> pricePerDrink
-            else -> averagePresetCost(presetCosts)
-        }
+        val perDrink = if (favoriteCost > 0) favoriteCost else averagePresetCost(presetCosts)
         return if (perDrink > 0 && drinkSizeMl > 0) perDrink * (entry.volumeMl / drinkSizeMl) else 0.0
     }
 
@@ -81,22 +76,18 @@ object SavingsEngine {
         baselineDailyMl: Double,
         defaultAbv: Double,
         drinkSizeMl: Double,
-        pricePerDrink: Double,
         presetCosts: List<DrinkCost> = emptyList(),
-        /** The favorite drink's price, used before the global fallback for unmatched entries. */
+        /** The favorite drink's price: what an unmatched entry is worth, and what one baseline drink costs. */
         favoriteCost: Double = 0.0,
-        /** Cost of one baseline drink; callers pass the favorite preset's cost when set. */
-        baselineCostPerDrink: Double = pricePerDrink,
         /** What the user says they used to spend on alcohol per week; preferred when > 0. */
         baselineWeeklySpend: Double = 0.0
     ): Result {
         // Completed days only - today joins the ledger when it closes.
         val daysTracked = ledger.completedDays.size
 
-        val effectiveBaselineCost = if (baselineCostPerDrink > 0) baselineCostPerDrink else averagePresetCost(presetCosts)
+        val costPerDrink = if (favoriteCost > 0) favoriteCost else averagePresetCost(presetCosts)
         val usesWeeklySpend = baselineWeeklySpend > 0
-        val moneyAvailable = usesWeeklySpend ||
-            (drinkSizeMl > 0 && (effectiveBaselineCost > 0 || pricePerDrink > 0 || presetCosts.any { it.cost > 0 }))
+        val moneyAvailable = usesWeeklySpend || (drinkSizeMl > 0 && costPerDrink > 0)
 
         var actualSpend = 0.0
         var actualKcal = 0.0
@@ -104,16 +95,16 @@ object SavingsEngine {
             if (entry.alcoholPercentage <= 0) continue
             val date = try { LocalDate.parse(entry.date) } catch (_: Exception) { continue }
             if (date < ledger.trackingStart || date >= ledger.todayEffective) continue
-            actualSpend += entryCost(entry, presetCosts, drinkSizeMl, pricePerDrink, favoriteCost)
+            actualSpend += entryCost(entry, presetCosts, drinkSizeMl, favoriteCost)
             actualKcal += entry.volumeMl * (entry.alcoholPercentage / 100.0) * KCAL_PER_ML_ALCOHOL
         }
 
         // Prefer the user's stated weekly spend, pro-rated over the tracked days;
-        // otherwise fall back to the per-drink-price estimate.
+        // otherwise estimate it from the baseline drinks at the favorite's price.
         val expectedSpend = when {
             usesWeeklySpend -> (baselineWeeklySpend / 7.0) * daysTracked
-            effectiveBaselineCost > 0 && drinkSizeMl > 0 ->
-                (baselineDailyMl / drinkSizeMl) * effectiveBaselineCost * daysTracked
+            costPerDrink > 0 && drinkSizeMl > 0 ->
+                (baselineDailyMl / drinkSizeMl) * costPerDrink * daysTracked
             else -> 0.0
         }
         val moneySaved = if (moneyAvailable && expectedSpend > 0) {
