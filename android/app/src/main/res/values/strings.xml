@@ -14,6 +14,7 @@
     <string name="ring_description">Today\'s ring. It starts full and empties as you log drinks. Tap to log your favorite drink.</string>
     <string name="tile_money_saved">saved</string>
     <string name="tile_set_price">Set spend</string>
+    <string name="tile_no_days_yet">no tracked days yet</string>
     <string name="tile_calories_avoided">calories avoided</string>
     <string name="tile_fewer_than_usual">fewer than usual this week</string>
     <string name="tile_avg_per_week">drinks a week on average</string>

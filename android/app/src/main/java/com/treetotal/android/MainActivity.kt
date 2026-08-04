@@ -240,7 +240,16 @@ class MainActivity : AppCompatActivity() {
         val moneyValue = findViewById<TextView>(R.id.tv_money_saved)
         val moneyCaption = findViewById<TextView>(R.id.tv_money_caption)
         moneyTile.visibility = View.VISIBLE
-        if (state.moneyAvailable) {
+        if (state.moneyAvailable && !state.metrics.hasClosedDays) {
+            // Savings accrue per closed day, so before the first day closes the
+            // honest answer is "nothing measured yet" — a bare 0 reads as a bug,
+            // especially when the journey start date is later than the entries.
+            moneyValue.text = "—"
+            moneyCaption.setText(R.string.tile_no_days_yet)
+            moneyTile.setOnClickListener {
+                startActivity(Intent(this, SettingsActivity::class.java))
+            }
+        } else if (state.moneyAvailable) {
             moneyValue.text = Money.format(state.moneySaved)
             moneyCaption.setText(R.string.tile_money_saved)
             moneyTile.setOnClickListener {
@@ -255,7 +264,8 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this, SettingsActivity::class.java))
             }
         }
-        findViewById<TextView>(R.id.tv_calories_saved).text = String.format("%,d", state.caloriesSaved.toInt())
+        findViewById<TextView>(R.id.tv_calories_saved).text =
+            if (state.metrics.hasClosedDays) String.format("%,d", state.caloriesSaved.toInt()) else "—"
 
         // AF days this week (today's provisional AF day included)
         val afThisWeek = state.streaks.afDaysThisWeek + if (state.isTodayAf) 1 else 0
