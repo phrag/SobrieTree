@@ -42,7 +42,7 @@
     <string name="shields_label">shields</string>
     <string name="shields_explainer">You earn a shield for every 7 alcohol-free days. A shield automatically protects your streak through a single off day.</string>
     <string name="timeline_title">Your body\'s recovery</string>
-    <string name="timeline_subtitle">Milestones track your current alcohol-free run — drinking restarts the clock, because your body's recovery does too</string>
+    <string name="timeline_subtitle">Milestones track your current alcohol-free run — drinking restarts the clock, because your body\'s recovery does too</string>
     <string name="milestone_reached_on">Reached %s</string>
     <string name="milestone_next_up">Next up — keep going</string>
     <string name="milestone_af_days">At %d AF days</string>
@@ -71,15 +71,15 @@
     <string name="stats_this_month">This month</string>
     <string name="stats_last_30">Last 30 days</string>
     <string name="stats_all_time">Since you started</string>
-    <string name="stats_window_days">%1$s \u2013 %2$s \u00b7 %3$d days</string>
-    <string name="stats_window_day">%1$s \u00b7 1 day</string>
-    <string name="stats_line">%1$s drinks \u00b7 %2$s units \u00b7 %3$d dry %4$s</string>
+    <string name="stats_window_days">%1$s – %2$s · %3$d days</string>
+    <string name="stats_window_day">%1$s · 1 day</string>
+    <string name="stats_line">%1$s drinks · %2$s units · %3$d dry %4$s</string>
     <string name="stats_avg">%1$s units a day on average</string>
     <string name="stats_vs_baseline_below">%1$s%% below your usual</string>
     <string name="stats_vs_baseline_above">%1$s%% above your usual</string>
     <string name="stats_no_data">Nothing logged in this window.</string>
     <string name="stats_not_started">Before you started tracking.</string>
-    <string name="calendar_recent_heading">Nothing on %1$s \u2014 recent entries</string>
+    <string name="calendar_recent_heading">Nothing on %1$s — recent entries</string>
 
     <!-- Encrypted backup -->
     <string name="backup_title">Encrypted backup</string>
