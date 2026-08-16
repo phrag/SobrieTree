@@ -64,6 +64,14 @@
     <string name="less_than_baseline">less than baseline this week</string>
     <string name="more_than_baseline">more than baseline this week</string>
     <string name="n_of_7">%d of 7</string>
+    <!-- Home-screen widget -->
+    <string name="widget_description">Today\'s ring, and one tap to log your favourite drink.</string>
+    <string name="widget_ring_description">Today\'s ring. Full means nothing logged yet.</string>
+    <string name="widget_af_today">Alcohol-free today</string>
+    <string name="widget_logged_today">%1$s units today</string>
+    <string name="widget_log">+ %1$s</string>
+    <string name="widget_undo">Undo</string>
+
     <!-- UK units vs the CMO/NHS low-risk guideline -->
     <string name="units_title">This week in units</string>
     <string name="units_value">%1$s units</string>

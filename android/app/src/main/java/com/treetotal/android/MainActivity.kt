@@ -191,6 +191,8 @@ class MainActivity : AppCompatActivity() {
             bindHomeState(state)
             populateQuickAdd()
             showMilestoneCelebrations(state.uncelebrated)
+            // Home and the widget show the same ring; keep them from disagreeing.
+            TreeTotalWidget.refresh(this)
         } catch (e: Exception) {
             Toast.makeText(this, "Failed to load data", Toast.LENGTH_SHORT).show()
         }

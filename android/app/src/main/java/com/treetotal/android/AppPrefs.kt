@@ -121,6 +121,19 @@ class AppPrefs(context: Context) {
         get() = prefs.getStringSet("shield_bridged_dates", emptySet()) ?: emptySet()
         set(value) = prefs.edit().putStringSet("shield_bridged_dates", value).apply()
 
+    /**
+     * The entry the widget logged most recently, and when. The widget logs in a
+     * single tap with no confirmation, so it offers an undo for a short window
+     * afterwards; this is the only state that needs.
+     */
+    var lastWidgetEntryId: String?
+        get() = prefs.getString("widget_last_entry_id", null)
+        set(value) = prefs.edit().putString("widget_last_entry_id", value).apply()
+
+    var lastWidgetEntryAt: Long
+        get() = prefs.getLong("widget_last_entry_at", 0L)
+        set(value) = prefs.edit().putLong("widget_last_entry_at", value).apply()
+
     /** Milestone ids that already had their celebration sheet shown. */
     var celebratedMilestones: Set<String>
         get() = prefs.getStringSet("milestones_celebrated", emptySet()) ?: emptySet()

@@ -18,7 +18,7 @@ data class DrinkPreset(
     val volume: Int,
     val strength: Float,
     val favorite: Boolean = false,
-    /** What one of these drinks costs the user; 0 = not set (falls back to the global price). */
+    /** What one of these drinks costs the user; 0 = not set (falls back to the favourite's price). */
     val cost: Float = 0f
 ) {
     /** ABV as a clean Double - naive Float widening produces noise like 5.1999999980926513. */

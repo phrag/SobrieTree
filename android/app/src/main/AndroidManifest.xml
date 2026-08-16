@@ -61,6 +61,22 @@
         <receiver
             android:name=".CheckinActionReceiver"
             android:exported="false" />
+
+        <!-- Home-screen widget: today's ring plus one-tap logging of the favourite.
+             Exported because the launcher hosts it; its own log/undo actions are
+             delivered to this same component and touch only local data. -->
+        <receiver
+            android:name=".TreeTotalWidget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.treetotal.android.widget.LOG_FAVORITE" />
+                <action android:name="com.treetotal.android.widget.UNDO" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/treetotal_widget_info" />
+        </receiver>
     </application>
 
 </manifest> 

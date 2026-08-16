@@ -55,12 +55,26 @@ class EntryRepository(private val treeTotal: TreeTotal = TreeTotalProvider.insta
         }
     }
 
-    fun addEntryAt(date: LocalDate, name: String, alcoholPercentage: Double, volumeMl: Double, notes: String): Boolean {
+    fun addEntryAt(date: LocalDate, name: String, alcoholPercentage: Double, volumeMl: Double, notes: String): Boolean =
+        addEntryAtReturningId(date, name, alcoholPercentage, volumeMl, notes) != null
+
+    /**
+     * Same as [addEntryAt] but hands back the new entry's id, so a caller that
+     * logged without a confirmation step (the widget) can offer to undo it.
+     * Returns null when the write failed.
+     */
+    fun addEntryAtReturningId(
+        date: LocalDate,
+        name: String,
+        alcoholPercentage: Double,
+        volumeMl: Double,
+        notes: String
+    ): String? {
         val id = java.util.UUID.randomUUID().toString()
         val r = try {
             TreeTotalNative.add_beer_entry_full_jni(id, name, alcoholPercentage, volumeMl, date.toString(), notes)
         } catch (_: Throwable) { "" }
-        return r.startsWith("OK")
+        return if (r.startsWith("OK")) id else null
     }
 
     fun updateEntry(id: String, name: String, alcoholPercentage: Double, volumeMl: Double, notes: String) {

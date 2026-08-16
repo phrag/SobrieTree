@@ -40,6 +40,8 @@ object UnitsEngine {
         else volumeMl * (abvPercent / 100.0) / ML_PER_UNIT
 
     data class Result(
+        /** Units logged today so far. */
+        val unitsToday: Double,
         /** Units so far in the current week (today included - it is the live figure). */
         val unitsThisWeek: Double,
         /** Units in the last fully completed week, or 0 when there isn't one yet. */
@@ -89,6 +91,7 @@ object UnitsEngine {
         }
 
         return Result(
+            unitsToday = ledger.unitsFor(today),
             unitsThisWeek = unitsThisWeek,
             unitsLastWeek = unitsLastWeek,
             avgUnitsPerWeek = avgUnitsPerDay * 7.0,
