@@ -13,6 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import java.io.File
 import java.io.FileWriter
@@ -58,6 +59,25 @@ class SettingsActivity : AppCompatActivity() {
     
     private val importFileLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let { importFromFile(it) }
+    }
+
+    // Encrypted backup. The passphrase is asked for at the moment it's needed and
+    // never stored, so nothing on the device can open a backup on its own.
+    private val backupFileLauncher =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
+            uri?.let { target ->
+                askPassphrase(confirm = true, message = getString(R.string.backup_set_passphrase)) { pass ->
+                    writeBackup(target, pass)
+                }
+            }
+        }
+
+    private val restoreFileLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let { source ->
+            askPassphrase(confirm = false, message = getString(R.string.backup_enter_passphrase)) { pass ->
+                restoreBackup(source, pass)
+            }
+        }
     }
 
     // Whatever feature requested notification permission runs its callback here
@@ -109,6 +129,8 @@ class SettingsActivity : AppCompatActivity() {
         val eodEdit = findViewById<TextInputEditText>(R.id.et_end_of_day)
         val exportBtn = findViewById<MaterialButton>(R.id.btn_export)
         val importBtn = findViewById<MaterialButton>(R.id.btn_import)
+        val backupBtn = findViewById<MaterialButton>(R.id.btn_backup)
+        val restoreBtn = findViewById<MaterialButton>(R.id.btn_restore)
         val deleteAllBtn = findViewById<MaterialButton>(R.id.btn_delete_all)
         val redoSetupBtn = findViewById<MaterialButton>(R.id.btn_redo_initial_setup)
         val versionText = findViewById<TextView>(R.id.tv_version)
@@ -361,6 +383,16 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         // Export button
+        bindBackupStatus()
+        backupBtn.setOnClickListener {
+            backupFileLauncher.launch(BackupManager.backupFileName(LocalDate.now()))
+        }
+        restoreBtn.setOnClickListener {
+            // Widened deliberately: .ttbk has no registered MIME type, so a
+            // narrow filter greys out the very file we wrote.
+            restoreFileLauncher.launch(arrayOf("*/*"))
+        }
+
         exportBtn.setOnClickListener {
             try {
                 exportFileLauncher.launch("treetotal_export_${System.currentTimeMillis()}.csv")
@@ -412,6 +444,115 @@ class SettingsActivity : AppCompatActivity() {
         }
         
         BottomNavHelper.wire(this, findViewById(R.id.bottom_nav), R.id.nav_settings)
+    }
+
+    /**
+     * Asks for a passphrase, optionally twice. The characters go straight to the
+     * crypto and are wiped afterwards - they are never written to prefs, which
+     * is what keeps a stolen phone from being able to open its own backups.
+     */
+    private fun askPassphrase(confirm: Boolean, message: String, onEntered: (CharArray) -> Unit) {
+        val view = layoutInflater.inflate(R.layout.dialog_passphrase, null)
+        view.findViewById<TextView>(R.id.tv_passphrase_message).text = message
+        val field = view.findViewById<TextInputEditText>(R.id.et_passphrase)
+        val confirmLayout = view.findViewById<TextInputLayout>(R.id.layout_passphrase_confirm)
+        val confirmField = view.findViewById<TextInputEditText>(R.id.et_passphrase_confirm)
+        val warning = view.findViewById<TextView>(R.id.tv_passphrase_warning)
+        if (!confirm) {
+            confirmLayout.visibility = View.GONE
+            warning.visibility = View.GONE
+        }
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(view)
+            .setPositiveButton(R.string.save, null)
+            .setNegativeButton(R.string.cancel) { d, _ -> d.dismiss() }
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val entered = field.text?.toString().orEmpty()
+                if (entered.isEmpty()) {
+                    field.error = getString(R.string.backup_passphrase_empty)
+                    return@setOnClickListener
+                }
+                if (confirm && entered != confirmField.text?.toString().orEmpty()) {
+                    confirmField.error = getString(R.string.backup_passphrase_mismatch)
+                    return@setOnClickListener
+                }
+                dialog.dismiss()
+                val chars = entered.toCharArray()
+                try {
+                    onEntered(chars)
+                } finally {
+                    chars.fill('\u0000')
+                }
+            }
+        }
+        dialog.show()
+    }
+
+    private fun writeBackup(uri: Uri, passphrase: CharArray) {
+        try {
+            BackupManager.writeTo(this, uri, passphrase)
+            Toast.makeText(this, R.string.backup_written, Toast.LENGTH_SHORT).show()
+            bindBackupStatus()
+        } catch (e: Exception) {
+            Toast.makeText(this, getString(R.string.backup_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun restoreBackup(uri: Uri, passphrase: CharArray) {
+        try {
+            val r = BackupManager.restoreFrom(this, uri, passphrase)
+            val message = buildString {
+                append(
+                    getString(
+                        R.string.backup_restored,
+                        r.entriesRestored,
+                        getString(if (r.entriesRestored == 1) R.string.entry_singular else R.string.entry_plural),
+                        r.presetsRestored,
+                        getString(if (r.presetsRestored == 1) R.string.drink_singular else R.string.drink_plural)
+                    )
+                )
+                if (r.entriesAlreadyPresent > 0) {
+                    append(
+                        getString(
+                            R.string.backup_restored_skipped,
+                            r.entriesAlreadyPresent,
+                            getString(if (r.entriesAlreadyPresent == 1) R.string.entry_singular else R.string.entry_plural)
+                        )
+                    )
+                }
+            }
+            AlertDialog.Builder(this)
+                .setTitle(R.string.backup_restore)
+                .setMessage(message)
+                .setPositiveButton(R.string.got_it, null)
+                .show()
+            bindBackupStatus()
+        } catch (e: Exception) {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.backup_restore)
+                .setMessage(getString(R.string.backup_restore_failed, e.message ?: ""))
+                .setPositiveButton(R.string.got_it, null)
+                .show()
+        }
+    }
+
+    private fun bindBackupStatus() {
+        val status = findViewById<TextView>(R.id.tv_backup_status) ?: return
+        val at = AppPrefs(this).lastBackupAt
+        status.text = if (at <= 0L) {
+            getString(R.string.backup_never)
+        } else {
+            getString(
+                R.string.backup_last,
+                android.text.format.DateUtils.getRelativeTimeSpanString(
+                    at, System.currentTimeMillis(), android.text.format.DateUtils.MINUTE_IN_MILLIS
+                )
+            )
+        }
     }
 
     private fun exportToFile(uri: Uri) {

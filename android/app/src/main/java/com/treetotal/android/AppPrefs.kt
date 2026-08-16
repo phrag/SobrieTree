@@ -121,6 +121,11 @@ class AppPrefs(context: Context) {
         get() = prefs.getStringSet("shield_bridged_dates", emptySet()) ?: emptySet()
         set(value) = prefs.edit().putStringSet("shield_bridged_dates", value).apply()
 
+    /** When the last encrypted backup was written, so Settings can say how stale it is. */
+    var lastBackupAt: Long
+        get() = prefs.getLong("last_backup_at", 0L)
+        set(value) = prefs.edit().putLong("last_backup_at", value).apply()
+
     /**
      * The entry the widget logged most recently, and when. The widget logs in a
      * single tap with no confirmation, so it offers an undo for a short window

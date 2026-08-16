@@ -593,6 +593,51 @@
                         app:iconPadding="8dp"
                         style="@style/Widget.TreeTotal.Button.Outlined" />
 
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="@color/surface_variant" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/backup_title"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Title"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="12dp"
+                        android:text="@string/backup_description"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Caption" />
+
+                    <TextView
+                        android:id="@+id/tv_backup_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:textAppearance="@style/TextAppearance.TreeTotal.Caption" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_backup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:text="@string/backup_now"
+                        style="@style/Widget.TreeTotal.Button.Outlined" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_restore"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:text="@string/backup_restore"
+                        style="@style/Widget.TreeTotal.Button.Outlined" />
+
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_delete_all"
                         android:layout_width="match_parent"

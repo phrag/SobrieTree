@@ -64,6 +64,30 @@
     <string name="less_than_baseline">less than baseline this week</string>
     <string name="more_than_baseline">more than baseline this week</string>
     <string name="n_of_7">%d of 7</string>
+    <!-- Encrypted backup -->
+    <string name="backup_title">Encrypted backup</string>
+    <string name="backup_description">A single encrypted file holding your entries, drinks and settings. Save it wherever you like — an SD card, a folder your own sync app watches. TreeTotal never sends it anywhere.</string>
+    <string name="backup_now">Back up now</string>
+    <string name="backup_restore">Restore from backup</string>
+    <string name="backup_never">No backup yet. One lost phone loses everything.</string>
+    <string name="backup_last">Last backup: %1$s.</string>
+    <string name="backup_passphrase_hint">Passphrase</string>
+    <string name="backup_passphrase_confirm_hint">Passphrase again</string>
+    <string name="backup_passphrase_warning">There is no way to recover this passphrase. Without it the backup can\'t be opened — not by you, not by us.</string>
+    <string name="backup_set_passphrase">Choose a passphrase for this backup. You\'ll need it to restore.</string>
+    <string name="backup_enter_passphrase">Enter the passphrase this backup was written with.</string>
+    <string name="backup_passphrase_mismatch">Those don\'t match.</string>
+    <string name="backup_passphrase_empty">Enter a passphrase.</string>
+    <string name="backup_written">Backup saved and encrypted.</string>
+    <string name="backup_failed">Backup failed: %1$s</string>
+    <string name="backup_restored">Restored %1$d %2$s and %3$d saved %4$s.</string>
+    <string name="backup_restored_skipped">\n\n%1$d %2$s were already here and left untouched.</string>
+    <string name="backup_restore_failed">Couldn\'t restore: %1$s</string>
+    <string name="entry_singular">entry</string>
+    <string name="entry_plural">entries</string>
+    <string name="drink_singular">drink</string>
+    <string name="drink_plural">drinks</string>
+
     <!-- Home-screen widget -->
     <string name="widget_description">Today\'s ring, and one tap to log your favourite drink.</string>
     <string name="widget_ring_description">Today\'s ring. Full means nothing logged yet.</string>
