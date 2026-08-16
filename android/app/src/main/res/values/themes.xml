@@ -10,6 +10,11 @@
         <item name="colorSecondary">@color/brand_secondary</item>
         <item name="colorSecondaryVariant">@color/brand_secondary_dark</item>
         <item name="colorOnSecondary">@color/black</item>
+        <!-- Paint the window in the app's own background. Left unset, Android
+             flashes its default between activities, which is what made tab
+             switches look like a flicker. -->
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:windowAnimationStyle">@style/Animation.TreeTotal.None</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">@color/brand_primary_dark</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
@@ -147,5 +152,17 @@
         <item name="boxCornerRadiusTopStart">12dp</item>
         <item name="boxStrokeColor">@color/brand_primary</item>
         <item name="hintTextColor">@color/brand_primary</item>
+    </style>
+
+    <!-- Tabs are one surface changing content, so they don't slide. -->
+    <style name="Animation.TreeTotal.None" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@null</item>
+        <item name="android:activityOpenExitAnimation">@null</item>
+        <item name="android:activityCloseEnterAnimation">@null</item>
+        <item name="android:activityCloseExitAnimation">@null</item>
+        <item name="android:taskOpenEnterAnimation">@null</item>
+        <item name="android:taskOpenExitAnimation">@null</item>
+        <item name="android:taskCloseEnterAnimation">@null</item>
+        <item name="android:taskCloseExitAnimation">@null</item>
     </style>
 </resources>

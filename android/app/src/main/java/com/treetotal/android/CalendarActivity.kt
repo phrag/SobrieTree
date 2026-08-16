@@ -10,6 +10,10 @@ import org.json.JSONArray
 class CalendarActivity : AppCompatActivity() {
     private lateinit var adapter: BeerEntryAdapter
     private val prefsName = "treetotal_prefs"
+    private val repo by lazy { EntryRepository() }
+
+    /** The day the calendar is pointed at; edits refresh this, not the entry's own date. */
+    private var currentDate: LocalDate = LocalDate.now()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,19 +34,13 @@ class CalendarActivity : AppCompatActivity() {
         rv.layoutManager = LinearLayoutManager(this)
         rv.adapter = adapter
 
-        val today = LocalDate.now()
-        setDate(today)
+        setDate(LocalDate.now())
 
-        findViewById<android.widget.TextView>(R.id.tv_selected_date).text = today.toString()
-        var currentDate = today
         findViewById<android.view.View>(R.id.btn_add_entry_for_day).setOnClickListener { showQuickAddForDate(currentDate) }
         findViewById<android.view.View>(R.id.btn_set_total_for_day).setOnClickListener { showSetTotalDialog(currentDate) }
 
         findViewById<CalendarView>(R.id.calendar_view).setOnDateChangeListener { _, year, month, dayOfMonth ->
-            val selected = LocalDate.of(year, month + 1, dayOfMonth)
-            findViewById<android.widget.TextView>(R.id.tv_selected_date).text = selected.toString()
-            currentDate = selected
-            setDate(selected)
+            setDate(LocalDate.of(year, month + 1, dayOfMonth))
         }
 
         BottomNavHelper.wire(this, findViewById(R.id.bottom_nav), R.id.nav_calendar)
@@ -53,22 +51,32 @@ class CalendarActivity : AppCompatActivity() {
         SecureWindow.apply(this)
     }
 
+    /**
+     * Shows the chosen day, or - when nothing was logged then - the most recent
+     * entries instead. Home used to carry a "recent entries" card, but browsing
+     * what you logged belongs with the calendar, and a day-picker that goes
+     * blank on every dry day wastes the screen it takes.
+     */
     private fun setDate(date: LocalDate) {
+        currentDate = date
+        val heading = findViewById<android.widget.TextView>(R.id.tv_selected_date)
         try {
-            val json = TreeTotalNative.get_beer_entries_json(date.toString(), date.toString())
-            val arr = JSONArray(json)
-            val list = List(arr.length()) { i ->
-                val o = arr.getJSONObject(i)
-                BeerEntry(
-                    id = o.optString("id"),
-                    name = o.optString("name"),
-                    alcoholPercentage = o.optDouble("alcohol_percentage", o.optDouble("alcoholPercentage", 0.0)),
-                    volumeMl = o.optDouble("volume_ml", o.optDouble("volumeMl", 0.0)),
-                    date = o.optString("date"),
-                    notes = o.optString("notes", "")
-                )
+            val forDay = repo.getEntries(date, date)
+            if (forDay.isNotEmpty()) {
+                heading.text = date.toString()
+                adapter.submitList(forDay)
+                return
             }
-            adapter.submitList(list)
+            // Nothing that day: fall back to the recent log.
+            val recent = repo.getEntries(date.minusDays(90), date)
+                .sortedByDescending { it.date }
+                .take(20)
+            heading.text = if (recent.isEmpty()) {
+                getString(R.string.no_entries_yet)
+            } else {
+                getString(R.string.calendar_recent_heading, date.toString())
+            }
+            adapter.submitList(recent)
         } catch (_: Exception) {}
     }
 
@@ -110,7 +118,7 @@ class CalendarActivity : AppCompatActivity() {
             val vol = dialogView.findViewById<android.widget.EditText>(R.id.et_volume_ml).text.toString().toDoubleOrNull() ?: entry.volumeMl
             val notes = dialogView.findViewById<android.widget.EditText>(R.id.et_notes).text.toString()
             val r = TreeTotalNative.update_beer_entry_jni(entry.id, name, strength, vol, notes)
-            if (r.startsWith("OK")) setDate(LocalDate.parse(entry.date))
+            if (r.startsWith("OK")) setDate(currentDate)
             dialog.dismiss()
         }
         dialog.show()
@@ -118,7 +126,7 @@ class CalendarActivity : AppCompatActivity() {
 
     private fun deleteInline(entry: BeerEntry) {
         val r = TreeTotalNative.delete_beer_entry_jni(entry.id)
-        if (r.startsWith("OK")) setDate(LocalDate.parse(entry.date))
+        if (r.startsWith("OK")) setDate(currentDate)
     }
 
     private fun showSetTotalDialog(date: LocalDate) {

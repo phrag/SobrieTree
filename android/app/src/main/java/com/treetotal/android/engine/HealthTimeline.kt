@@ -95,6 +95,35 @@ object HealthTimeline {
         return null
     }
 
+    /**
+     * When the current unbroken run reached [afDaysThreshold], or null if it
+     * hasn't. Unlike [dateReached] this counts only the days since the last
+     * drink, because that is what the milestone now represents.
+     *
+     * [bridgedDates] are lapse days a shield covered; they don't break the run.
+     */
+    fun dateReachedInStreak(
+        ledger: DayLedger,
+        afDaysThreshold: Int,
+        bridgedDates: Set<LocalDate> = emptySet()
+    ): LocalDate? {
+        val days = ledger.completedDays
+        // Walk back to the day after the last drink that no shield covered.
+        var streakStartIndex = days.size
+        for (i in days.indices.reversed()) {
+            val day = days[i]
+            val isAf = ledger.isCompletedAfDay(day) || day in bridgedDates
+            if (!isAf) break
+            streakStartIndex = i
+        }
+        var count = 0
+        for (i in streakStartIndex until days.size) {
+            count++
+            if (count >= afDaysThreshold) return days[i]
+        }
+        return null
+    }
+
     fun next(totalAfDays: Int): HealthMilestone? = milestones.firstOrNull { it.afDays > totalAfDays }
 
     /** The most recent recovery stage whose AF-day threshold has been reached, if any. */

@@ -13,6 +13,7 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import com.treetotal.android.engine.StatsEngine
 import com.treetotal.android.engine.UnitsEngine
 import java.time.LocalDate
 
@@ -48,8 +49,85 @@ class ProgressActivity : AppCompatActivity() {
     }
 
     private fun loadData() {
+        bindStats()
         bindUnits()
         showRange(currentRangeDays)
+    }
+
+    /**
+     * Every window carries the span it covers. "12 drinks" means nothing until
+     * you know whether that is three days or thirty, and a part-finished week
+     * next to a whole one flatters the shorter of the two.
+     */
+    private fun bindStats() {
+        val container = findViewById<android.widget.LinearLayout>(R.id.stats_container)
+        container.removeAllViews()
+        val stats = gamification.statsState()
+        val dayFormat = java.time.format.DateTimeFormatter.ofPattern("d MMM")
+
+        for (stat in stats) {
+            val row = layoutInflater.inflate(R.layout.item_stat_period, container, false)
+            row.findViewById<TextView>(R.id.tv_stat_label).setText(
+                when (stat.period) {
+                    StatsEngine.Period.THIS_WEEK -> R.string.stats_this_week
+                    StatsEngine.Period.LAST_WEEK -> R.string.stats_last_week
+                    StatsEngine.Period.THIS_MONTH -> R.string.stats_this_month
+                    StatsEngine.Period.LAST_30_DAYS -> R.string.stats_last_30
+                    StatsEngine.Period.ALL_TIME -> R.string.stats_all_time
+                }
+            )
+            val window = row.findViewById<TextView>(R.id.tv_stat_window)
+            val line = row.findViewById<TextView>(R.id.tv_stat_line)
+            val detail = row.findViewById<TextView>(R.id.tv_stat_detail)
+
+            if (stat.days == 0) {
+                window.setText(R.string.stats_not_started)
+                line.visibility = View.GONE
+                detail.visibility = View.GONE
+                container.addView(row)
+                continue
+            }
+
+            window.text = if (stat.days == 1) {
+                getString(R.string.stats_window_day, stat.start.format(dayFormat))
+            } else {
+                getString(
+                    R.string.stats_window_days,
+                    stat.start.format(dayFormat),
+                    stat.end.format(dayFormat),
+                    stat.days
+                )
+            }
+
+            if (!stat.hasData) {
+                line.setText(R.string.stats_no_data)
+                detail.visibility = View.GONE
+                container.addView(row)
+                continue
+            }
+
+            line.visibility = View.VISIBLE
+            line.text = getString(
+                R.string.stats_line,
+                format(stat.drinks),
+                format(stat.units),
+                stat.alcoholFreeDays,
+                getString(if (stat.alcoholFreeDays == 1) R.string.day_singular else R.string.day_plural)
+            )
+
+            detail.visibility = View.VISIBLE
+            detail.text = buildString {
+                append(getString(R.string.stats_avg, format(stat.avgUnitsPerDay)))
+                stat.vsBaselinePct?.let { pct ->
+                    append(" · ")
+                    append(
+                        if (pct >= 0) getString(R.string.stats_vs_baseline_below, format(pct))
+                        else getString(R.string.stats_vs_baseline_above, format(-pct))
+                    )
+                }
+            }
+            container.addView(row)
+        }
     }
 
     /**

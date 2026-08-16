@@ -22,7 +22,18 @@ object BottomNavHelper {
                 else -> null
             }
             if (target != null) {
-                activity.startActivity(Intent(activity, target))
+                // Bottom-nav tabs should feel like one screen changing, not five
+                // activities stacking up. REORDER_TO_FRONT reuses the existing
+                // instance instead of building a new one, and killing the
+                // animation removes the slide-and-flash between tabs.
+                activity.startActivity(
+                    Intent(activity, target).addFlags(
+                        Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or
+                            Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                            Intent.FLAG_ACTIVITY_NO_ANIMATION
+                    )
+                )
+                activity.overridePendingTransition(0, 0)
                 true
             } else {
                 false

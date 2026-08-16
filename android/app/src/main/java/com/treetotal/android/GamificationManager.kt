@@ -13,6 +13,7 @@ import com.treetotal.android.engine.HealthTimeline
 import com.treetotal.android.engine.HighRiskSupport
 import com.treetotal.android.engine.MetricsEngine
 import com.treetotal.android.engine.SavingsEngine
+import com.treetotal.android.engine.StatsEngine
 import com.treetotal.android.engine.StreakEngine
 import com.treetotal.android.engine.UnitsEngine
 import java.time.DayOfWeek
@@ -175,6 +176,15 @@ class GamificationManager(context: Context) {
     /** This week measured in UK units, against the CMO/NHS low-risk guideline. */
     fun unitsState(): UnitsEngine.Result = UnitsEngine.compute(compute().ledger)
 
+    /** Weekly, monthly and all-time figures, each carrying the window it covers. */
+    fun statsState(): List<StatsEngine.Stat> {
+        val c = compute()
+        val presets = DrinkPresetStore.getPresets(prefs.prefs)
+        val favorite = presets.firstOrNull { it.favorite } ?: presets.firstOrNull()
+        val drinkSize = (favorite?.volume ?: prefs.defaultDrinkSizeMl).toDouble()
+        return StatsEngine.compute(c.ledger, drinkSize, prefs.baselineDailyMl)
+    }
+
     fun homeState(): HomeState {
         val c = compute()
         val ledger = c.ledger
@@ -246,7 +256,9 @@ class GamificationManager(context: Context) {
             caloriesSaved = c.savings.caloriesSaved,
             nextBadge = nextBadge,
             nextBadgeHint = nextBadge?.let { BadgeEngine.progressHint(it, inputs) },
-            currentHealthStage = HealthTimeline.current(displayAfDays),
+            // Streak, not lifetime total: the recovery stage steps back when
+            // drinking resumes, which is what the milestones actually describe.
+            currentHealthStage = HealthTimeline.current(streaks.displayStreak),
             weekDots = weekDots,
             drinkSizeMl = drinkSize,
             cravingSupport = cravingSupport,
@@ -292,11 +304,18 @@ class GamificationManager(context: Context) {
         val earned = prefs.badgesEarned
         val totalAf = c.streaks.totalAfDays
 
-        val nextMilestone = HealthTimeline.next(totalAf)
+        // Recovery is keyed to the current unbroken run, not to lifetime dry
+        // days: the body's clock restarts when drinking does. Shields still
+        // bridge a single lapse, as they do everywhere else.
+        val recoveryDays = c.streaks.displayStreak
+        val bridged = c.streaks.bridgedDates.toSet()
+        val nextMilestone = HealthTimeline.next(recoveryDays)
         val timeline = HealthTimeline.milestones.map { m ->
             TimelineEntry(
                 milestone = m,
-                reachedDate = if (totalAf >= m.afDays) HealthTimeline.dateReached(c.ledger, m.afDays) else null,
+                reachedDate = if (recoveryDays >= m.afDays) {
+                    HealthTimeline.dateReachedInStreak(c.ledger, m.afDays, bridged)
+                } else null,
                 isNext = m.id == nextMilestone?.id
             )
         }

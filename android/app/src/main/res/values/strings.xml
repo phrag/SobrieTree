@@ -4,7 +4,7 @@
 
     <!-- Bottom navigation -->
     <string name="nav_home">Home</string>
-    <string name="nav_progress">Progress</string>
+    <string name="nav_progress">Stats</string>
     <string name="nav_journey">Journey</string>
     <string name="nav_calendar">Calendar</string>
     <string name="nav_settings">Settings</string>
@@ -42,7 +42,7 @@
     <string name="shields_label">shields</string>
     <string name="shields_explainer">You earn a shield for every 7 alcohol-free days. A shield automatically protects your streak through a single off day.</string>
     <string name="timeline_title">Your body\'s recovery</string>
-    <string name="timeline_subtitle">Milestones unlock with your total alcohol-free days</string>
+    <string name="timeline_subtitle">Milestones track your current alcohol-free run — drinking restarts the clock, because your body's recovery does too</string>
     <string name="milestone_reached_on">Reached %s</string>
     <string name="milestone_next_up">Next up — keep going</string>
     <string name="milestone_af_days">At %d AF days</string>
@@ -64,6 +64,23 @@
     <string name="less_than_baseline">less than baseline this week</string>
     <string name="more_than_baseline">more than baseline this week</string>
     <string name="n_of_7">%d of 7</string>
+    <!-- Stats tab: the same figures over several windows -->
+    <string name="stats_title">Your numbers</string>
+    <string name="stats_this_week">This week</string>
+    <string name="stats_last_week">Last week</string>
+    <string name="stats_this_month">This month</string>
+    <string name="stats_last_30">Last 30 days</string>
+    <string name="stats_all_time">Since you started</string>
+    <string name="stats_window_days">%1$s \u2013 %2$s \u00b7 %3$d days</string>
+    <string name="stats_window_day">%1$s \u00b7 1 day</string>
+    <string name="stats_line">%1$s drinks \u00b7 %2$s units \u00b7 %3$d dry %4$s</string>
+    <string name="stats_avg">%1$s units a day on average</string>
+    <string name="stats_vs_baseline_below">%1$s%% below your usual</string>
+    <string name="stats_vs_baseline_above">%1$s%% above your usual</string>
+    <string name="stats_no_data">Nothing logged in this window.</string>
+    <string name="stats_not_started">Before you started tracking.</string>
+    <string name="calendar_recent_heading">Nothing on %1$s \u2014 recent entries</string>
+
     <!-- Encrypted backup -->
     <string name="backup_title">Encrypted backup</string>
     <string name="backup_description">A single encrypted file holding your entries, drinks and settings. Save it wherever you like — an SD card, a folder your own sync app watches. TreeTotal never sends it anywhere.</string>

@@ -14,10 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var adapter: BeerEntryAdapter
     private var treeTotal: TreeTotal? = null
     private var hasShownFavoriteSetup = false
     private var celebrationShowing = false
@@ -48,7 +46,6 @@ class MainActivity : AppCompatActivity() {
 
         SecureWindow.apply(this)
 
-        setupRecyclerView()
         setupClickListeners()
         initializeTreeTotal()
         loadData()
@@ -90,18 +87,6 @@ class MainActivity : AppCompatActivity() {
         SecureWindow.apply(this)
         // Also re-checks for badges earned by days passing since the last visit
         try { loadData() } catch (_: Exception) {}
-    }
-
-    private fun setupRecyclerView() {
-        adapter = BeerEntryAdapter(
-            onEditClick = { entry -> showEditBeerDialog(entry) },
-            onDeleteClick = { entry -> deleteBeerEntry(entry) }
-        )
-
-        findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recycler_view).apply {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = this@MainActivity.adapter
-        }
     }
 
     private fun setupClickListeners() {
@@ -181,12 +166,6 @@ class MainActivity : AppCompatActivity() {
     private fun loadData() {
         try {
             val state = gamification.homeState()
-            val today = gamification.todayEffective()
-            val weekStart = state.weekDots.firstOrNull()?.date ?: today.minusDays(6)
-
-            val entries = repo.getEntries(weekStart, today)
-            adapter.submitList(entries)
-            findViewById<View>(R.id.empty_state).visibility = if (entries.isEmpty()) View.VISIBLE else View.GONE
 
             bindHomeState(state)
             populateQuickAdd()
