@@ -34,7 +34,12 @@ object BottomNavHelper {
                     )
                 )
                 activity.overridePendingTransition(0, 0)
-                true
+                // False, not true: returning true would mark the tapped item
+                // selected on *this* activity's own bar. Reused activities skip
+                // onCreate (and so never re-run wire()), so that stray selection
+                // would stick - the next time this tab is reordered back to
+                // front it would show the tab you tapped away to, not its own.
+                false
             } else {
                 false
             }
