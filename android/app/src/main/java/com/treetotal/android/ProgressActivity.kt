@@ -12,6 +12,8 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.google.android.material.progressindicator.LinearProgressIndicator
+import com.treetotal.android.engine.UnitsEngine
 import java.time.LocalDate
 
 /**
@@ -46,8 +48,67 @@ class ProgressActivity : AppCompatActivity() {
     }
 
     private fun loadData() {
+        bindUnits()
         showRange(currentRangeDays)
     }
+
+    /**
+     * The week in UK units next to the 14-unit low-risk guideline. Volume drives
+     * the rest of the app; this is the one place the numbers are expressed the
+     * way the guidance the app cites is written.
+     */
+    private fun bindUnits() {
+        val u = gamification.unitsState()
+        val value = findViewById<TextView>(R.id.tv_units_value)
+        val bar = findViewById<LinearProgressIndicator>(R.id.progress_units)
+        val status = findViewById<TextView>(R.id.tv_units_status)
+        val average = findViewById<TextView>(R.id.tv_units_average)
+
+        if (!u.hasUnitData) {
+            value.text = getString(R.string.units_value, format(0.0))
+            bar.progress = 0
+            status.setText(R.string.units_empty)
+            average.visibility = View.GONE
+            return
+        }
+
+        value.text = getString(R.string.units_value, format(u.unitsThisWeek))
+        bar.progress = (u.ratioOfGuideline * 100).toInt().coerceIn(0, 100)
+
+        // Caution, not alarm: over the guideline is information, not a telling-off.
+        val overColor = ContextCompat.getColor(this, R.color.state_caution)
+        val okColor = ContextCompat.getColor(this, R.color.state_positive)
+        bar.setIndicatorColor(if (u.withinGuideline) okColor else overColor)
+
+        status.text = when {
+            u.concentratedDrinking -> getString(
+                R.string.units_concentrated,
+                u.drinkingDaysThisWeek,
+                dayWord(u.drinkingDaysThisWeek)
+            )
+            !u.withinGuideline -> getString(
+                R.string.units_over,
+                format(u.unitsThisWeek - UnitsEngine.WEEKLY_GUIDELINE_UNITS)
+            )
+            u.drinkFreeDaysThisWeek > 0 -> getString(
+                R.string.units_within_with_dry,
+                u.drinkFreeDaysThisWeek,
+                dayWord(u.drinkFreeDaysThisWeek)
+            )
+            else -> getString(R.string.units_within)
+        }
+
+        average.visibility = View.VISIBLE
+        average.text = getString(R.string.units_average, format(u.avgUnitsPerWeek))
+    }
+
+    private fun dayWord(n: Int): String =
+        getString(if (n == 1) R.string.day_singular else R.string.day_plural)
+
+    /** Units read better to one decimal, but without a trailing ".0". */
+    private fun format(units: Double): String =
+        if (units == units.toInt().toDouble()) units.toInt().toString()
+        else String.format("%.1f", units)
 
     private var currentRangeDays = 7
 

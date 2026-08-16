@@ -64,6 +64,20 @@
     <string name="less_than_baseline">less than baseline this week</string>
     <string name="more_than_baseline">more than baseline this week</string>
     <string name="n_of_7">%d of 7</string>
+    <!-- UK units vs the CMO/NHS low-risk guideline -->
+    <string name="units_title">This week in units</string>
+    <string name="units_value">%1$s units</string>
+    <string name="units_value_one">1 unit</string>
+    <string name="units_within">Inside the 14-unit weekly guideline.</string>
+    <string name="units_within_with_dry">Inside the 14-unit weekly guideline, with %1$d drink-free %2$s so far.</string>
+    <string name="units_over">Over the 14-unit weekly guideline by %1$s units.</string>
+    <string name="units_concentrated">That\'s 14 units or more across just %1$d %2$s. The guidance asks for it to be spread over 3 or more days.</string>
+    <string name="units_average">Your average is %1$s units a week.</string>
+    <string name="units_empty">Log a drink with its strength and your week in units appears here.</string>
+    <string name="units_source">1 unit = 10 ml of pure alcohol. The 14-unit weekly figure is the UK Chief Medical Officers\' low-risk guideline (2016), as published by the NHS.</string>
+    <string name="day_singular">day</string>
+    <string name="day_plural">days</string>
+
     <string name="consumption_trend">Your pattern</string>
     <string name="range_7_days">7 days</string>
     <string name="range_4_weeks">4 weeks</string>

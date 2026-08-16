@@ -171,6 +171,9 @@ class GamificationManager(context: Context) {
         prefs.celebratedMilestones = prefs.celebratedMilestones + badgeId
     }
 
+    /** This week measured in UK units, against the CMO/NHS low-risk guideline. */
+    fun unitsState(): UnitsEngine.Result = UnitsEngine.compute(compute().ledger)
+
     fun homeState(): HomeState {
         val c = compute()
         val ledger = c.ledger
