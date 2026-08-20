@@ -26,6 +26,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
+import com.treetotal.android.engine.AbvRepair
 import android.content.ContentResolver
 import java.io.InputStream
 import java.io.OutputStream
@@ -384,6 +385,7 @@ class SettingsActivity : AppCompatActivity() {
 
         // Export button
         bindBackupStatus()
+        findViewById<MaterialButton>(R.id.btn_fix_strengths).setOnClickListener { showAbvRepair() }
         backupBtn.setOnClickListener {
             backupFileLauncher.launch(BackupManager.backupFileName(LocalDate.now()))
         }
@@ -539,6 +541,110 @@ class SettingsActivity : AppCompatActivity() {
                 .show()
         }
     }
+
+    /**
+     * Offers to replace placeholder drink strengths with real ones.
+     *
+     * Import, "set total for day" and the old export all left entries carrying
+     * the default ABV, which makes units, calories and money quietly wrong on
+     * an otherwise correct calculation. Nothing is changed without the user
+     * confirming each name, because a drink that genuinely is the default
+     * strength looks identical to a placeholder.
+     */
+    private fun showAbvRepair() {
+        val prefs = AppPrefs(this)
+        val defaultAbv = prefs.defaultDrinkStrength.toDouble()
+        val today = LocalDate.now()
+        val entries = EntryRepository().getEntries(today.minusYears(20), today.plusDays(1))
+        val drinks = DrinkPresetStore.getPresets(prefs.prefs).map { AbvRepair.Drink(it.name, it.abv) }
+        val groups = AbvRepair.groups(entries, drinks, defaultAbv)
+
+        if (groups.isEmpty()) {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.abv_fix_title)
+                .setMessage(R.string.abv_fix_none)
+                .setPositiveButton(R.string.got_it, null)
+                .show()
+            return
+        }
+
+        val labels = groups.map { g ->
+            val noun = getString(if (g.count == 1) R.string.entry_singular else R.string.entry_plural)
+            if (g.suggestedAbv != null) {
+                getString(
+                    R.string.abv_fix_row_suggested,
+                    g.name, g.count, noun, trimNumber(g.currentAbv), trimNumber(g.suggestedAbv!!)
+                )
+            } else {
+                getString(R.string.abv_fix_row_plain, g.name, g.count, noun, trimNumber(g.currentAbv))
+            }
+        }.toTypedArray()
+
+        AlertDialog.Builder(this)
+            .setTitle(R.string.abv_fix_title)
+            .setMessage(getString(R.string.abv_fix_intro, trimNumber(defaultAbv)))
+            .setItems(labels) { _, which -> promptStrength(entries, groups[which], defaultAbv) }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun promptStrength(
+        entries: List<BeerEntry>,
+        group: AbvRepair.Group,
+        defaultAbv: Double
+    ) {
+        val input = android.widget.EditText(this).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER or
+                android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+            setHint(R.string.alcohol_percentage)
+            group.suggestedAbv?.let { setText(trimNumber(it)) }
+        }
+        val noun = getString(if (group.count == 1) R.string.entry_singular else R.string.entry_plural)
+
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.abv_fix_prompt, group.name, group.count, noun))
+            .setView(input)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val abv = input.text.toString().replace(',', '.').toDoubleOrNull()
+                if (abv == null || abv < 0.0 || abv > 100.0) {
+                    Toast.makeText(this, R.string.abv_fix_invalid, Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                applyStrength(entries, group, defaultAbv, abv)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun applyStrength(
+        entries: List<BeerEntry>,
+        group: AbvRepair.Group,
+        defaultAbv: Double,
+        newAbv: Double
+    ) {
+        val repo = EntryRepository()
+        val ids = AbvRepair.entryIdsFor(entries, group, defaultAbv).toSet()
+        var updated = 0
+        for (e in entries) {
+            if (e.id !in ids) continue
+            repo.updateEntry(e.id, e.name, newAbv, e.volumeMl, e.notes)
+            updated++
+        }
+        val noun = getString(if (updated == 1) R.string.entry_singular else R.string.entry_plural)
+        Toast.makeText(
+            this,
+            getString(R.string.abv_fix_applied, updated, noun, trimNumber(newAbv)),
+            Toast.LENGTH_LONG
+        ).show()
+        TreeTotalWidget.refresh(this)
+        // More names may still need fixing, so drop straight back to the list.
+        showAbvRepair()
+    }
+
+    /** "5.2" and "5", never "5.0" - a trailing zero reads like precision that isn't there. */
+    private fun trimNumber(value: Double): String =
+        if (value == value.toInt().toDouble()) value.toInt().toString()
+        else String.format("%.1f", value)
 
     private fun bindBackupStatus() {
         val status = findViewById<TextView>(R.id.tv_backup_status) ?: return

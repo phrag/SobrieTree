@@ -19,10 +19,15 @@ class ReminderWorker(context: Context, params: WorkerParameters) : Worker(contex
     override fun doWork(): Result {
         val context = applicationContext
         val prefs = AppPrefs(context)
+        // One firing is queued at a time, so tomorrow's is lined up here rather
+        // than by a repeating schedule - see ReminderScheduler for why.
         if (!prefs.reminderEnabled) return Result.success()
+        ReminderScheduler.scheduleNext(context)
+
         if (Build.VERSION.SDK_INT >= 33 &&
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) {
+            // Still reminded tomorrow: permission may be granted by then.
             return Result.success()
         }
 

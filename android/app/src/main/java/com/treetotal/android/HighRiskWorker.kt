@@ -22,7 +22,11 @@ class HighRiskWorker(context: Context, params: WorkerParameters) : Worker(contex
     override fun doWork(): Result {
         val context = applicationContext
         val prefs = AppPrefs(context)
+        // One firing is queued at a time; line up tomorrow's before doing anything
+        // that might return early - see HighRiskScheduler for why.
         if (!prefs.highRiskEnabled) return Result.success()
+        HighRiskScheduler.scheduleNext(context)
+
         if (Build.VERSION.SDK_INT >= 33 &&
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) {

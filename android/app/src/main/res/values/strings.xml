@@ -81,6 +81,17 @@
     <string name="stats_not_started">Before you started tracking.</string>
     <string name="calendar_recent_heading">Nothing on %1$s — recent entries</string>
 
+    <!-- Repairing placeholder drink strengths -->
+    <string name="abv_fix_button">Fix drink strengths</string>
+    <string name="abv_fix_title">Drink strengths</string>
+    <string name="abv_fix_none">Nothing to fix — no drinks are sitting on your default strength.</string>
+    <string name="abv_fix_intro">These were logged at your default of %1$s%%, which usually means the real strength wasn\'t recorded. Tap one to set it.</string>
+    <string name="abv_fix_row_suggested">%1$s — %2$d %3$s, now %4$s%% · suggests %5$s%%</string>
+    <string name="abv_fix_row_plain">%1$s — %2$d %3$s, now %4$s%%</string>
+    <string name="abv_fix_prompt">Strength for “%1$s” (%2$d %3$s)</string>
+    <string name="abv_fix_applied">Updated %1$d %2$s to %3$s%%.</string>
+    <string name="abv_fix_invalid">Enter a strength between 0 and 100.</string>
+
     <!-- Encrypted backup -->
     <string name="backup_title">Encrypted backup</string>
     <string name="backup_description">A single encrypted file holding your entries, drinks and settings. Save it wherever you like — an SD card, a folder your own sync app watches. TreeTotal never sends it anywhere.</string>
