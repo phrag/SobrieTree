@@ -86,8 +86,8 @@
     <string name="abv_fix_title">Drink strengths</string>
     <string name="abv_fix_none">Nothing to fix — no drinks are sitting on your default strength.</string>
     <string name="abv_fix_intro">These were logged at your default of %1$s%%, which usually means the real strength wasn\'t recorded. Tap one to set it.</string>
-    <string name="abv_fix_row_suggested">%1$s — %2$d %3$s, now %4$s%% · suggests %5$s%%</string>
-    <string name="abv_fix_row_plain">%1$s — %2$d %3$s, now %4$s%%</string>
+    <string name="abv_fix_row_suggested">%1$d %2$s at %3$s%% · suggests %4$s%%, from your saved “%5$s”</string>
+    <string name="abv_fix_row_plain">%1$d %2$s at %3$s%% · no saved drink matches this name</string>
     <string name="abv_fix_prompt">Strength for “%1$s” (%2$d %3$s)</string>
     <string name="abv_fix_applied">Updated %1$d %2$s to %3$s%%.</string>
     <string name="abv_fix_invalid">Enter a strength between 0 and 100.</string>

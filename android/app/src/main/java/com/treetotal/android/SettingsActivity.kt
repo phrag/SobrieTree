@@ -568,24 +568,40 @@ class SettingsActivity : AppCompatActivity() {
             return
         }
 
-        val labels = groups.map { g ->
+        // A custom view rather than setMessage + setItems: AlertDialog gives the
+        // content slot to the message and silently drops the list, which left
+        // this dialog with intro text and nothing to tap.
+        val view = layoutInflater.inflate(R.layout.dialog_abv_repair, null)
+        view.findViewById<TextView>(R.id.tv_abv_intro).text =
+            getString(R.string.abv_fix_intro, trimNumber(defaultAbv))
+        val container = view.findViewById<android.widget.LinearLayout>(R.id.ll_abv_groups)
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.abv_fix_title)
+            .setView(view)
+            .setNegativeButton(R.string.cancel, null)
+            .create()
+
+        for (g in groups) {
+            val row = layoutInflater.inflate(R.layout.item_abv_group, container, false)
             val noun = getString(if (g.count == 1) R.string.entry_singular else R.string.entry_plural)
-            if (g.suggestedAbv != null) {
+            row.findViewById<TextView>(R.id.tv_abv_name).text = g.name
+            row.findViewById<TextView>(R.id.tv_abv_detail).text = if (g.suggestedAbv != null) {
                 getString(
                     R.string.abv_fix_row_suggested,
-                    g.name, g.count, noun, trimNumber(g.currentAbv), trimNumber(g.suggestedAbv!!)
+                    g.count, noun, trimNumber(g.currentAbv), trimNumber(g.suggestedAbv!!), g.suggestedFrom ?: ""
                 )
             } else {
-                getString(R.string.abv_fix_row_plain, g.name, g.count, noun, trimNumber(g.currentAbv))
+                getString(R.string.abv_fix_row_plain, g.count, noun, trimNumber(g.currentAbv))
             }
-        }.toTypedArray()
+            row.setOnClickListener {
+                dialog.dismiss()
+                promptStrength(entries, g, defaultAbv)
+            }
+            container.addView(row)
+        }
 
-        AlertDialog.Builder(this)
-            .setTitle(R.string.abv_fix_title)
-            .setMessage(getString(R.string.abv_fix_intro, trimNumber(defaultAbv)))
-            .setItems(labels) { _, which -> promptStrength(entries, groups[which], defaultAbv) }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
+        dialog.show()
     }
 
     private fun promptStrength(
