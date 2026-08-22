@@ -1,10 +1,16 @@
 # 🌳 SobrieTree
 
-**Drink less. Grow a forest. Tell no one.**
+**Drink less. Feel more.**
 
-SobrieTree is an Android app for cutting back on alcohol. It keeps a calm, honest record of what you drink, turns the days you skip into a forest you can see growing, and explains what those days are doing for your body — using guidance from the WHO and NHS rather than vibes.
+An Android app for drinking less, that keeps everything on your phone.
 
-It runs entirely on your phone. No account. No cloud. No analytics. No ads. It doesn't even hold the permission needed to reach the internet.
+No account. No cloud. No analytics. The app holds **no network permission at all** — not "we promise not to look", but *it cannot connect to the internet*, enforced by the manifest.
+
+<p align="center">
+  <img src="docs/screenshots/04-home.png" width="270" alt="Home screen: a full ring, weekly dots, stat tiles and the current recovery stage">
+  &nbsp;
+  <img src="docs/screenshots/05-journey.png" width="270" alt="Journey screen: forest, streaks, shields and the body's recovery timeline">
+</p>
 
 ---
 
@@ -12,90 +18,119 @@ It runs entirely on your phone. No account. No cloud. No analytics. No ads. It d
 
 ### The ring empties, it doesn't fill
 
-Home is a single ring around a young tree. The ring holds **today's allowance**: it starts full and **retracts each time you log a drink**. An untouched day is the fullest ring — so the visual rewards the absence of drinking rather than the act of logging it.
-
-As the ring runs low it warms from green toward soft amber. Go past your goal and it simply empties, leaving one small amber tick. Nothing ever turns red, and nothing ever scolds you.
+Most trackers reward you for adding things. Here the ring starts **full** each day and depletes as you log. An untouched day is a complete circle, and a small plant grows in the middle of it. There is nothing to earn by opening the app — only something to keep.
 
 ### Alcohol-free days grow trees you keep
 
-Skip a day and the seedling at the centre grows. In your first month a tree completes **every 7 alcohol-free days** — four quicker wins when motivation is most fragile — and after that each **30 alcohol-free days** grows a larger tree. Finished trees join the forest on your Journey tab and never disappear.
-
-Growth is keyed to your *cumulative* alcohol-free days, so a slip pauses a tree but never shrinks it.
+Seven dry days in your first month grow a tree; after that they take a month each. Finished trees join a forest that never shrinks — a lapse costs you the sapling in progress, never the woodland behind it.
 
 ### Streaks that forgive
 
-Every 7 alcohol-free days earns you a **shield**. If you have a shield, a single off day is quietly bridged and your streak survives. One bad evening shouldn't erase three good weeks, so it doesn't.
+Every seven alcohol-free days earns a **shield**, and a shield carries your streak through a single off day automatically. Cutting down is not a clean line, and a counter that resets to zero on one bad Friday teaches you to stop logging.
 
-### Your body's recovery, in plain language
+### Your body's recovery, keyed to the run you're actually on
 
-Home shows the **latest recovery stage** you've reached — better sleep, steadier blood pressure, liver repair — pulled from a timeline that runs from your first dry day out to a year. The Journey tab has the full list plus short, cited reads on sleep, hangxiety, calories, cravings, and how to decline a drink without a speech.
+<img src="docs/screenshots/05-journey.png" width="220" align="right" alt="Recovery timeline">
 
-Health claims are attributed to real authorities (WHO, IARC, NHS / UK Chief Medical Officers, NIAAA), not to the app.
+Rehydration at 24 hours, REM sleep returning around day five, blood pressure easing around three weeks, the measurable shifts a month brings. Each milestone says what is happening and why.
+
+The timeline follows your **current unbroken run**, not your lifetime total — drinking restarts the clock, because your body's recovery does too. Shields still bridge a single lapse, as they do everywhere else.
+
+<br clear="right">
 
 ### Honest numbers, not flattering ones
 
-- **Alcohol-free days this week**, and your **reduction against your own baseline**.
-- **Money kept** — you tell SobrieTree roughly what you *used* to spend per week, and it subtracts what you've actually logged spending. Anchoring to a figure you already know beats guessing a per-drink price when a pub round and a beer at home cost wildly different amounts.
-- **Calories avoided**, with a rough burger equivalent.
+Savings and streaks only count **completed** days, so nothing appears out of thin air at midnight. "Money saved" is measured against what you say you *used* to spend per week, and shows the whole sum — what you'd have spent, what you actually spent — so a zero explains itself instead of looking broken.
 
-Only **completed** days count toward savings, so numbers never appear out of thin air at midnight.
-
-### Support at the hard hour
-
-Tell SobrieTree when you usually start drinking and it sends one supportive, local-only nudge just before — strongest in your first days, easing as the habit settles. The optional daily check-in notification includes a **"Still alcohol-free 🎉"** button that logs the win and celebrates it without opening the app.
+Your week is also reported in **UK units**, against the guideline the app quotes at you: no more than 14 a week, spread over three or more days. Volume drives goals and streaks because those are set in drinks; units are what health guidance is written in, so both exist. A 500 ml glass of 12% wine is one drink and six units, and the app will not pretend otherwise.
 
 ### Logging that stays out of your way
 
-Tap a saved drink to log it in one touch, or log a custom one. Managing your saved drinks is a **separate** screen from logging them, so you can never record a drink by accident while editing your list. There's a calendar for fixing past days, flexible goals (daily *or* weekly), a journey start date you choose, configurable currency, and an end-of-day cut-off so late nights land on the right day.
+Tap a saved drink on Home, or the home-screen **widget**, and it's logged. The widget then offers a 60-second **Undo**, because one-tap logging with no confirmation is exactly how you end up with drinks you never had.
+
+Managing your saved drinks never logs anything — that's a separate screen, on purpose.
+
+---
+
+## The screens
+
+| | |
+|---|---|
+| <img src="docs/screenshots/01-welcome.png" width="240" alt="Welcome screen"> | **Welcome.** What the app does, and where your data lives, before you commit to anything. |
+| <img src="docs/screenshots/02-motivations.png" width="240" alt="Motivation picker"> | **What brings you here.** Sleep, health, money, weight, a clearer head — or just curious. Encouragement and the reading list tune to what you pick. |
+| <img src="docs/screenshots/03-goals-baseline.png" width="240" alt="Goals and baseline setup"> | **Goals & baseline.** Daily or weekly, whichever fits how you drink. The baseline is what your reduction is measured against; low-risk guidance sits right beside the field. |
+| <img src="docs/screenshots/04-home.png" width="240" alt="Home screen"> | **Home.** Today's ring, the week's dots, your headline numbers and the recovery stage you're on. |
+| <img src="docs/screenshots/05-journey.png" width="240" alt="Journey screen"> | **Journey.** The forest, streaks and shields, the recovery timeline, what you've saved, and short cited reads. |
+| <img src="docs/screenshots/06-settings-drinks.png" width="240" alt="Settings: drink defaults, goals and app settings"> | **Settings.** Drink defaults, the weekly spend that powers "money saved", when your day ends, when your week starts, and the date your progress counts from. |
+
+**Stats** adds the same figures over five windows — this week, last week, this month, the last 30 days, since you started — each carrying the span it covers, because "12 drinks" means nothing until you know whether that's three days or thirty. **Calendar** is where you review and fix past days.
 
 ---
 
 ## 🔒 Privacy
 
-Privacy here is structural, not a promise in a settings screen.
+| | |
+|---|---|
+| **No network permission** | `INTERNET` is stripped from the merged manifest, so neither the app nor any library it links can reach the network. |
+| **No account, no cloud, no analytics** | There is no server. There is nothing to sign into. |
+| **Screenshot blocking** | On by default, so the app doesn't show up in the recents switcher or screen recordings. |
+| **Private notifications** | Lock-screen text stays generic; the detail is only visible once unlocked. |
+| **Android backup disabled** | `allowBackup="false"` keeps your drinking history out of Google's cloud backup. |
+| **Local reminders only** | Notifications are scheduled on-device by WorkManager. |
 
-- **The app cannot reach the network.** It does not hold the `INTERNET` permission — the manifest explicitly strips it, along with network-state, install-packages, Bluetooth, nearby-devices and location. No request can be made, by SobrieTree or by any library inside it.
-- **The only permission it holds is notifications**, and only if you turn reminders on.
-- **No account, no sign-in, no cloud, no analytics, no trackers, no ads, no third-party SDKs.**
-- **Everything lives in the app's private storage.** Uninstalling erases it.
-- **Prevent-screenshots** toggle for extra discretion.
-- **Export or import everything as CSV**, or wipe it with Delete All Data.
+### Encrypted backup
+
+<img src="docs/screenshots/08-settings-data.png" width="220" align="right" alt="Data management and encrypted backup">
+
+Because nothing syncs, a lost phone would otherwise lose everything — and the plain CSV export leaves your drinking history readable in Downloads.
+
+**Back up now** writes a single encrypted file wherever you point it: an SD card, a folder your own sync client watches. AES-256-GCM, keyed from your passphrase with PBKDF2-HMAC-SHA256 at 210,000 iterations, with a fresh salt and IV per backup — so two backups of identical data share no bytes, and a watcher of a synced folder can't tell whether anything changed.
+
+The passphrase is asked for when it's needed and **never stored**, so nothing on the device can open its own backups. That also means there is no automatic schedule: an unattended backup would need the passphrase sitting next to the file.
+
+Restore is additive and idempotent — entries already present are left alone — so restoring twice, or onto a phone you've used since, can't duplicate or overwrite a history.
+
+<br clear="right">
 
 ### Updating
 
-Because the app has no network access, it can't update itself. **Settings → App updates → View latest release** opens the releases page in *your browser*, where you download and install the new build yourself. It's a manual step, deliberately: it's what lets the app hold zero network permissions.
+<img src="docs/screenshots/07-settings-reminders.png" width="220" align="right" alt="Reminders and updates settings">
+
+The app can't check for updates, because it can't reach the network. **View latest release** opens the releases page in your browser; you download and install the build yourself.
+
+The daily check-in and the craving-time nudge are local notifications, scheduled one firing at a time so they hold to the minute you set — including across a daylight-saving change.
+
+<br clear="right">
 
 ---
 
 ## Install
 
-Grab the APK from the [releases page](https://github.com/phrag/SobrieTree/releases) — CI publishes a rolling `latest` release with [`SobrieTree-latest.apk`](https://github.com/phrag/SobrieTree/releases/download/latest/SobrieTree-latest.apk) (plus a version-stamped copy) on every green build.
+Grab the APK from the [latest release](https://github.com/phrag/SobrieTree/releases/download/latest/SobrieTree-latest.apk), or from the [releases page](https://github.com/phrag/SobrieTree/releases).
 
-You'll need to allow "Install unknown apps" for your browser or file manager.
+Android 7.0 (API 24) or newer. You'll need to allow installing from your browser or file manager.
 
-> SobrieTree is a fresh app identity (`com.sobrietree.android`). If you used the earlier BrewLog builds, this installs alongside rather than upgrading them.
+Every release is signed with a key that lives only in CI secrets — never in this repository.
 
 ---
 
 ## Architecture
 
-Native Android — Kotlin, XML views, Material 3 — over a small Rust core.
+**Pure-Kotlin engine** (`android/app/src/main/java/com/sobrietree/android/engine/`) — all the logic that decides anything, with no `android.*` imports, so it runs on a plain JVM and is tested there.
 
-**UI** — five tabs (Home, Progress, Journey, Calendar, Settings). The ring, trees, and forest are custom `Canvas` views drawn procedurally; there are no image assets to keep in sync.
-
-**Engine** (`com.sobrietree.android.engine`) — pure Kotlin, zero Android imports, so it runs under plain JVM unit tests with no device or emulator:
-
-| Component | Responsibility |
+| | |
 |---|---|
-| `DayLedger` | Completed vs. in-progress days, tracking window, end-of-day cut-off |
-| `StreakEngine` | Streaks, shields, tree and forest growth |
-| `SavingsEngine` | Money and calories vs. baseline, completed days only |
-| `MetricsEngine` | Daily/weekly ratios, reduction against baseline |
-| `BadgeCatalog` · `EncouragementEngine` | Badges, and copy that adapts to your motivations |
-| `HealthTimeline` · `EducationLibrary` | Recovery milestones and cited reads |
-| `HighRiskSupport` | Craving-window intensity and messaging |
+| `DayLedger` | Per-day totals in both volume and units; the substrate everything else reads |
+| `StreakEngine` | Streaks, shields, trees |
+| `MetricsEngine` · `StatsEngine` | Goal and baseline comparisons; the windowed figures on Stats |
+| `UnitsEngine` | UK units and the low-risk guideline |
+| `SavingsEngine` | Money and calories not spent |
+| `HealthTimeline` · `EducationLibrary` | Recovery milestones and the cited reads |
+| `BackupCrypto` | AES-256-GCM and a hand-rolled PBKDF2 (the JCE name is API 26+; minSdk here is 24) |
+| `DailySchedule` · `HighRiskSupport` | Notification timing and craving-window support |
+| `AbvRepair` | Finds drinks logged at a placeholder strength and proposes the real one |
 
-`GamificationManager` composes these into the single state object the UI binds to. Gamification state is derived or kept in `SharedPreferences`; the Rust core owns the entries.
+**Android layer** — activities bind an immutable state snapshot from `GamificationManager`; views like `GrowthRingView` and `ForestView` only draw.
 
 **Native core** (`rust/src/lib.rs`) — SQLite storage exposed to Kotlin over JNI.
 
@@ -124,6 +159,8 @@ cd android && ./gradlew testDebugUnitTest   # includes the engine layer
 cd rust    && cargo test --all
 ```
 
+The engine suite is the part worth reading. Unit conversions are pinned to the published worked examples rather than to my own arithmetic; the PBKDF2 implementation is checked against standard test vectors; the notification schedule is walked an hour at a time across a fortnight to prove it never drifts.
+
 ### Signing
 
 No keystore or password lives in this repository. Signing config is read from **either** a gitignored `android/keystore.properties` **or** `SIGNING_*` environment variables (CI secrets):
@@ -148,10 +185,11 @@ With no key configured the build falls back to the debug key and CI skips publis
 ```
 ├── android/app/src/main/java/com/sobrietree/android/
 │   ├── MainActivity.kt          # Home: ring, tiles, recovery stage, logging
-│   ├── ProgressActivity.kt      # Trend chart vs. baseline and goal
+│   ├── ProgressActivity.kt      # Stats: windowed figures, units, trend chart
 │   ├── JourneyActivity.kt       # Forest, recovery timeline, badges, savings, reads
 │   ├── CalendarActivity.kt      # Review and edit past days
-│   ├── SettingsActivity.kt      # Goals, spend, currency, reminders, privacy
+│   ├── SettingsActivity.kt      # Goals, spend, reminders, backup, privacy
+│   ├── SobrieTreeWidget.kt      # Home-screen ring + one-tap logging with undo
 │   ├── GrowthRingView.kt        # The depleting ring
 │   ├── TreePainter.kt / ForestView.kt
 │   ├── GamificationManager.kt   # Engine state → UI state
@@ -164,7 +202,11 @@ With no key configured the build falls back to the debug key and CI skips publis
 
 ## A note on scope
 
-SobrieTree is a tracking and motivation tool, not treatment. It follows the WHO position that no level of alcohol is risk-free and the NHS low-risk guideline of no more than 14 units a week spread over three or more days. If alcohol is causing you harm, or you experience physical withdrawal, please talk to a doctor — stopping suddenly can be dangerous without support.
+SobrieTree is a tracking and motivation tool, not treatment.
+
+It follows the WHO position that no level of alcohol consumption is risk-free, and the UK Chief Medical Officers' low-risk guideline (2016), as published by the NHS: no more than 14 units a week, spread over three or more days. Health claims in the app carry their source.
+
+If alcohol is causing you harm, or you experience physical withdrawal, please talk to a doctor — stopping suddenly can be dangerous without support.
 
 ## License
 
