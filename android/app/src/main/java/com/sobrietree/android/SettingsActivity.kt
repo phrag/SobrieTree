@@ -33,8 +33,7 @@ import java.io.OutputStream
 
 class SettingsActivity : AppCompatActivity() {
     private val prefsName = "sobrietree_prefs"
-    // Still the repo's real name; GitHub redirects it if the repo is renamed.
-    private val RELEASES_URL = "https://github.com/phrag/TreeTotal/releases"
+    private val RELEASES_URL = "https://github.com/phrag/SobrieTree/releases"
 
     // Flushes the text-field settings to prefs; reassigned in onCreate. Called
     // from onPause so a typed-but-not-blurred value is still saved on exit.
