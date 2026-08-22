@@ -11,7 +11,7 @@ use jni::sys::{jdouble, jstring as jni_jstring};
 use jni::JNIEnv;
 
 #[derive(Debug, thiserror::Error)]
-pub enum TreeTotalError {
+pub enum SobrieTreeError {
     #[error("Database error: {0}")]
     DatabaseError(String),
     #[error("Invalid input: {0}")]
@@ -20,9 +20,9 @@ pub enum TreeTotalError {
     NotFound(String),
 }
 
-impl From<rusqlite::Error> for TreeTotalError {
+impl From<rusqlite::Error> for SobrieTreeError {
     fn from(err: rusqlite::Error) -> Self {
-        TreeTotalError::DatabaseError(err.to_string())
+        SobrieTreeError::DatabaseError(err.to_string())
     }
 }
 
@@ -61,30 +61,30 @@ pub struct ProgressStats {
     pub period_end: String,
 }
 
-pub struct TreeTotal {
+pub struct SobrieTree {
     db: Mutex<Connection>,
 }
 
-impl TreeTotal {
-    pub fn new() -> Result<Self, TreeTotalError> {
+impl SobrieTree {
+    pub fn new() -> Result<Self, SobrieTreeError> {
         let conn = Connection::open_in_memory()?;
-        let log = TreeTotal {
+        let log = SobrieTree {
             db: Mutex::new(conn),
         };
         log.init_database()?;
         Ok(log)
     }
 
-    pub fn new_with_path(path: &str) -> Result<Self, TreeTotalError> {
+    pub fn new_with_path(path: &str) -> Result<Self, SobrieTreeError> {
         let conn = Connection::open(path)?;
-        let log = TreeTotal {
+        let log = SobrieTree {
             db: Mutex::new(conn),
         };
         log.init_database()?;
         Ok(log)
     }
 
-    fn init_database(&self) -> Result<(), TreeTotalError> {
+    fn init_database(&self) -> Result<(), SobrieTreeError> {
         let conn = self.db.lock().unwrap();
 
         conn.execute(
@@ -121,19 +121,19 @@ impl TreeTotal {
         alcohol_percentage: f64,
         volume_ml: f64,
         notes: String,
-    ) -> Result<(), TreeTotalError> {
+    ) -> Result<(), SobrieTreeError> {
         if name.is_empty() {
-            return Err(TreeTotalError::InvalidInput(
+            return Err(SobrieTreeError::InvalidInput(
                 "Name cannot be empty".to_string(),
             ));
         }
         if !(0.0..=100.0).contains(&alcohol_percentage) {
-            return Err(TreeTotalError::InvalidInput(
+            return Err(SobrieTreeError::InvalidInput(
                 "Alcohol percentage must be between 0 and 100".to_string(),
             ));
         }
         if volume_ml <= 0.0 {
-            return Err(TreeTotalError::InvalidInput(
+            return Err(SobrieTreeError::InvalidInput(
                 "Volume must be positive".to_string(),
             ));
         }
@@ -156,7 +156,7 @@ impl TreeTotal {
         &self,
         start_date: String,
         end_date: String,
-    ) -> Result<Vec<BeerEntry>, TreeTotalError> {
+    ) -> Result<Vec<BeerEntry>, SobrieTreeError> {
         let conn = self.db.lock().unwrap();
 
         let mut stmt = conn.prepare(
@@ -188,14 +188,14 @@ impl TreeTotal {
         weekly_target: f64,
         start_date: String,
         end_date: String,
-    ) -> Result<(), TreeTotalError> {
+    ) -> Result<(), SobrieTreeError> {
         if daily_target < 0.0 {
-            return Err(TreeTotalError::InvalidInput(
+            return Err(SobrieTreeError::InvalidInput(
                 "Daily target must be non-negative".to_string(),
             ));
         }
         if weekly_target < 0.0 {
-            return Err(TreeTotalError::InvalidInput(
+            return Err(SobrieTreeError::InvalidInput(
                 "Weekly target must be non-negative".to_string(),
             ));
         }
@@ -216,7 +216,7 @@ impl TreeTotal {
         Ok(())
     }
 
-    pub fn get_current_goal(&self) -> Result<ConsumptionGoal, TreeTotalError> {
+    pub fn get_current_goal(&self) -> Result<ConsumptionGoal, SobrieTreeError> {
         let conn = self.db.lock().unwrap();
 
         let mut stmt = conn.prepare(
@@ -243,11 +243,11 @@ impl TreeTotal {
         &self,
         start_date: String,
         end_date: String,
-    ) -> Result<Baseline, TreeTotalError> {
+    ) -> Result<Baseline, SobrieTreeError> {
         let entries = self.get_beer_entries(start_date.clone(), end_date.clone())?;
 
         if entries.is_empty() {
-            return Err(TreeTotalError::NotFound(
+            return Err(SobrieTreeError::NotFound(
                 "No entries found for baseline calculation".to_string(),
             ));
         }
@@ -269,11 +269,11 @@ impl TreeTotal {
         &self,
         period_start: String,
         period_end: String,
-    ) -> Result<ProgressStats, TreeTotalError> {
+    ) -> Result<ProgressStats, SobrieTreeError> {
         let current_entries = self.get_beer_entries(period_start.clone(), period_end.clone())?;
 
         if current_entries.is_empty() {
-            return Err(TreeTotalError::NotFound(
+            return Err(SobrieTreeError::NotFound(
                 "No entries found for progress calculation".to_string(),
             ));
         }
@@ -297,16 +297,16 @@ impl TreeTotal {
         })
     }
 
-    pub fn get_daily_consumption(&self, date: String) -> Result<f64, TreeTotalError> {
+    pub fn get_daily_consumption(&self, date: String) -> Result<f64, SobrieTreeError> {
         let entries = self.get_beer_entries(date.clone(), date)?;
         let total_volume: f64 = entries.iter().map(|e| e.volume_ml).sum();
         Ok(total_volume)
     }
 
-    pub fn get_weekly_consumption(&self, week_start_date: String) -> Result<f64, TreeTotalError> {
+    pub fn get_weekly_consumption(&self, week_start_date: String) -> Result<f64, SobrieTreeError> {
         // Calculate end of week (7 days later)
         let start_date = NaiveDate::parse_from_str(&week_start_date, "%Y-%m-%d")
-            .map_err(|_| TreeTotalError::InvalidInput("Invalid date format".to_string()))?;
+            .map_err(|_| SobrieTreeError::InvalidInput("Invalid date format".to_string()))?;
         let end_date = start_date + chrono::Duration::days(6);
 
         let entries = self.get_beer_entries(week_start_date, end_date.to_string())?;
@@ -314,13 +314,13 @@ impl TreeTotal {
         Ok(total_volume)
     }
 
-    pub fn delete_beer_entry(&self, id: String) -> Result<(), TreeTotalError> {
+    pub fn delete_beer_entry(&self, id: String) -> Result<(), SobrieTreeError> {
         let conn = self.db.lock().unwrap();
 
         let rows_affected = conn.execute("DELETE FROM beer_entries WHERE id = ?1", [&id])?;
 
         if rows_affected == 0 {
-            return Err(TreeTotalError::NotFound(format!(
+            return Err(SobrieTreeError::NotFound(format!(
                 "Beer entry with id {id} not found"
             )));
         }
@@ -335,19 +335,19 @@ impl TreeTotal {
         alcohol_percentage: f64,
         volume_ml: f64,
         notes: String,
-    ) -> Result<(), TreeTotalError> {
+    ) -> Result<(), SobrieTreeError> {
         if name.is_empty() {
-            return Err(TreeTotalError::InvalidInput(
+            return Err(SobrieTreeError::InvalidInput(
                 "Name cannot be empty".to_string(),
             ));
         }
         if !(0.0..=100.0).contains(&alcohol_percentage) {
-            return Err(TreeTotalError::InvalidInput(
+            return Err(SobrieTreeError::InvalidInput(
                 "Alcohol percentage must be between 0 and 100".to_string(),
             ));
         }
         if volume_ml <= 0.0 {
-            return Err(TreeTotalError::InvalidInput(
+            return Err(SobrieTreeError::InvalidInput(
                 "Volume must be positive".to_string(),
             ));
         }
@@ -362,7 +362,7 @@ impl TreeTotal {
         )?;
 
         if rows_affected == 0 {
-            return Err(TreeTotalError::NotFound(format!(
+            return Err(SobrieTreeError::NotFound(format!(
                 "Beer entry with id {id} not found"
             )));
         }
@@ -370,14 +370,14 @@ impl TreeTotal {
         Ok(())
     }
 
-    pub fn update_beer_entry_date(&self, id: String, date: String) -> Result<(), TreeTotalError> {
+    pub fn update_beer_entry_date(&self, id: String, date: String) -> Result<(), SobrieTreeError> {
         let conn = self.db.lock().unwrap();
         let rows = conn.execute(
             "UPDATE beer_entries SET date = ?1 WHERE id = ?2",
             (&date, &id),
         )?;
         if rows == 0 {
-            return Err(TreeTotalError::NotFound(format!(
+            return Err(SobrieTreeError::NotFound(format!(
                 "Beer entry with id {id} not found"
             )));
         }
@@ -392,19 +392,19 @@ impl TreeTotal {
         volume_ml: f64,
         date: String,
         notes: String,
-    ) -> Result<(), TreeTotalError> {
+    ) -> Result<(), SobrieTreeError> {
         if name.is_empty() {
-            return Err(TreeTotalError::InvalidInput(
+            return Err(SobrieTreeError::InvalidInput(
                 "Name cannot be empty".to_string(),
             ));
         }
         if !(0.0..=100.0).contains(&alcohol_percentage) {
-            return Err(TreeTotalError::InvalidInput(
+            return Err(SobrieTreeError::InvalidInput(
                 "Alcohol percentage must be between 0 and 100".to_string(),
             ));
         }
         if volume_ml <= 0.0 {
-            return Err(TreeTotalError::InvalidInput(
+            return Err(SobrieTreeError::InvalidInput(
                 "Volume must be positive".to_string(),
             ));
         }
@@ -418,7 +418,7 @@ impl TreeTotal {
         Ok(())
     }
 
-    pub fn clear_all_data(&self) -> Result<(), TreeTotalError> {
+    pub fn clear_all_data(&self) -> Result<(), SobrieTreeError> {
         let conn = self.db.lock().unwrap();
         conn.execute("DELETE FROM beer_entries", [])?;
         conn.execute("DELETE FROM consumption_goals", [])?;
@@ -427,12 +427,12 @@ impl TreeTotal {
 }
 
 // Global instance for JNI/FFI
-static LOG: OnceLock<TreeTotal> = OnceLock::new();
+static LOG: OnceLock<SobrieTree> = OnceLock::new();
 
 // JNI Functions
 #[no_mangle]
 pub extern "C" fn init_brew_log() -> *mut c_char {
-    let msg = match TreeTotal::new() {
+    let msg = match SobrieTree::new() {
         Ok(log) => {
             let _ = LOG.set(log);
             "OK".to_string()
@@ -450,7 +450,7 @@ pub unsafe extern "C" fn init_brew_log_with_path(path: *const c_char) -> *mut c_
         return CString::new("Error: path is null").unwrap().into_raw();
     }
     let path_str = unsafe { CStr::from_ptr(path).to_string_lossy().into_owned() };
-    let msg = match TreeTotal::new_with_path(&path_str) {
+    let msg = match SobrieTree::new_with_path(&path_str) {
         Ok(log) => {
             let _ = LOG.set(log);
             "OK".to_string()
@@ -605,13 +605,13 @@ pub unsafe extern "C" fn update_beer_entry_jni(
     }
 }
 
-// JNI wrappers for Android (class: com.treetotal.android.TreeTotalNative)
+// JNI wrappers for Android (class: com.sobrietree.android.SobrieTreeNative)
 #[no_mangle]
-pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_init_1brew_1log(
+pub extern "system" fn Java_com_sobrietree_android_SobrieTreeNative_init_1brew_1log(
     env: JNIEnv,
     _cls: JClass,
 ) -> jni_jstring {
-    let msg = match TreeTotal::new() {
+    let msg = match SobrieTree::new() {
         Ok(log) => {
             let _ = LOG.set(log);
             "OK".to_string()
@@ -622,13 +622,13 @@ pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_init_1brew_1lo
 }
 
 #[no_mangle]
-pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_init_1brew_1log_1with_1path(
+pub extern "system" fn Java_com_sobrietree_android_SobrieTreeNative_init_1brew_1log_1with_1path(
     mut env: JNIEnv,
     _cls: JClass,
     path: JString,
 ) -> jni_jstring {
     let path_str: String = env.get_string(&path).unwrap().into();
-    let msg = match TreeTotal::new_with_path(&path_str) {
+    let msg = match SobrieTree::new_with_path(&path_str) {
         Ok(log) => {
             let _ = LOG.set(log);
             "OK".to_string()
@@ -639,7 +639,7 @@ pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_init_1brew_1lo
 }
 
 #[no_mangle]
-pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_add_1beer_1entry(
+pub extern "system" fn Java_com_sobrietree_android_SobrieTreeNative_add_1beer_1entry(
     mut env: JNIEnv,
     _cls: JClass,
     name: JString,
@@ -661,7 +661,7 @@ pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_add_1beer_1ent
 }
 
 #[no_mangle]
-pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_get_1daily_1consumption(
+pub extern "system" fn Java_com_sobrietree_android_SobrieTreeNative_get_1daily_1consumption(
     mut env: JNIEnv,
     _cls: JClass,
     date: JString,
@@ -675,7 +675,7 @@ pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_get_1daily_1co
 }
 
 #[no_mangle]
-pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_get_1weekly_1consumption(
+pub extern "system" fn Java_com_sobrietree_android_SobrieTreeNative_get_1weekly_1consumption(
     mut env: JNIEnv,
     _cls: JClass,
     week_start_date: JString,
@@ -689,7 +689,7 @@ pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_get_1weekly_1c
 }
 
 #[no_mangle]
-pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_set_1consumption_1goal(
+pub extern "system" fn Java_com_sobrietree_android_SobrieTreeNative_set_1consumption_1goal(
     mut env: JNIEnv,
     _cls: JClass,
     daily_target: jdouble,
@@ -711,7 +711,7 @@ pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_set_1consumpti
 }
 
 #[no_mangle]
-pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_get_1beer_1entries_1json(
+pub extern "system" fn Java_com_sobrietree_android_SobrieTreeNative_get_1beer_1entries_1json(
     mut env: JNIEnv,
     _cls: JClass,
     start_date: JString,
@@ -733,7 +733,7 @@ pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_get_1beer_1ent
 }
 
 #[no_mangle]
-pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_delete_1beer_1entry_1jni(
+pub extern "system" fn Java_com_sobrietree_android_SobrieTreeNative_delete_1beer_1entry_1jni(
     mut env: JNIEnv,
     _cls: JClass,
     id: JString,
@@ -751,7 +751,7 @@ pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_delete_1beer_1
 }
 
 #[no_mangle]
-pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_update_1beer_1entry_1jni(
+pub extern "system" fn Java_com_sobrietree_android_SobrieTreeNative_update_1beer_1entry_1jni(
     mut env: JNIEnv,
     _cls: JClass,
     id: JString,
@@ -775,7 +775,7 @@ pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_update_1beer_1
 }
 
 #[no_mangle]
-pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_update_1beer_1entry_1date_1jni(
+pub extern "system" fn Java_com_sobrietree_android_SobrieTreeNative_update_1beer_1entry_1date_1jni(
     mut env: JNIEnv,
     _cls: JClass,
     id: JString,
@@ -795,7 +795,7 @@ pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_update_1beer_1
 }
 
 #[no_mangle]
-pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_add_1beer_1entry_1full_1jni(
+pub extern "system" fn Java_com_sobrietree_android_SobrieTreeNative_add_1beer_1entry_1full_1jni(
     mut env: JNIEnv,
     _cls: JClass,
     id: JString,
@@ -828,7 +828,7 @@ pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_add_1beer_1ent
 }
 
 #[no_mangle]
-pub extern "system" fn Java_com_treetotal_android_TreeTotalNative_delete_1all_1data(
+pub extern "system" fn Java_com_sobrietree_android_SobrieTreeNative_delete_1all_1data(
     env: JNIEnv,
     _cls: JClass,
 ) -> jni_jstring {
@@ -850,13 +850,13 @@ mod tests {
 
     #[test]
     fn test_brew_log_creation() {
-        let log = TreeTotal::new();
+        let log = SobrieTree::new();
         assert!(log.is_ok());
     }
 
     #[test]
     fn test_add_beer_entry() {
-        let log = TreeTotal::new().unwrap();
+        let log = SobrieTree::new().unwrap();
 
         let result = log.add_beer_entry(
             "Test Beer".to_string(),
@@ -870,7 +870,7 @@ mod tests {
 
     #[test]
     fn test_add_beer_entry_validation() {
-        let log = TreeTotal::new().unwrap();
+        let log = SobrieTree::new().unwrap();
 
         // Test empty name
         let result = log.add_beer_entry("".to_string(), 5.0, 330.0, "Test notes".to_string());
@@ -893,7 +893,7 @@ mod tests {
 
     #[test]
     fn test_get_beer_entries() {
-        let log = TreeTotal::new().unwrap();
+        let log = SobrieTree::new().unwrap();
 
         // Add a test entry
         log.add_beer_entry(
@@ -917,7 +917,7 @@ mod tests {
 
     #[test]
     fn test_set_and_get_goals() {
-        let log = TreeTotal::new().unwrap();
+        let log = SobrieTree::new().unwrap();
 
         let today = chrono::Utc::now().date_naive().to_string();
         let end_date = (chrono::Utc::now().date_naive() + chrono::Duration::days(30)).to_string();
@@ -934,7 +934,7 @@ mod tests {
 
     #[test]
     fn test_daily_consumption() {
-        let log = TreeTotal::new().unwrap();
+        let log = SobrieTree::new().unwrap();
 
         // Add a test entry
         log.add_beer_entry(

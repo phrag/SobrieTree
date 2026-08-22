@@ -1,10 +1,10 @@
 [package]
-name = "treetotal-core"
+name = "sobrietree-core"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "treetotal_core"
+name = "sobrietree_core"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]

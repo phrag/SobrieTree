@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# TreeTotal Setup Script
-# This script sets up the development environment for the TreeTotal Android app
+# SobrieTree Setup Script
+# This script sets up the development environment for the SobrieTree Android app
 
 set -e
 
-echo "🍺 Setting up TreeTotal development environment..."
+echo "🍺 Setting up SobrieTree development environment..."
 
 # Check if we're in the right directory
 if [ ! -f "rust/Cargo.toml" ] || [ ! -f "android/build.gradle" ]; then
@@ -15,7 +15,7 @@ fi
 
 # Create necessary directories
 echo "📁 Creating directories..."
-mkdir -p android/app/src/main/java/com/treetotal/android
+mkdir -p android/app/src/main/java/com/sobrietree/android
 mkdir -p android/app/src/main/jniLibs/arm64-v8a
 mkdir -p android/app/src/main/jniLibs/armeabi-v7a
 mkdir -p android/app/src/main/jniLibs/x86
@@ -66,10 +66,10 @@ cd ..
 
 # Copy Rust libraries to Android project
 echo "📋 Copying Rust libraries to Android project..."
-cp rust/target/aarch64-linux-android/release/libtreetotal_core.so android/app/src/main/jniLibs/arm64-v8a/
-cp rust/target/armv7-linux-androideabi/release/libtreetotal_core.so android/app/src/main/jniLibs/armeabi-v7a/
-cp rust/target/i686-linux-android/release/libtreetotal_core.so android/app/src/main/jniLibs/x86/
-cp rust/target/x86_64-linux-android/release/libtreetotal_core.so android/app/src/main/jniLibs/x86_64/
+cp rust/target/aarch64-linux-android/release/libsobrietree_core.so android/app/src/main/jniLibs/arm64-v8a/
+cp rust/target/armv7-linux-androideabi/release/libsobrietree_core.so android/app/src/main/jniLibs/armeabi-v7a/
+cp rust/target/i686-linux-android/release/libsobrietree_core.so android/app/src/main/jniLibs/x86/
+cp rust/target/x86_64-linux-android/release/libsobrietree_core.so android/app/src/main/jniLibs/x86_64/
 
 # Set up Gradle wrapper if it doesn't exist
 if [ ! -f "android/gradlew" ]; then

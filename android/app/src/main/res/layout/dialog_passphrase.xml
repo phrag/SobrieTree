@@ -11,14 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:textAppearance="@style/TextAppearance.TreeTotal.Body" />
+        android:textAppearance="@style/TextAppearance.SobrieTree.Body" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/backup_passphrase_hint"
         app:endIconMode="password_toggle"
-        style="@style/Widget.TreeTotal.TextInputLayout">
+        style="@style/Widget.SobrieTree.TextInputLayout">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_passphrase"
@@ -35,7 +35,7 @@
         android:layout_marginTop="12dp"
         android:hint="@string/backup_passphrase_confirm_hint"
         app:endIconMode="password_toggle"
-        style="@style/Widget.TreeTotal.TextInputLayout">
+        style="@style/Widget.SobrieTree.TextInputLayout">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_passphrase_confirm"
@@ -51,6 +51,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:text="@string/backup_passphrase_warning"
-        android:textAppearance="@style/TextAppearance.TreeTotal.Caption" />
+        android:textAppearance="@style/TextAppearance.SobrieTree.Caption" />
 
 </LinearLayout>

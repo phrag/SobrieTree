@@ -14,7 +14,7 @@
             android:id="@+id/tv_edu_detail_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.TreeTotal.Headline"
+            android:textAppearance="@style/TextAppearance.SobrieTree.Headline"
             tools:text="Why the nightcap backfires" />
 
         <TextView
@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:lineSpacingExtra="3sp"
-            android:textAppearance="@style/TextAppearance.TreeTotal.Body"
+            android:textAppearance="@style/TextAppearance.SobrieTree.Body"
             tools:text="Alcohol is sedating at first..." />
 
         <TextView
@@ -31,7 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
+            android:textAppearance="@style/TextAppearance.SobrieTree.Caption"
             tools:text="Based on sleep research summarised by the Sleep Foundation." />
 
         <com.google.android.material.button.MaterialButton
@@ -41,7 +41,7 @@
             android:layout_marginTop="20dp"
             android:textAllCaps="false"
             android:text="@string/got_it"
-            style="@style/Widget.TreeTotal.Button" />
+            style="@style/Widget.SobrieTree.Button" />
 
     </LinearLayout>
 

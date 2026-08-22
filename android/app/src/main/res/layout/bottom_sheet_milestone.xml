@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="@string/milestone_reached"
-        android:textAppearance="@style/TextAppearance.TreeTotal.Caption" />
+        android:textAppearance="@style/TextAppearance.SobrieTree.Caption" />
 
     <TextView
         android:id="@+id/tv_badge_title"
@@ -31,7 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:gravity="center"
-        android:textAppearance="@style/TextAppearance.TreeTotal.Headline"
+        android:textAppearance="@style/TextAppearance.SobrieTree.Headline"
         tools:text="Week of Clarity" />
 
     <TextView
@@ -40,7 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:gravity="center"
-        android:textAppearance="@style/TextAppearance.TreeTotal.Body"
+        android:textAppearance="@style/TextAppearance.SobrieTree.Body"
         tools:text="7 alcohol-free days in total — deeper sleep territory." />
 
     <com.google.android.material.button.MaterialButton
@@ -51,6 +51,6 @@
         android:minHeight="52dp"
         android:textAllCaps="false"
         android:text="@string/keep_going"
-        style="@style/Widget.TreeTotal.Button" />
+        style="@style/Widget.SobrieTree.Button" />
 
 </LinearLayout>

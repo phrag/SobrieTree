@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/Theme.TreeTotal"
+    android:theme="@style/Theme.SobrieTree"
     tools:context=".JourneyActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -41,7 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.TreeTotal.Card">
+                style="@style/Widget.SobrieTree.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -50,7 +50,7 @@
                     android:gravity="center_horizontal"
                     android:padding="20dp">
 
-                    <com.treetotal.android.TreeView
+                    <com.sobrietree.android.TreeView
                         android:id="@+id/tree_view"
                         android:layout_width="110dp"
                         android:layout_height="110dp"
@@ -61,7 +61,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Display"
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Display"
                         android:textColor="@color/state_positive"
                         tools:text="23" />
 
@@ -69,7 +69,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/total_af_days_label"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Body2" />
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Body2" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -88,14 +88,14 @@
                                 android:id="@+id/tv_current_streak"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textAppearance="@style/TextAppearance.TreeTotal.Title"
+                                android:textAppearance="@style/TextAppearance.SobrieTree.Title"
                                 tools:text="5" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/current_streak_label"
-                                android:textAppearance="@style/TextAppearance.TreeTotal.Caption" />
+                                android:textAppearance="@style/TextAppearance.SobrieTree.Caption" />
 
                         </LinearLayout>
 
@@ -110,14 +110,14 @@
                                 android:id="@+id/tv_best_streak"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textAppearance="@style/TextAppearance.TreeTotal.Title"
+                                android:textAppearance="@style/TextAppearance.SobrieTree.Title"
                                 tools:text="8" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/best_streak_label"
-                                android:textAppearance="@style/TextAppearance.TreeTotal.Caption" />
+                                android:textAppearance="@style/TextAppearance.SobrieTree.Caption" />
 
                         </LinearLayout>
 
@@ -132,14 +132,14 @@
                                 android:id="@+id/tv_shields"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textAppearance="@style/TextAppearance.TreeTotal.Title"
+                                android:textAppearance="@style/TextAppearance.SobrieTree.Title"
                                 tools:text="🛡 2" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/shields_label"
-                                android:textAppearance="@style/TextAppearance.TreeTotal.Caption" />
+                                android:textAppearance="@style/TextAppearance.SobrieTree.Caption" />
 
                         </LinearLayout>
 
@@ -151,7 +151,7 @@
                         android:layout_marginTop="12dp"
                         android:gravity="center"
                         android:text="@string/shields_explainer"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Caption" />
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Caption" />
 
                 </LinearLayout>
 
@@ -162,7 +162,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.TreeTotal.Card">
+                style="@style/Widget.SobrieTree.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -174,7 +174,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/forest_title"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Title" />
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Title" />
 
                     <TextView
                         android:id="@+id/tv_forest_caption"
@@ -182,9 +182,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:layout_marginBottom="8dp"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Caption" />
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Caption" />
 
-                    <com.treetotal.android.ForestView
+                    <com.sobrietree.android.ForestView
                         android:id="@+id/forest_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
@@ -198,7 +198,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.TreeTotal.Card">
+                style="@style/Widget.SobrieTree.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -210,7 +210,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/timeline_title"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Title" />
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Title" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -218,7 +218,7 @@
                         android:layout_marginTop="2dp"
                         android:layout_marginBottom="12dp"
                         android:text="@string/timeline_subtitle"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Caption" />
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Caption" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_timeline"
@@ -236,7 +236,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.TreeTotal.Card">
+                style="@style/Widget.SobrieTree.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -249,7 +249,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
                         android:text="@string/badges_title"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Title" />
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Title" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_badges"
@@ -267,7 +267,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.TreeTotal.Card">
+                style="@style/Widget.SobrieTree.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -280,13 +280,13 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
                         android:text="@string/savings_title"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Title" />
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Title" />
 
                     <TextView
                         android:id="@+id/tv_money_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Body"
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Body"
                         tools:text="💰 120 saved" />
 
                     <TextView
@@ -294,7 +294,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Caption"
                         tools:text="You'd usually have spent 227 by now. You've spent 107." />
 
                     <TextView
@@ -302,7 +302,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Body"
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Body"
                         tools:text="🔥 4,300 calories avoided — about 7 burgers" />
 
                 </LinearLayout>
@@ -313,7 +313,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/Widget.TreeTotal.Card">
+                style="@style/Widget.SobrieTree.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -325,7 +325,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/learn_title"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Title" />
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Title" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -333,7 +333,7 @@
                         android:layout_marginTop="2dp"
                         android:layout_marginBottom="12dp"
                         android:text="@string/learn_subtitle"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Caption" />
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Caption" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_education"

@@ -5,7 +5,7 @@
     <!-- Local-only opt-in daily check-in reminder -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- Privacy guard: TreeTotal has NO network access of its own. Updates open in
+    <!-- Privacy guard: SobrieTree has NO network access of its own. Updates open in
          your browser, not in-app. These entries strip network/install/Bluetooth/
          nearby/location permissions from the merged manifest so neither this app
          nor any third-party library can ever hold them. -->
@@ -20,7 +20,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" tools:node="remove" />
 
     <application
-        android:name=".TreeTotalApplication"
+        android:name=".SobrieTreeApplication"
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:usesCleartextTraffic="false"
@@ -29,13 +29,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.TreeTotal"
+        android:theme="@style/Theme.SobrieTree"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
             android:exported="true"
-            android:theme="@style/Theme.TreeTotal">
+            android:theme="@style/Theme.SobrieTree">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -45,22 +45,22 @@
             android:name=".ProgressActivity"
             android:launchMode="singleTop"
             android:exported="false"
-            android:theme="@style/Theme.TreeTotal" />
+            android:theme="@style/Theme.SobrieTree" />
         <activity
             android:name=".JourneyActivity"
             android:launchMode="singleTop"
             android:exported="false"
-            android:theme="@style/Theme.TreeTotal" />
+            android:theme="@style/Theme.SobrieTree" />
         <activity
             android:name=".CalendarActivity"
             android:launchMode="singleTop"
             android:exported="false"
-            android:theme="@style/Theme.TreeTotal" />
+            android:theme="@style/Theme.SobrieTree" />
         <activity
             android:name=".SettingsActivity"
             android:launchMode="singleTop"
             android:exported="false"
-            android:theme="@style/Theme.TreeTotal" />
+            android:theme="@style/Theme.SobrieTree" />
 
         <!-- Handles the "Still alcohol-free" action on the check-in notification -->
         <receiver
@@ -71,16 +71,16 @@
              Exported because the launcher hosts it; its own log/undo actions are
              delivered to this same component and touch only local data. -->
         <receiver
-            android:name=".TreeTotalWidget"
+            android:name=".SobrieTreeWidget"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.treetotal.android.widget.LOG_FAVORITE" />
-                <action android:name="com.treetotal.android.widget.UNDO" />
+                <action android:name="com.sobrietree.android.widget.LOG_FAVORITE" />
+                <action android:name="com.sobrietree.android.widget.UNDO" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/treetotal_widget_info" />
+                android:resource="@xml/sobrietree_widget_info" />
         </receiver>
     </application>
 

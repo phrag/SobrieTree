@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/your_drinks"
-        android:textAppearance="@style/TextAppearance.TreeTotal.Headline"
+        android:textAppearance="@style/TextAppearance.SobrieTree.Headline"
         android:layout_marginBottom="16dp" />
 
     <FrameLayout
@@ -34,7 +34,7 @@
             android:gravity="center"
             android:padding="24dp"
             android:text="@string/drinks_empty"
-            android:textAppearance="@style/TextAppearance.TreeTotal.Body"
+            android:textAppearance="@style/TextAppearance.SobrieTree.Body"
             android:textColor="@color/text_secondary"
             android:visibility="gone" />
 
@@ -45,7 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:text="@string/new_drink"
-        style="@style/Widget.TreeTotal.Button"
+        style="@style/Widget.SobrieTree.Button"
         app:cornerRadius="12dp" />
 
 </LinearLayout> 

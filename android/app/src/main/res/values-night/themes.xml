@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme (night). Token colors resolve to the night palette,
          so only structural differences live here. -->
-    <style name="Theme.TreeTotal" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.SobrieTree" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/brand_primary</item>
         <item name="colorPrimaryVariant">@color/brand_primary_dark</item>
@@ -28,26 +28,26 @@
         <item name="cardElevation">2dp</item>
         <item name="cardCornerRadius">24dp</item>
         <!-- Button styling -->
-        <item name="materialButtonStyle">@style/Widget.TreeTotal.Button.Night</item>
-        <item name="materialButtonOutlinedStyle">@style/Widget.TreeTotal.Button.Outlined.Night</item>
+        <item name="materialButtonStyle">@style/Widget.SobrieTree.Button.Night</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.SobrieTree.Button.Outlined.Night</item>
         <!-- Input field styling -->
-        <item name="textInputStyle">@style/Widget.TreeTotal.TextInputLayout.OutlinedBox.Night</item>
+        <item name="textInputStyle">@style/Widget.SobrieTree.TextInputLayout.OutlinedBox.Night</item>
     </style>
 
-    <style name="Widget.TreeTotal.Button.Night" parent="Widget.Material3.Button">
+    <style name="Widget.SobrieTree.Button.Night" parent="Widget.Material3.Button">
         <item name="android:textColor">@color/black</item>
         <item name="backgroundTint">@color/brand_primary</item>
         <item name="cornerRadius">24dp</item>
     </style>
 
-    <style name="Widget.TreeTotal.Button.Outlined.Night" parent="Widget.Material3.Button.OutlinedButton">
+    <style name="Widget.SobrieTree.Button.Outlined.Night" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:textColor">@color/brand_primary</item>
         <item name="strokeColor">@color/brand_primary</item>
         <item name="cornerRadius">24dp</item>
     </style>
 
     <!-- Custom Input Field Styles for Night Theme -->
-    <style name="Widget.TreeTotal.TextInputLayout.OutlinedBox.Night" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+    <style name="Widget.SobrieTree.TextInputLayout.OutlinedBox.Night" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="boxBackgroundMode">filled</item>
         <item name="boxBackgroundColor">@color/dark_surface_variant</item>
         <item name="boxCornerRadiusBottomEnd">12dp</item>

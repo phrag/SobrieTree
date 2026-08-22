@@ -11,14 +11,14 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:text="@string/reminder_optin_title"
-        android:textAppearance="@style/TextAppearance.TreeTotal.Headline" />
+        android:textAppearance="@style/TextAppearance.SobrieTree.Headline" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:text="@string/reminder_optin_body"
-        android:textAppearance="@style/TextAppearance.TreeTotal.Body" />
+        android:textAppearance="@style/TextAppearance.SobrieTree.Body" />
 
     <LinearLayout
         android:id="@+id/row_onboarding_reminder_time"
@@ -41,7 +41,7 @@
             android:id="@+id/tv_onboarding_reminder_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.TreeTotal.Body"
+            android:textAppearance="@style/TextAppearance.SobrieTree.Body"
             android:textColor="@color/brand_primary"
             android:text="20:00" />
 
@@ -61,7 +61,7 @@
             android:layout_weight="1"
             android:textAllCaps="false"
             android:text="@string/reminder_no_thanks"
-            style="@style/Widget.TreeTotal.Button.Outlined" />
+            style="@style/Widget.SobrieTree.Button.Outlined" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_reminder_enable"
@@ -71,7 +71,7 @@
             android:layout_weight="1"
             android:textAllCaps="false"
             android:text="@string/reminder_yes"
-            style="@style/Widget.TreeTotal.Button" />
+            style="@style/Widget.SobrieTree.Button" />
 
     </LinearLayout>
 

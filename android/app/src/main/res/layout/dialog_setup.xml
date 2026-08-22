@@ -16,14 +16,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Set Goals &amp; Baseline"
-        android:textAppearance="@style/TextAppearance.TreeTotal.Headline"
+        android:textAppearance="@style/TextAppearance.SobrieTree.Headline"
         android:layout_marginBottom="8dp" />
         
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Configure your daily and weekly consumption goals, and set your baseline for tracking progress."
-        android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
+        android:textAppearance="@style/TextAppearance.SobrieTree.Caption"
         android:textColor="@color/text_secondary"
         android:layout_marginBottom="16dp" />
 
@@ -95,7 +95,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:text=""
-        android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
+        android:textAppearance="@style/TextAppearance.SobrieTree.Caption"
         android:textColor="@color/text_secondary" />
 
     <com.google.android.material.textfield.TextInputLayout
@@ -146,7 +146,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        style="@style/Widget.TreeTotal.Card">
+        style="@style/Widget.SobrieTree.Card">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -167,7 +167,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Tip: Many health guidelines recommend no more than 2 standard drinks per day."
-                android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
+                android:textAppearance="@style/TextAppearance.SobrieTree.Caption"
                 android:textColor="@color/brand_primary_dark" />
 
         </LinearLayout>
@@ -187,7 +187,7 @@
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
             android:text="Cancel"
-            style="@style/Widget.TreeTotal.Button.Outlined" />
+            style="@style/Widget.SobrieTree.Button.Outlined" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_save"
@@ -196,7 +196,7 @@
             android:layout_marginStart="8dp"
             android:layout_weight="1"
             android:text="Save"
-            style="@style/Widget.TreeTotal.Button" />
+            style="@style/Widget.SobrieTree.Button" />
 
     </LinearLayout>
 

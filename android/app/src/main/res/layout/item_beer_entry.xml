@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    style="@style/Widget.TreeTotal.Card">
+    style="@style/Widget.SobrieTree.Card">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -39,7 +39,7 @@
                 android:maxLines="2"
                 android:ellipsize="end"
                 android:text="Beer Name"
-                android:textAppearance="@style/TextAppearance.TreeTotal.Title"
+                android:textAppearance="@style/TextAppearance.SobrieTree.Title"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 tools:text="Corona Extra" />
@@ -56,7 +56,7 @@
                     android:layout_height="wrap_content"
                     android:maxLines="1"
                     android:text="330ml"
-                    android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
+                    android:textAppearance="@style/TextAppearance.SobrieTree.Caption"
                     android:textColor="@color/text_secondary"
                     tools:text="330ml" />
 
@@ -66,7 +66,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
                     android:text="•"
-                    android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
+                    android:textAppearance="@style/TextAppearance.SobrieTree.Caption"
                     android:textColor="@color/text_hint" />
 
                 <TextView
@@ -75,7 +75,7 @@
                     android:layout_height="wrap_content"
                     android:maxLines="1"
                     android:text="4.5%"
-                    android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
+                    android:textAppearance="@style/TextAppearance.SobrieTree.Caption"
                     android:textColor="@color/text_secondary"
                     tools:text="4.5%" />
 
@@ -87,7 +87,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Today"
-                android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
+                android:textAppearance="@style/TextAppearance.SobrieTree.Caption"
                 android:textColor="@color/text_hint"
                 tools:text="Dec 15, 2024" />
 

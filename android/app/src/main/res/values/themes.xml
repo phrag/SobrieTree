@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.TreeTotal" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.SobrieTree" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/brand_primary</item>
         <item name="colorPrimaryVariant">@color/brand_primary_dark</item>
@@ -14,7 +14,7 @@
              flashes its default between activities, which is what made tab
              switches look like a flicker. -->
         <item name="android:windowBackground">@color/background</item>
-        <item name="android:windowAnimationStyle">@style/Animation.TreeTotal.None</item>
+        <item name="android:windowAnimationStyle">@style/Animation.SobrieTree.None</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">@color/brand_primary_dark</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
@@ -33,14 +33,14 @@
         <item name="cardElevation">2dp</item>
         <item name="cardCornerRadius">16dp</item>
         <!-- Button styling -->
-        <item name="materialButtonStyle">@style/Widget.TreeTotal.Button</item>
-        <item name="materialButtonOutlinedStyle">@style/Widget.TreeTotal.Button.Outlined</item>
+        <item name="materialButtonStyle">@style/Widget.SobrieTree.Button</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.SobrieTree.Button.Outlined</item>
         <!-- Input field styling -->
-        <item name="textInputStyle">@style/Widget.TreeTotal.TextInputLayout.OutlinedBox</item>
+        <item name="textInputStyle">@style/Widget.SobrieTree.TextInputLayout.OutlinedBox</item>
     </style>
 
     <!-- Custom Button Styles -->
-    <style name="Widget.TreeTotal.Button" parent="Widget.Material3.Button">
+    <style name="Widget.SobrieTree.Button" parent="Widget.Material3.Button">
         <item name="android:textColor">@color/text_on_primary</item>
         <item name="backgroundTint">@color/brand_primary</item>
         <item name="cornerRadius">24dp</item>
@@ -54,7 +54,7 @@
         <item name="android:includeFontPadding">false</item>
     </style>
 
-    <style name="Widget.TreeTotal.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+    <style name="Widget.SobrieTree.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:textColor">@color/brand_primary</item>
         <item name="strokeColor">@color/brand_primary</item>
         <item name="cornerRadius">24dp</item>
@@ -69,7 +69,7 @@
     </style>
 
     <!-- De-emphasized text button (no fill, no outline) for secondary actions -->
-    <style name="Widget.TreeTotal.Button.Text" parent="Widget.Material3.Button.TextButton">
+    <style name="Widget.SobrieTree.Button.Text" parent="Widget.Material3.Button.TextButton">
         <item name="android:textColor">@color/brand_primary</item>
         <item name="iconTint">@color/brand_primary</item>
         <item name="cornerRadius">24dp</item>
@@ -80,7 +80,7 @@
     </style>
 
     <!-- Card Styles -->
-    <style name="Widget.TreeTotal.Card" parent="Widget.Material3.CardView.Elevated">
+    <style name="Widget.SobrieTree.Card" parent="Widget.Material3.CardView.Elevated">
         <item name="cardBackgroundColor">@color/card_background</item>
         <item name="cardElevation">2dp</item>
         <item name="cardCornerRadius">24dp</item>
@@ -90,48 +90,48 @@
     </style>
 
     <!-- Text Styles -->
-    <style name="TextAppearance.TreeTotal.Display" parent="TextAppearance.Material3.DisplaySmall">
+    <style name="TextAppearance.SobrieTree.Display" parent="TextAppearance.Material3.DisplaySmall">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">34sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="TextAppearance.TreeTotal.Headline" parent="TextAppearance.Material3.HeadlineMedium">
+    <style name="TextAppearance.SobrieTree.Headline" parent="TextAppearance.Material3.HeadlineMedium">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">22sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="TextAppearance.TreeTotal.Title" parent="TextAppearance.Material3.TitleLarge">
+    <style name="TextAppearance.SobrieTree.Title" parent="TextAppearance.Material3.TitleLarge">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="TextAppearance.TreeTotal.Body" parent="TextAppearance.Material3.BodyLarge">
+    <style name="TextAppearance.SobrieTree.Body" parent="TextAppearance.Material3.BodyLarge">
         <item name="android:textColor">@color/text_secondary</item>
         <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="TextAppearance.TreeTotal.Caption" parent="TextAppearance.Material3.BodyMedium">
+    <style name="TextAppearance.SobrieTree.Caption" parent="TextAppearance.Material3.BodyMedium">
         <item name="android:textColor">@color/text_hint</item>
         <item name="android:textSize">13sp</item>
     </style>
 
-    <style name="TextAppearance.TreeTotal.Body2" parent="TextAppearance.Material3.BodyMedium">
+    <style name="TextAppearance.SobrieTree.Body2" parent="TextAppearance.Material3.BodyMedium">
         <item name="android:textColor">@color/text_secondary</item>
         <item name="android:textSize">14sp</item>
     </style>
 
     <!-- Warm adaptive status copy under the growth ring -->
-    <style name="TextAppearance.TreeTotal.Encourage" parent="TextAppearance.Material3.BodyLarge">
+    <style name="TextAppearance.SobrieTree.Encourage" parent="TextAppearance.Material3.BodyLarge">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">16sp</item>
         <item name="android:lineSpacingExtra">2sp</item>
     </style>
 
     <!-- TextInputLayout style -->
-    <style name="Widget.TreeTotal.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+    <style name="Widget.SobrieTree.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="boxBackgroundMode">filled</item>
         <item name="boxBackgroundColor">@color/input_background</item>
         <item name="boxCornerRadiusBottomEnd">12dp</item>
@@ -143,7 +143,7 @@
     </style>
 
     <!-- Custom Input Field Styles -->
-    <style name="Widget.TreeTotal.TextInputLayout.OutlinedBox" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+    <style name="Widget.SobrieTree.TextInputLayout.OutlinedBox" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="boxBackgroundMode">filled</item>
         <item name="boxBackgroundColor">@color/input_background</item>
         <item name="boxCornerRadiusBottomEnd">12dp</item>
@@ -155,7 +155,7 @@
     </style>
 
     <!-- Tabs are one surface changing content, so they don't slide. -->
-    <style name="Animation.TreeTotal.None" parent="@android:style/Animation.Activity">
+    <style name="Animation.SobrieTree.None" parent="@android:style/Animation.Activity">
         <item name="android:activityOpenEnterAnimation">@null</item>
         <item name="android:activityOpenExitAnimation">@null</item>
         <item name="android:activityCloseEnterAnimation">@null</item>

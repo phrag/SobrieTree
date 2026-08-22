@@ -38,7 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                style="@style/Widget.TreeTotal.Card">
+                style="@style/Widget.SobrieTree.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -51,7 +51,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="4dp"
                         android:text="@string/stats_title"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Title" />
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Title" />
 
                     <LinearLayout
                         android:id="@+id/stats_container"
@@ -69,7 +69,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                style="@style/Widget.TreeTotal.Card">
+                style="@style/Widget.SobrieTree.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -81,14 +81,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/units_title"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Title" />
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Title" />
 
                     <TextView
                         android:id="@+id/tv_units_value"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Headline"
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Headline"
                         tools:text="9.1 units" />
 
                     <com.google.android.material.progressindicator.LinearProgressIndicator
@@ -106,7 +106,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Body"
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Body"
                         tools:text="Inside the 14-unit weekly guideline, with 3 drink-free days so far." />
 
                     <TextView
@@ -114,7 +114,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Caption"
                         tools:text="Your average is 11.2 units a week." />
 
                     <TextView
@@ -122,7 +122,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:text="@string/units_source"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Caption"
                         android:alpha="0.75" />
 
                 </LinearLayout>
@@ -134,7 +134,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                style="@style/Widget.TreeTotal.Card">
+                style="@style/Widget.SobrieTree.Card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -147,7 +147,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:text="@string/consumption_trend"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Title" />
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Title" />
 
                     <com.google.android.material.chip.ChipGroup
                         android:id="@+id/chips_range"
@@ -195,7 +195,7 @@
                         android:layout_marginBottom="16dp"
                         android:gravity="center"
                         android:text="@string/chart_empty"
-                        android:textAppearance="@style/TextAppearance.TreeTotal.Body"
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Body"
                         android:visibility="gone" />
 
                 </LinearLayout>

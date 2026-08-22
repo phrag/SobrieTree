@@ -1,8 +1,8 @@
-# 🌳 TreeTotal
+# 🌳 SobrieTree
 
 **Drink less. Grow a forest. Tell no one.**
 
-TreeTotal is an Android app for cutting back on alcohol. It keeps a calm, honest record of what you drink, turns the days you skip into a forest you can see growing, and explains what those days are doing for your body — using guidance from the WHO and NHS rather than vibes.
+SobrieTree is an Android app for cutting back on alcohol. It keeps a calm, honest record of what you drink, turns the days you skip into a forest you can see growing, and explains what those days are doing for your body — using guidance from the WHO and NHS rather than vibes.
 
 It runs entirely on your phone. No account. No cloud. No analytics. No ads. It doesn't even hold the permission needed to reach the internet.
 
@@ -35,14 +35,14 @@ Health claims are attributed to real authorities (WHO, IARC, NHS / UK Chief Medi
 ### Honest numbers, not flattering ones
 
 - **Alcohol-free days this week**, and your **reduction against your own baseline**.
-- **Money kept** — you tell TreeTotal roughly what you *used* to spend per week, and it subtracts what you've actually logged spending. Anchoring to a figure you already know beats guessing a per-drink price when a pub round and a beer at home cost wildly different amounts.
+- **Money kept** — you tell SobrieTree roughly what you *used* to spend per week, and it subtracts what you've actually logged spending. Anchoring to a figure you already know beats guessing a per-drink price when a pub round and a beer at home cost wildly different amounts.
 - **Calories avoided**, with a rough burger equivalent.
 
 Only **completed** days count toward savings, so numbers never appear out of thin air at midnight.
 
 ### Support at the hard hour
 
-Tell TreeTotal when you usually start drinking and it sends one supportive, local-only nudge just before — strongest in your first days, easing as the habit settles. The optional daily check-in notification includes a **"Still alcohol-free 🎉"** button that logs the win and celebrates it without opening the app.
+Tell SobrieTree when you usually start drinking and it sends one supportive, local-only nudge just before — strongest in your first days, easing as the habit settles. The optional daily check-in notification includes a **"Still alcohol-free 🎉"** button that logs the win and celebrates it without opening the app.
 
 ### Logging that stays out of your way
 
@@ -54,7 +54,7 @@ Tap a saved drink to log it in one touch, or log a custom one. Managing your sav
 
 Privacy here is structural, not a promise in a settings screen.
 
-- **The app cannot reach the network.** It does not hold the `INTERNET` permission — the manifest explicitly strips it, along with network-state, install-packages, Bluetooth, nearby-devices and location. No request can be made, by TreeTotal or by any library inside it.
+- **The app cannot reach the network.** It does not hold the `INTERNET` permission — the manifest explicitly strips it, along with network-state, install-packages, Bluetooth, nearby-devices and location. No request can be made, by SobrieTree or by any library inside it.
 - **The only permission it holds is notifications**, and only if you turn reminders on.
 - **No account, no sign-in, no cloud, no analytics, no trackers, no ads, no third-party SDKs.**
 - **Everything lives in the app's private storage.** Uninstalling erases it.
@@ -69,11 +69,11 @@ Because the app has no network access, it can't update itself. **Settings → Ap
 
 ## Install
 
-Grab the APK from the [releases page](https://github.com/phrag/TreeTotal/releases) — CI publishes a rolling `latest` release with [`TreeTotal-latest.apk`](https://github.com/phrag/TreeTotal/releases/download/latest/TreeTotal-latest.apk) (plus a version-stamped copy) on every green build.
+Grab the APK from the [releases page](https://github.com/phrag/SobrieTree/releases) — CI publishes a rolling `latest` release with [`SobrieTree-latest.apk`](https://github.com/phrag/SobrieTree/releases/download/latest/SobrieTree-latest.apk) (plus a version-stamped copy) on every green build.
 
 You'll need to allow "Install unknown apps" for your browser or file manager.
 
-> TreeTotal is a fresh app identity (`com.treetotal.android`). If you used the earlier BrewLog builds, this installs alongside rather than upgrading them.
+> SobrieTree is a fresh app identity (`com.sobrietree.android`). If you used the earlier BrewLog builds, this installs alongside rather than upgrading them.
 
 ---
 
@@ -83,7 +83,7 @@ Native Android — Kotlin, XML views, Material 3 — over a small Rust core.
 
 **UI** — five tabs (Home, Progress, Journey, Calendar, Settings). The ring, trees, and forest are custom `Canvas` views drawn procedurally; there are no image assets to keep in sync.
 
-**Engine** (`com.treetotal.android.engine`) — pure Kotlin, zero Android imports, so it runs under plain JVM unit tests with no device or emulator:
+**Engine** (`com.sobrietree.android.engine`) — pure Kotlin, zero Android imports, so it runs under plain JVM unit tests with no device or emulator:
 
 | Component | Responsibility |
 |---|---|
@@ -115,7 +115,7 @@ cd ../android
 ./gradlew assembleDebug
 ```
 
-Output: `android/app/build/outputs/apk/debug/TreeTotal-<version>.apk`.
+Output: `android/app/build/outputs/apk/debug/SobrieTree-<version>.apk`.
 
 ### Tests
 
@@ -129,9 +129,9 @@ cd rust    && cargo test --all
 No keystore or password lives in this repository. Signing config is read from **either** a gitignored `android/keystore.properties` **or** `SIGNING_*` environment variables (CI secrets):
 
 ```properties
-storeFile=/absolute/path/to/treetotal-release.jks
+storeFile=/absolute/path/to/sobrietree-release.jks
 storePassword=…
-keyAlias=treetotal
+keyAlias=sobrietree
 keyPassword=…
 ```
 
@@ -146,7 +146,7 @@ With no key configured the build falls back to the debug key and CI skips publis
 ## Project structure
 
 ```
-├── android/app/src/main/java/com/treetotal/android/
+├── android/app/src/main/java/com/sobrietree/android/
 │   ├── MainActivity.kt          # Home: ring, tiles, recovery stage, logging
 │   ├── ProgressActivity.kt      # Trend chart vs. baseline and goal
 │   ├── JourneyActivity.kt       # Forest, recovery timeline, badges, savings, reads
@@ -164,7 +164,7 @@ With no key configured the build falls back to the debug key and CI skips publis
 
 ## A note on scope
 
-TreeTotal is a tracking and motivation tool, not treatment. It follows the WHO position that no level of alcohol is risk-free and the NHS low-risk guideline of no more than 14 units a week spread over three or more days. If alcohol is causing you harm, or you experience physical withdrawal, please talk to a doctor — stopping suddenly can be dangerous without support.
+SobrieTree is a tracking and motivation tool, not treatment. It follows the WHO position that no level of alcohol is risk-free and the NHS low-risk guideline of no more than 14 units a week spread over three or more days. If alcohol is causing you harm, or you experience physical withdrawal, please talk to a doctor — stopping suddenly can be dangerous without support.
 
 ## License
 

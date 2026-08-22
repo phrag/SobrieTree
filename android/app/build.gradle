@@ -4,15 +4,15 @@ plugins {
 }
 
 android {
-    namespace 'com.treetotal.android'
+    namespace 'com.sobrietree.android'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.treetotal.android"
+        applicationId "com.sobrietree.android"
         minSdk 24
         targetSdk 34
-        versionCode 41
-        versionName "0.2.31"
+        versionCode 42
+        versionName "0.3.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -80,7 +80,7 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
-            outputFileName = "TreeTotal-${variant.versionName}.apk"
+            outputFileName = "SobrieTree-${variant.versionName}.apk"
         }
     }
 }

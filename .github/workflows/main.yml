@@ -86,7 +86,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.tag }}
-          name: TreeTotal ${{ github.event.inputs.tag }}
+          name: SobrieTree ${{ github.event.inputs.tag }}
           draft: true
           generate_release_notes: true
         env:

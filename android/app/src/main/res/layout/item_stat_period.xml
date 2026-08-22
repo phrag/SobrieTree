@@ -11,7 +11,7 @@
         android:id="@+id/tv_stat_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.TreeTotal.Title"
+        android:textAppearance="@style/TextAppearance.SobrieTree.Title"
         tools:text="This week" />
 
     <TextView
@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
+        android:textAppearance="@style/TextAppearance.SobrieTree.Caption"
         tools:text="13 Jul – 15 Jul · 3 days" />
 
     <TextView
@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:textAppearance="@style/TextAppearance.TreeTotal.Body"
+        android:textAppearance="@style/TextAppearance.SobrieTree.Body"
         tools:text="2 drinks · 5 units · 1 dry day" />
 
     <TextView
@@ -35,7 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
+        android:textAppearance="@style/TextAppearance.SobrieTree.Caption"
         tools:text="1.7 units a day on average · 67% below your usual" />
 
 </LinearLayout>

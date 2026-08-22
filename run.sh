@@ -11,11 +11,11 @@ echo "Waiting for emulator to be ready..."
 
 echo "Installing application..."
 # Uninstall to avoid signature mismatch, then install the latest built APK
-~/Library/Android/sdk/platform-tools/adb uninstall com.treetotal.android || true
+~/Library/Android/sdk/platform-tools/adb uninstall com.sobrietree.android || true
 # Prefer versioned APK produced by build.sh, fall back to debug
-APK_PATH="TreeTotal-0.0.3.apk"
+APK_PATH="SobrieTree-0.0.3.apk"
 if [ ! -f "$APK_PATH" ]; then
-  APK_PATH="TreeTotal-0.0.3-dev.apk"
+  APK_PATH="SobrieTree-0.0.3-dev.apk"
 fi
 if [ -f "$APK_PATH" ]; then
   ~/Library/Android/sdk/platform-tools/adb install "$APK_PATH"
@@ -24,7 +24,7 @@ else
 fi
 
 echo "Launching application..."
-~/Library/Android/sdk/platform-tools/adb shell am start -n com.treetotal.android/.MainActivity
+~/Library/Android/sdk/platform-tools/adb shell am start -n com.sobrietree.android/.MainActivity
 
 echo "Launch complete!"
 

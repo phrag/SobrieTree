@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:maxLines="2"
             android:ellipsize="end"
-            android:textAppearance="@style/TextAppearance.TreeTotal.Body"
+            android:textAppearance="@style/TextAppearance.SobrieTree.Body"
             android:textColor="@color/text_primary"
             android:textStyle="bold"
             tools:text="Why the nightcap backfires" />
@@ -33,7 +33,7 @@
             android:layout_marginTop="6dp"
             android:maxLines="3"
             android:ellipsize="end"
-            android:textAppearance="@style/TextAppearance.TreeTotal.Body2"
+            android:textAppearance="@style/TextAppearance.SobrieTree.Body2"
             tools:text="Alcohol makes you fall asleep faster but wrecks the second half of the night." />
 
         <TextView
@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/read_more"
-            android:textAppearance="@style/TextAppearance.TreeTotal.Caption"
+            android:textAppearance="@style/TextAppearance.SobrieTree.Caption"
             android:textColor="@color/brand_primary" />
 
     </LinearLayout>
