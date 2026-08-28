@@ -3,6 +3,8 @@ name: CI
 on:
   push:
     branches: [ '**' ]
+    # A v-tag cuts a real, versioned release; see the release steps at the end.
+    tags: [ 'v*' ]
   pull_request:
     branches: [ main ]
 
@@ -162,4 +164,27 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # ---------------------------------------------------------------- release
+      # Pushing a v-tag cuts a real release. Unlike the rolling "latest" build
+      # this is assembleRelease, so it ships with debuggable=false - a debug APK
+      # lets anyone with the phone attach a debugger and read the database,
+      # which is not what a privacy-first app should hand out. Both are signed
+      # with the same release key, so either upgrade-installs over the other.
+      - name: Build Android (assembleRelease)
+        if: startsWith(github.ref, 'refs/tags/v') && env.SIGNING_KEYSTORE_BASE64 != ''
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: 8.7
+          build-root-directory: android
+          arguments: assembleRelease --no-daemon
 
+      - name: Publish versioned release
+        if: startsWith(github.ref, 'refs/tags/v') && env.SIGNING_KEYSTORE_BASE64 != ''
+        uses: softprops/action-gh-release@v2
+        with:
+          name: SobrieTree ${{ github.ref_name }}
+          prerelease: false
+          generate_release_notes: true
+          files: android/app/build/outputs/apk/release/SobrieTree-*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
