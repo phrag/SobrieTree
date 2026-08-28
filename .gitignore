@@ -7,6 +7,9 @@ Cargo.lock
 # Android
 android/.gradle/
 android/local.properties
+# The root-level one too: it carries an absolute SDK path, so it leaks the
+# machine's username into every clone.
+local.properties
 android/.idea/
 android/build/
 android/app/build/
@@ -49,3 +52,8 @@ Package
 
 # built APKs should not be committed
 /*.apk
+*.apk
+
+# Native libraries are a build product of rust/ - CI produces them with
+# cargo-ndk. Committing them ships a binary nobody can audit against the source.
+android/app/src/main/jniLibs/
