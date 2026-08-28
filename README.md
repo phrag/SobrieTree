@@ -8,7 +8,6 @@ No account. No cloud. No analytics. The app holds **no network permission at all
 
 <p align="center">
   <img src="docs/screenshots/04-home.png" width="270" alt="Home screen: a full ring, weekly dots, stat tiles and the current recovery stage">
-  &nbsp;
 </p>
 
 ---
@@ -209,4 +208,13 @@ If alcohol is causing you harm, or you experience physical withdrawal, please ta
 
 ## License
 
-GPLv3
+SobrieTree is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either **version 3 of the License, or (at your option) any later
+version** (`SPDX-License-Identifier: GPL-3.0-or-later`).
+
+It is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. See the [LICENSE](LICENSE) file for the full text.
+
+Copyright (C) 2025-2026 phrag
