@@ -1,8 +1,8 @@
 # 🌳 SobrieTree
 
-**Drink less. Feel more.**
+**Drink less. Grow more.**
 
-An Android app for drinking less, that keeps everything on your phone.
+A private Android app for drinking less, gamified by growing virtual trees in your forest.
 
 No account. No cloud. No analytics. The app holds **no network permission at all** — not "we promise not to look", but *it cannot connect to the internet*, enforced by the manifest.
 
