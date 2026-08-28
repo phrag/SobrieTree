@@ -9,7 +9,6 @@ No account. No cloud. No analytics. The app holds **no network permission at all
 <p align="center">
   <img src="docs/screenshots/04-home.png" width="270" alt="Home screen: a full ring, weekly dots, stat tiles and the current recovery stage">
   &nbsp;
-  <img src="docs/screenshots/05-journey.png" width="270" alt="Journey screen: forest, streaks, shields and the body's recovery timeline">
 </p>
 
 ---
@@ -210,4 +209,4 @@ If alcohol is causing you harm, or you experience physical withdrawal, please ta
 
 ## License
 
-See the repository for license details.
+GPLv3
