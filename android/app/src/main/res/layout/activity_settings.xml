@@ -90,7 +90,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        android:hint="End of Day Hour (0-23)"
+                        android:hint="@string/end_of_day_hint"
+                        app:helperText="@string/end_of_day_helper"
                         style="@style/Widget.SobrieTree.TextInputLayout">
 
                         <com.google.android.material.textfield.TextInputEditText

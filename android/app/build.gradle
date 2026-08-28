@@ -11,8 +11,8 @@ android {
         applicationId "com.sobrietree.android"
         minSdk 24
         targetSdk 34
-        versionCode 44
-        versionName "0.3.2"
+        versionCode 45
+        versionName "0.3.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

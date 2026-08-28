@@ -81,6 +81,10 @@
     <string name="stats_not_started">Before you started tracking.</string>
     <string name="calendar_recent_heading">Nothing on %1$s — recent entries</string>
 
+    <!-- Where one logging day ends and the next begins -->
+    <string name="end_of_day_hint">Day rolls over at (hour, 0–23)</string>
+    <string name="end_of_day_helper">Drinking rarely respects midnight. Set an early hour (3) and last night runs on until then; set a late one (23) and anything after it counts as tomorrow.</string>
+
     <!-- Repairing placeholder drink strengths -->
     <string name="abv_fix_button">Fix drink strengths</string>
     <string name="abv_fix_title">Drink strengths</string>

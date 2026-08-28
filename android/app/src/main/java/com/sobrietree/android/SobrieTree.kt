@@ -1,5 +1,6 @@
 package com.sobrietree.android
 
+import com.sobrietree.android.engine.DayBoundary
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -247,10 +248,8 @@ class SobrieTree {
 
     fun getEndOfDayHour(): Int = endOfDayHour
 
-    fun nowEffectiveDate(): LocalDate {
-        val now = LocalDateTime.now()
-        return if (now.hour < endOfDayHour) now.toLocalDate().minusDays(1) else now.toLocalDate()
-    }
+    fun nowEffectiveDate(): LocalDate =
+        DayBoundary.effectiveDate(LocalDateTime.now(), endOfDayHour)
 
     fun getMonthlyConsumption(monthStartDate: LocalDate): Double {
         val endDate = monthStartDate.plusDays(29)

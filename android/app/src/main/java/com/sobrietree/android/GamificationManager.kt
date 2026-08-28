@@ -4,6 +4,7 @@ import android.content.Context
 import com.sobrietree.android.engine.Badge
 import com.sobrietree.android.engine.BadgeCatalog
 import com.sobrietree.android.engine.BadgeEngine
+import com.sobrietree.android.engine.DayBoundary
 import com.sobrietree.android.engine.DayLedger
 import com.sobrietree.android.engine.EducationCard
 import com.sobrietree.android.engine.EducationLibrary
@@ -92,10 +93,8 @@ class GamificationManager(context: Context) {
         val educationCards: List<EducationCard>
     )
 
-    fun todayEffective(): LocalDate {
-        val now = LocalDateTime.now()
-        return if (now.hour < prefs.endOfDayHour) now.toLocalDate().minusDays(1) else now.toLocalDate()
-    }
+    fun todayEffective(): LocalDate =
+        DayBoundary.effectiveDate(LocalDateTime.now(), prefs.endOfDayHour)
 
     private fun weekStartDay(): DayOfWeek = DayOfWeek.of(prefs.startOfWeek.coerceIn(1, 7))
 
