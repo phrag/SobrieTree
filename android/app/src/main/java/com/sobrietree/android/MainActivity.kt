@@ -397,33 +397,6 @@ class MainActivity : AppCompatActivity() {
 
         dialogView.findViewById<View>(R.id.btn_get_started).setOnClickListener {
             dialog.dismiss()
-            showMotivationDialog()
-        }
-
-        dialog.show()
-    }
-
-    private fun showMotivationDialog() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_onboarding_motivation, null)
-        val dialog = AlertDialog.Builder(this)
-            .setView(dialogView)
-            .setCancelable(false)
-            .create()
-
-        val chipToKey = mapOf(
-            R.id.chip_sleep to "sleep",
-            R.id.chip_health to "health",
-            R.id.chip_money to "money",
-            R.id.chip_weight to "weight",
-            R.id.chip_mind to "mind",
-            R.id.chip_curious to "curious"
-        )
-        dialogView.findViewById<View>(R.id.btn_motivation_continue).setOnClickListener {
-            val selected = chipToKey.filter { (id, _) ->
-                dialogView.findViewById<com.google.android.material.chip.Chip>(id).isChecked
-            }.values.toSet()
-            AppPrefs(this).motivations = selected
-            dialog.dismiss()
             showSetGoalsDialog(true)
         }
 

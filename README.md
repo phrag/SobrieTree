@@ -7,7 +7,7 @@ A private Android app for drinking less, gamified by growing virtual trees in yo
 No account. No cloud. No analytics. The app holds **no network permission at all** — not "we promise not to look", but *it cannot connect to the internet*, enforced by the manifest.
 
 <p align="center">
-  <img src="docs/screenshots/04-home.png" width="270" alt="Home screen: a full ring, weekly dots, stat tiles and the current recovery stage">
+  <img src="docs/screenshots/03-home.png" width="270" alt="Home screen: a full ring, weekly dots, stat tiles and the current recovery stage">
 </p>
 
 ---
@@ -28,7 +28,7 @@ Every seven alcohol-free days earns a **shield**, and a shield carries your stre
 
 ### Your body's recovery, keyed to the run you're actually on
 
-<img src="docs/screenshots/05-journey.png" width="220" align="right" alt="Recovery timeline">
+<img src="docs/screenshots/04-journey.png" width="220" align="right" alt="Recovery timeline">
 
 Rehydration at 24 hours, REM sleep returning around day five, blood pressure easing around three weeks, the measurable shifts a month brings. Each milestone says what is happening and why.
 
@@ -55,11 +55,10 @@ Managing your saved drinks never logs anything — that's a separate screen, on 
 | | |
 |---|---|
 | <img src="docs/screenshots/01-welcome.png" width="240" alt="Welcome screen"> | **Welcome.** What the app does, and where your data lives, before you commit to anything. |
-| <img src="docs/screenshots/02-motivations.png" width="240" alt="Motivation picker"> | **What brings you here.** Sleep, health, money, weight, a clearer head — or just curious. Encouragement and the reading list tune to what you pick. |
-| <img src="docs/screenshots/03-goals-baseline.png" width="240" alt="Goals and baseline setup"> | **Goals & baseline.** Daily or weekly, whichever fits how you drink. The baseline is what your reduction is measured against; low-risk guidance sits right beside the field. |
-| <img src="docs/screenshots/04-home.png" width="240" alt="Home screen"> | **Home.** Today's ring, the week's dots, your headline numbers and the recovery stage you're on. |
-| <img src="docs/screenshots/05-journey.png" width="240" alt="Journey screen"> | **Journey.** The forest, streaks and shields, the recovery timeline, what you've saved, and short cited reads. |
-| <img src="docs/screenshots/06-settings-drinks.png" width="240" alt="Settings: drink defaults, goals and app settings"> | **Settings.** Drink defaults, the weekly spend that powers "money saved", when your day ends, when your week starts, and the date your progress counts from. |
+| <img src="docs/screenshots/02-goals-baseline.png" width="240" alt="Goals and baseline setup"> | **Goals & baseline.** Daily or weekly, whichever fits how you drink. The baseline is what your reduction is measured against; low-risk guidance sits right beside the field. |
+| <img src="docs/screenshots/03-home.png" width="240" alt="Home screen"> | **Home.** Today's ring, the week's dots, your headline numbers and the recovery stage you're on. |
+| <img src="docs/screenshots/04-journey.png" width="240" alt="Journey screen"> | **Journey.** The forest, streaks and shields, the recovery timeline, what you've saved, and short cited reads. |
+| <img src="docs/screenshots/05-settings-drinks.png" width="240" alt="Settings: drink defaults, goals and app settings"> | **Settings.** Drink defaults, the weekly spend that powers "money saved", when your day ends, when your week starts, and the date your progress counts from. |
 
 **Stats** adds the same figures over five windows — this week, last week, this month, the last 30 days, since you started — each carrying the span it covers, because "12 drinks" means nothing until you know whether that's three days or thirty. **Calendar** is where you review and fix past days.
 
@@ -78,7 +77,7 @@ Managing your saved drinks never logs anything — that's a separate screen, on 
 
 ### Encrypted backup
 
-<img src="docs/screenshots/08-settings-data.png" width="220" align="right" alt="Data management and encrypted backup">
+<img src="docs/screenshots/07-settings-data.png" width="220" align="right" alt="Data management and encrypted backup">
 
 Because nothing syncs, a lost phone would otherwise lose everything — and the plain CSV export leaves your drinking history readable in Downloads.
 
@@ -92,7 +91,7 @@ Restore is additive and idempotent — entries already present are left alone �
 
 ### Updating
 
-<img src="docs/screenshots/07-settings-reminders.png" width="220" align="right" alt="Reminders and updates settings">
+<img src="docs/screenshots/06-settings-reminders.png" width="220" align="right" alt="Reminders and updates settings">
 
 The app can't check for updates, because it can't reach the network. **View latest release** opens the releases page in your browser; you download and install the build yourself.
 
