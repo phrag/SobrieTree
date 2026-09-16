@@ -33,6 +33,58 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- The goal the Home ring is counting down, said in words -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_goal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                style="@style/Widget.SobrieTree.Card">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:id="@+id/tv_goal_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/goal_card_title_day"
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Title"
+                        tools:text="This week's allowance" />
+
+                    <TextView
+                        android:id="@+id/tv_goal_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Headline"
+                        tools:text="6 of 14 drinks" />
+
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/progress_goal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        app:trackCornerRadius="4dp"
+                        app:trackThickness="8dp"
+                        android:max="100"
+                        tools:progress="43" />
+
+                    <TextView
+                        android:id="@+id/tv_goal_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Body"
+                        tools:text="8 left, with 3 days of the week to go." />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- The same figures over several windows, each naming its span -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
