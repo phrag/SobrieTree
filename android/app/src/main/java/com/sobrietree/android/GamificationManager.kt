@@ -345,7 +345,7 @@ class GamificationManager(context: Context) {
             moneyAvailable = c.savings.moneyAvailable,
             caloriesSaved = c.savings.caloriesSaved,
             burgersEquivalent = c.savings.burgersEquivalent,
-            educationCards = EducationLibrary.orderedFor(prefs.motivations)
+            educationCards = EducationLibrary.cards
         )
     }
 }

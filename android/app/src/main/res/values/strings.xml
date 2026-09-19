@@ -175,15 +175,6 @@
     <string name="welcome_feature_track">See your pattern honestly, without judgment</string>
     <string name="welcome_feature_grow">Grow a streak — and a plant — with alcohol-free days</string>
     <string name="welcome_feature_private">Everything stays on this phone. No account, no cloud.</string>
-    <string name="motivation_title">What\'s bringing you here?</string>
-    <string name="motivation_subtitle">Pick any that fit — SobrieTree tunes its encouragement and tips to what matters to you.</string>
-    <string name="motivation_sleep">😴 Better sleep</string>
-    <string name="motivation_health">❤️ Health</string>
-    <string name="motivation_money">💰 Save money</string>
-    <string name="motivation_weight">⚖️ Weight</string>
-    <string name="motivation_mind">🧠 Clearer head</string>
-    <string name="motivation_curious">🌱 Just curious</string>
-    <string name="continue_label">Continue</string>
     <string name="reminder_optin_title">A daily nudge?</string>
     <string name="reminder_optin_body">People who check in daily cut back the most. One local notification a day, at a time you pick — nothing leaves your phone, and you can turn it off anytime.</string>
     <string name="reminder_no_thanks">No thanks</string>

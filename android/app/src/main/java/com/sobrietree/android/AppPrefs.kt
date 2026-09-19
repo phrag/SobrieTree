@@ -61,11 +61,6 @@ class AppPrefs(context: Context) {
         get() = prefs.getInt("theme_mode", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         set(value) = prefs.edit().putInt("theme_mode", value).apply()
 
-    /** Why the user wants to cut back, chosen during onboarding (e.g. "sleep", "money"). */
-    var motivations: Set<String>
-        get() = prefs.getStringSet("motivation", emptySet()) ?: emptySet()
-        set(value) = prefs.edit().putStringSet("motivation", value).apply()
-
     /** What the user used to spend on alcohol per week, in their currency. Powers money saved. */
     var baselineWeeklySpend: Float
         get() = prefs.getFloat("baseline_weekly_spend", 0f)
