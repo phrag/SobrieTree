@@ -31,6 +31,8 @@ object MetricsEngine {
          * compared against a whole week. Floored at zero.
          */
         val fewerThanUsualThisWeekMl: Double,
+        /** Days of the current week that have happened, today included: 1..7. */
+        val daysElapsedThisWeek: Int,
         /** Mean per day across every tracked day, dry days included. */
         val avgPerDayAllTimeMl: Double,
         /** The same average expressed weekly, which is how drinking guidance is written. */
@@ -86,6 +88,7 @@ object MetricsEngine {
             overDailyGoal = effectiveDaily > 0 && todayMl > effectiveDaily,
             overWeeklyGoal = effectiveWeekly > 0 && weekMl > effectiveWeekly,
             fewerThanUsualThisWeekMl = fewerThanUsualThisWeekMl,
+            daysElapsedThisWeek = daysElapsedThisWeek.toInt(),
             avgPerDayAllTimeMl = avgPerDayAllTimeMl,
             avgPerWeekAllTimeMl = avgPerDayAllTimeMl * 7.0,
             hasClosedDays = closedDays.isNotEmpty()

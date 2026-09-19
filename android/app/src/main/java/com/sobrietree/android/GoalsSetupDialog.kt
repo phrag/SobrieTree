@@ -8,8 +8,10 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.sobrietree.android.engine.GoalMode
 import java.time.LocalDate
 
 /**
@@ -105,6 +107,23 @@ object GoalsSetupDialog {
         dailyGoalDrinks.addTextChangedListener(onDailyChanged(dailyGoalDrinks, weeklyGoalDrinks) { goalWeeklyTouched })
         dailyBaselineDrinks.addTextChangedListener(onDailyChanged(dailyBaselineDrinks, weeklyBaselineDrinks) { baselineWeeklyTouched })
 
+        // Goal mode picker. This only chooses which of the two figures below the
+        // app lives by; both are still saved and each prefills the other, so no
+        // goal has to be re-entered to switch.
+        val appPrefs = AppPrefs(activity)
+        val modeToggle = dialogView.findViewById<MaterialButtonToggleGroup>(R.id.toggle_goal_mode)
+        val modeHint = dialogView.findViewById<TextView>(R.id.tv_goal_mode_hint)
+        fun renderModeHint(weekly: Boolean) {
+            modeHint.setText(if (weekly) R.string.goal_mode_hint_weekly else R.string.goal_mode_hint_daily)
+        }
+        modeToggle.check(
+            if (appPrefs.goalMode == GoalMode.WEEKLY) R.id.btn_goal_mode_week else R.id.btn_goal_mode_day
+        )
+        renderModeHint(appPrefs.goalMode == GoalMode.WEEKLY)
+        modeToggle.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) renderModeHint(checkedId == R.id.btn_goal_mode_week)
+        }
+
         val dialog = AlertDialog.Builder(activity)
             .setView(dialogView)
             .create()
@@ -129,9 +148,17 @@ object GoalsSetupDialog {
             }
             if (!valid) return@setOnClickListener
 
-            // Fill in whichever side of each pair was left blank.
+            val weekly = modeToggle.checkedButtonId == R.id.btn_goal_mode_week
+
+            // Fill in whichever side of the pair was left blank. The chosen mode
+            // decides which side leads when both are entered: in weekly mode the
+            // weekly figure is the source of truth and the daily one is always
+            // derived from it (weekly / 7), so a stale daily entry can no longer
+            // silently override the weekly allowance the user is working to.
             val weeklyGoal = weeklyGoalIn ?: (dailyGoalIn!! * 7.0)
-            val dailyGoal = dailyGoalIn ?: (weeklyGoal / 7.0)
+            val dailyGoal = if (weekly) weeklyGoal / 7.0 else (dailyGoalIn ?: (weeklyGoal / 7.0))
+            // The baseline is a measurement, not a plan, so it keeps deriving the
+            // same way regardless of goal mode.
             val weeklyBase = weeklyBaseIn ?: (dailyBaseIn!! * 7.0)
             val dailyBase = dailyBaseIn ?: (weeklyBase / 7.0)
 
@@ -157,6 +184,9 @@ object GoalsSetupDialog {
                 editor.putString("baseline_set_date", today.toString())
             }
             editor.apply()
+            // Persisted through AppPrefs so the enum key stays the single source
+            // of truth for the mode.
+            appPrefs.goalMode = if (weekly) GoalMode.WEEKLY else GoalMode.DAILY
 
             Toast.makeText(activity, "Saved", Toast.LENGTH_SHORT).show()
             dialog.dismiss()

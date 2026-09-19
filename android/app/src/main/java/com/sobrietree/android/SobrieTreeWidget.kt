@@ -8,9 +8,11 @@ import android.content.Context
 import android.content.Intent
 import android.view.View
 import android.widget.RemoteViews
+import com.sobrietree.android.engine.GoalMode
 
 /**
- * Home-screen widget: today's ring, and one tap to log the favourite drink.
+ * Home-screen widget: the same ring Home shows - today's allowance, or the
+ * week's when the goal is set weekly - and one tap to log the favourite drink.
  *
  * Logging without opening the app means logging without a confirmation step, so
  * every tap is followed by a 60-second undo shown in the widget itself. That
@@ -43,17 +45,32 @@ class SobrieTreeWidget : AppWidgetProvider() {
             val state = gamification.homeState()
             val views = RemoteViews(context.packageName, R.layout.widget_sobrietree)
 
-            val remaining = (1.0 - state.metrics.dailyRatio).coerceIn(0.0, 1.0).toFloat()
+            // Home and the widget draw the same ring, so the widget follows the
+            // same goal mode: the day's allowance, or the week's.
+            val ring = state.goalRing
+            val weekly = ring.mode == GoalMode.WEEKLY
+            val remaining = (1.0 - ring.consumedRatio).coerceIn(0.0, 1.0).toFloat()
             views.setImageViewBitmap(
                 R.id.widget_ring,
-                WidgetRing.render(context, remaining, state.isTodayAf)
+                WidgetRing.render(context, remaining, ring.untouched)
+            )
+            views.setContentDescription(
+                R.id.widget_ring,
+                context.getString(
+                    if (weekly) R.string.widget_ring_description_week
+                    else R.string.widget_ring_description
+                )
             )
 
             val units = gamification.unitsState()
             views.setTextViewText(
                 R.id.widget_status,
-                if (state.isTodayAf) context.getString(R.string.widget_af_today)
-                else context.getString(R.string.widget_logged_today, formatUnits(units.unitsToday))
+                when {
+                    weekly && ring.untouched -> context.getString(R.string.widget_af_week)
+                    weekly -> context.getString(R.string.widget_logged_week, formatUnits(units.unitsThisWeek))
+                    state.isTodayAf -> context.getString(R.string.widget_af_today)
+                    else -> context.getString(R.string.widget_logged_today, formatUnits(units.unitsToday))
+                }
             )
 
             val favorite = DrinkPresetStore.getPresets(prefs.prefs)

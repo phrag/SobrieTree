@@ -68,6 +68,22 @@
         <item name="android:includeFontPadding">false</item>
     </style>
 
+    <!-- One half of a two-way choice (e.g. a daily limit vs a weekly allowance).
+         Only the selected half is filled, so which one is live is readable at a
+         glance in either theme. -->
+    <style name="Widget.SobrieTree.Button.Segmented" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textColor">@color/segmented_button_text</item>
+        <item name="backgroundTint">@color/segmented_button_background</item>
+        <item name="strokeColor">@color/brand_primary</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
     <!-- De-emphasized text button (no fill, no outline) for secondary actions -->
     <style name="Widget.SobrieTree.Button.Text" parent="Widget.Material3.Button.TextButton">
         <item name="android:textColor">@color/brand_primary</item>

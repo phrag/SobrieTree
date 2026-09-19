@@ -13,6 +13,8 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import com.sobrietree.android.engine.GoalEngine
+import com.sobrietree.android.engine.GoalMode
 import com.sobrietree.android.engine.StatsEngine
 import com.sobrietree.android.engine.UnitsEngine
 import java.time.LocalDate
@@ -49,9 +51,61 @@ class ProgressActivity : AppCompatActivity() {
     }
 
     private fun loadData() {
+        bindGoal()
         bindStats()
         bindUnits()
         showRange(currentRangeDays)
+    }
+
+    /**
+     * The active goal, stated in the terms the user chose: a limit for today,
+     * or an allowance for the week with the days left to spend it in. This is
+     * the same figure the Home ring is drawing, in words.
+     */
+    private fun bindGoal() {
+        val goal = gamification.goalState()
+        val ring = goal.ring
+        val card = findViewById<View>(R.id.card_goal)
+        if (ring.allowanceMl <= 0) {
+            // Neither a goal nor a baseline: there is no allowance to report.
+            card.visibility = View.GONE
+            return
+        }
+        card.visibility = View.VISIBLE
+
+        val weekly = ring.mode == GoalMode.WEEKLY
+        val drinkSize = goal.drinkSizeMl.takeIf { it > 0 } ?: 500.0
+        val consumed = ring.consumedMl / drinkSize
+        val allowance = ring.allowanceMl / drinkSize
+        val remaining = ring.remainingMl / drinkSize
+
+        findViewById<TextView>(R.id.tv_goal_title).setText(
+            if (weekly) R.string.goal_card_title_week else R.string.goal_card_title_day
+        )
+        findViewById<TextView>(R.id.tv_goal_value).text =
+            getString(R.string.goal_card_value, format(consumed), format(allowance))
+
+        val bar = findViewById<LinearProgressIndicator>(R.id.progress_goal)
+        bar.progress = (ring.consumedRatio * 100).toInt().coerceIn(0, 100)
+        // Over the allowance is information, not a telling-off - amber, never red.
+        bar.setIndicatorColor(
+            ContextCompat.getColor(
+                this,
+                if (ring.overGoal) R.color.state_caution else R.color.state_positive
+            )
+        )
+
+        findViewById<TextView>(R.id.tv_goal_status).text = when {
+            ring.overGoal && weekly -> getString(R.string.goal_over_week, format(consumed - allowance))
+            ring.overGoal -> getString(R.string.goal_over_day, format(consumed - allowance))
+            weekly -> getString(
+                R.string.goal_left_week,
+                format(remaining),
+                ring.daysLeftInWindow,
+                dayWord(ring.daysLeftInWindow)
+            )
+            else -> getString(R.string.goal_left_day, format(remaining))
+        }
     }
 
     /**
@@ -215,12 +269,21 @@ class ProgressActivity : AppCompatActivity() {
         chart.visibility = View.VISIBLE
         emptyView.visibility = View.GONE
 
-        // Per-day reference values in drinks
+        // Per-day reference values in drinks. A weekly allowance has no daily
+        // figure of its own, so it is spread evenly across the week rather than
+        // plotted against a daily goal the user is no longer working to.
         val baselinePerDay = (prefs.baselineDailyMl / sizeMl).toFloat()
-        val goalDailyMl = if (prefs.goalDailyMl > 0) prefs.goalDailyMl else prefs.baselineDailyMl
+        val weekly = prefs.goalMode == GoalMode.WEEKLY
+        val goalDailyMl = if (weekly) {
+            val weeklyMl = if (prefs.goalWeeklyMl > 0) prefs.goalWeeklyMl
+                else GoalEngine.weeklyFromDaily(prefs.baselineDailyMl)
+            GoalEngine.dailyFromWeekly(weeklyMl)
+        } else {
+            if (prefs.goalDailyMl > 0) prefs.goalDailyMl else prefs.baselineDailyMl
+        }
         val goalPerDay = (goalDailyMl / sizeMl).toFloat()
 
-        renderChart(chart, points, baselinePerDay, goalPerDay, startDate)
+        renderChart(chart, points, baselinePerDay, goalPerDay, startDate, weekly)
     }
 
     private fun renderChart(
@@ -228,7 +291,8 @@ class ProgressActivity : AppCompatActivity() {
         points: List<Pair<Int, Float>>,
         baseline: Float,
         goal: Float,
-        startDate: LocalDate
+        startDate: LocalDate,
+        weeklyGoal: Boolean
     ) {
         val actualColor = ContextCompat.getColor(this, R.color.chart_actual)
         val baselineColor = ContextCompat.getColor(this, R.color.chart_baseline)
@@ -256,7 +320,10 @@ class ProgressActivity : AppCompatActivity() {
             })
         }
         if (goal > 0) {
-            dataSets.add(LineDataSet(points.map { Entry(it.first.toFloat(), goal) }, getString(R.string.chart_goal_label)).apply {
+            val goalLabel = getString(
+                if (weeklyGoal) R.string.chart_goal_label_weekly else R.string.chart_goal_label
+            )
+            dataSets.add(LineDataSet(points.map { Entry(it.first.toFloat(), goal) }, goalLabel).apply {
                 color = goalColor
                 setDrawCircles(false)
                 enableDashedLine(6f, 6f, 0f)
