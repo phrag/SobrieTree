@@ -34,8 +34,17 @@ class CalendarActivity : AppCompatActivity() {
         rv.layoutManager = LinearLayoutManager(this)
         rv.adapter = adapter
 
-        setDate(LocalDate.now())
+        val startDate = intent.getStringExtra(EXTRA_DATE)
+            ?.let { try { LocalDate.parse(it) } catch (_: Exception) { null } }
+            ?: LocalDate.now()
+        setDate(startDate)
+        syncCalendarView(startDate)
 
+        findViewById<android.view.View>(R.id.btn_yesterday).setOnClickListener {
+            val yesterday = LocalDate.now().minusDays(1)
+            setDate(yesterday)
+            syncCalendarView(yesterday)
+        }
         findViewById<android.view.View>(R.id.btn_add_entry_for_day).setOnClickListener { showQuickAddForDate(currentDate) }
         findViewById<android.view.View>(R.id.btn_set_total_for_day).setOnClickListener { showSetTotalDialog(currentDate) }
 
@@ -51,32 +60,23 @@ class CalendarActivity : AppCompatActivity() {
         SecureWindow.apply(this)
     }
 
-    /**
-     * Shows the chosen day, or - when nothing was logged then - the most recent
-     * entries instead. Home used to carry a "recent entries" card, but browsing
-     * what you logged belongs with the calendar, and a day-picker that goes
-     * blank on every dry day wastes the screen it takes.
-     */
+    private fun syncCalendarView(date: LocalDate) {
+        val millis = date.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        findViewById<CalendarView>(R.id.calendar_view).setDate(millis, false, true)
+    }
+
+    /** Shows the entries logged on the chosen day, with an empty state when there are none. */
     private fun setDate(date: LocalDate) {
         currentDate = date
         val heading = findViewById<android.widget.TextView>(R.id.tv_selected_date)
         try {
             val forDay = repo.getEntries(date, date)
-            if (forDay.isNotEmpty()) {
-                heading.text = date.toString()
-                adapter.submitList(forDay)
-                return
-            }
-            // Nothing that day: fall back to the recent log.
-            val recent = repo.getEntries(date.minusDays(90), date)
-                .sortedByDescending { it.date }
-                .take(20)
-            heading.text = if (recent.isEmpty()) {
-                getString(R.string.no_entries_yet)
+            heading.text = if (forDay.isEmpty()) {
+                getString(R.string.calendar_nothing_on_day, date.toString())
             } else {
-                getString(R.string.calendar_recent_heading, date.toString())
+                date.toString()
             }
-            adapter.submitList(recent)
+            adapter.submitList(forDay)
         } catch (_: Exception) {}
     }
 
@@ -178,6 +178,8 @@ class CalendarActivity : AppCompatActivity() {
             if (res.startsWith("OK")) setDate(date)
         } catch (_: Exception) {}
     }
+
+    companion object {
+        const val EXTRA_DATE = "date"
+    }
 }
-
-
