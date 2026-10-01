@@ -11,6 +11,7 @@ class CalendarActivity : AppCompatActivity() {
     private lateinit var adapter: BeerEntryAdapter
     private val prefsName = "sobrietree_prefs"
     private val repo by lazy { EntryRepository() }
+    private lateinit var trend: TrendChart
 
     /** The day the calendar is pointed at; edits refresh this, not the entry's own date. */
     private var currentDate: LocalDate = LocalDate.now()
@@ -33,6 +34,12 @@ class CalendarActivity : AppCompatActivity() {
         val rv = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rv_day_entries)
         rv.layoutManager = LinearLayoutManager(this)
         rv.adapter = adapter
+
+        trend = TrendChart(this, findViewById(R.id.line_chart), findViewById(R.id.tv_chart_empty), repo)
+        trend.showRange(7)
+        findViewById<android.view.View>(R.id.chip_7d).setOnClickListener { trend.showRange(7) }
+        findViewById<android.view.View>(R.id.chip_4w).setOnClickListener { trend.showRange(28) }
+        findViewById<android.view.View>(R.id.chip_3m).setOnClickListener { trend.showRange(90) }
 
         val startDate = intent.getStringExtra(EXTRA_DATE)
             ?.let { try { LocalDate.parse(it) } catch (_: Exception) { null } }
@@ -58,6 +65,8 @@ class CalendarActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         SecureWindow.apply(this)
+        // Edits made on the calendar change the trend, so keep the two in step.
+        if (::trend.isInitialized) trend.showRange(trend.currentRangeDays)
     }
 
     private fun syncCalendarView(date: LocalDate) {
@@ -77,6 +86,7 @@ class CalendarActivity : AppCompatActivity() {
                 date.toString()
             }
             adapter.submitList(forDay)
+            if (::trend.isInitialized) trend.showRange(trend.currentRangeDays)
         } catch (_: Exception) {}
     }
 
