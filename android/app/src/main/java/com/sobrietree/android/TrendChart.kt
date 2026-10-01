@@ -24,15 +24,33 @@ class TrendChart(
     private val repo: EntryRepository = EntryRepository()
 ) {
 
+    /** The range last asked for - may be [RANGE_ALL], which is resolved on each draw. */
     var currentRangeDays = 7
         private set
 
-    fun showRange(days: Int) {
-        currentRangeDays = days
+    /** Hooks the range chips (present in both layouts that host this chart) up to the chart. */
+    fun wireChips(root: View) {
+        val ranges = mapOf(
+            R.id.chip_7d to 7, R.id.chip_4w to 28, R.id.chip_3m to 90,
+            R.id.chip_6m to 180, R.id.chip_1y to 365, R.id.chip_all to RANGE_ALL
+        )
+        ranges.forEach { (id, days) -> root.findViewById<View>(id).setOnClickListener { showRange(days) } }
+    }
+
+    fun showRange(requested: Int) {
+        currentRangeDays = requested
 
         val prefs = AppPrefs(context)
         val sizeMl = prefs.defaultDrinkSizeMl.toDouble().coerceAtLeast(1.0)
         val today = GamificationManager(context).todayEffective()
+        val days = if (requested == RANGE_ALL) {
+            // From the first logged day, but never a window too short to read as a trend.
+            val first = repo.getEntries(today.minusDays(MAX_ALL_DAYS), today)
+                .mapNotNull { try { LocalDate.parse(it.date) } catch (_: Exception) { null } }
+                .minOrNull()
+            val span = if (first == null) 0 else java.time.temporal.ChronoUnit.DAYS.between(first, today).toInt() + 1
+            span.coerceAtLeast(7)
+        } else requested
         val startDate = today.minusDays((days - 1).toLong())
 
         val totals = repo.getDailyTotals(startDate, today)
@@ -163,5 +181,10 @@ class TrendChart(
         }
 
         chart.invalidate()
+    }
+
+    companion object {
+        const val RANGE_ALL = -1
+        private const val MAX_ALL_DAYS = 3650L
     }
 }

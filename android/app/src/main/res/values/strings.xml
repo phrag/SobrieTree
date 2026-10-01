@@ -152,6 +152,9 @@
     <string name="range_7_days">7 days</string>
     <string name="range_4_weeks">4 weeks</string>
     <string name="range_3_months">3 months</string>
+    <string name="range_6_months">6 months</string>
+    <string name="range_1_year">1 year</string>
+    <string name="range_all">All time</string>
     <string name="chart_empty">Log a few days and your pattern appears here.</string>
     <string name="chart_actual_label">Drinks</string>
     <string name="chart_baseline_label">Baseline</string>

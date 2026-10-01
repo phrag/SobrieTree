@@ -37,9 +37,7 @@ class CalendarActivity : AppCompatActivity() {
 
         trend = TrendChart(this, findViewById(R.id.line_chart), findViewById(R.id.tv_chart_empty), repo)
         trend.showRange(7)
-        findViewById<android.view.View>(R.id.chip_7d).setOnClickListener { trend.showRange(7) }
-        findViewById<android.view.View>(R.id.chip_4w).setOnClickListener { trend.showRange(28) }
-        findViewById<android.view.View>(R.id.chip_3m).setOnClickListener { trend.showRange(90) }
+        trend.wireChips(window.decorView)
 
         val startDate = intent.getStringExtra(EXTRA_DATE)
             ?.let { try { LocalDate.parse(it) } catch (_: Exception) { null } }

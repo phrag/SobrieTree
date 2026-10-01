@@ -29,10 +29,7 @@ class ProgressActivity : AppCompatActivity() {
         SecureWindow.apply(this)
 
         setSupportActionBar(findViewById(R.id.toolbar))
-
-        findViewById<View>(R.id.chip_7d).setOnClickListener { trend.showRange(7) }
-        findViewById<View>(R.id.chip_4w).setOnClickListener { trend.showRange(28) }
-        findViewById<View>(R.id.chip_3m).setOnClickListener { trend.showRange(90) }
+        trend.wireChips(window.decorView)
 
         BottomNavHelper.wire(this, findViewById(R.id.bottom_nav), R.id.nav_progress)
     }
