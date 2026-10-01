@@ -79,7 +79,13 @@
     <string name="stats_vs_baseline_above">%1$s%% above your usual</string>
     <string name="stats_no_data">Nothing logged in this window.</string>
     <string name="stats_not_started">Before you started tracking.</string>
-    <string name="calendar_recent_heading">Nothing on %1$s — recent entries</string>
+    <string name="calendar_nothing_on_day">Nothing logged on %1$s</string>
+    <string name="calendar_yesterday">Yesterday</string>
+    <string name="review_title">Yesterday\'s count</string>
+    <string name="review_body_none">You logged no drinks yesterday. Is that right?</string>
+    <string name="review_body_some">You logged %1$d drink(s) yesterday. Is that right?</string>
+    <string name="review_accurate">Yes, accurate</string>
+    <string name="review_edit">Update it</string>
 
     <!-- Where one logging day ends and the next begins -->
     <string name="end_of_day_hint">Day rolls over at (hour, 0–23)</string>
@@ -146,6 +152,9 @@
     <string name="range_7_days">7 days</string>
     <string name="range_4_weeks">4 weeks</string>
     <string name="range_3_months">3 months</string>
+    <string name="range_6_months">6 months</string>
+    <string name="range_1_year">1 year</string>
+    <string name="range_all">All time</string>
     <string name="chart_empty">Log a few days and your pattern appears here.</string>
     <string name="chart_actual_label">Drinks</string>
     <string name="chart_baseline_label">Baseline</string>

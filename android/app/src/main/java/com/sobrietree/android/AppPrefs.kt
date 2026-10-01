@@ -18,6 +18,11 @@ class AppPrefs(context: Context) {
         get() = prefs.getBoolean("onboarding_complete", false)
         set(value) = prefs.edit().putBoolean("onboarding_complete", value).apply()
 
+    /** ISO date of the last day whose count the user confirmed (or chose to edit) the next morning. */
+    var lastReviewedDay: String?
+        get() = prefs.getString("last_reviewed_day", null)
+        set(value) = prefs.edit().putString("last_reviewed_day", value).apply()
+
     var defaultDrinkSizeMl: Int
         get() = prefs.getInt("default_beer_size", 500)
         set(value) = prefs.edit().putInt("default_beer_size", value).apply()
