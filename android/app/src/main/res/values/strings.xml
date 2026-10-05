@@ -192,6 +192,40 @@
     <string name="goals_settings_title">Goals &amp; baseline</string>
     <string name="goals_settings_description">Set your daily and weekly goal, and the baseline your reduction is measured against.</string>
     <string name="goals_edit_button">Edit goals &amp; baseline</string>
+
+    <!-- Goal mode: a daily limit vs a weekly allowance. Both figures are always
+         stored and each prefills the other; the mode picks which one the ring,
+         its copy and the stats screen live by. -->
+    <string name="goal_mode_label">What are you working to?</string>
+    <string name="goal_mode_daily">Daily limit</string>
+    <string name="goal_mode_weekly">Weekly allowance</string>
+    <string name="goal_mode_hint_daily">Your ring is a limit for each day, refilling every morning.</string>
+    <string name="goal_mode_hint_weekly">Your ring is one allowance for the whole week, spent down as you log.</string>
+    <string name="goal_mode_summary_day">Your ring counts down %1$s drinks a day.</string>
+    <string name="goal_mode_summary_week">Your ring counts down %1$s drinks a week.</string>
+    <string name="goal_mode_summary_unset">Set a goal below and your ring counts it down.</string>
+
+    <!-- Home ring copy, daily and weekly variants -->
+    <string name="ring_af_today">Alcohol-free so far</string>
+    <string name="ring_af_week">Whole allowance left</string>
+    <string name="ring_drinks_today">%1$d of %2$s drinks</string>
+    <string name="ring_drinks_week">%1$d of %2$s drinks this week</string>
+    <string name="ring_description_week">This week\'s ring. It starts full on the first day of the week and empties as you log drinks. Tap to log your favorite drink.</string>
+
+    <!-- Weekly variants of the widget copy -->
+    <string name="widget_ring_description_week">This week\'s ring. Full means nothing logged this week yet.</string>
+    <string name="widget_af_week">Nothing logged this week</string>
+    <string name="widget_logged_week">%1$s units this week</string>
+
+    <!-- Stats: the active goal, said in the terms the user chose -->
+    <string name="goal_card_title_day">Today\'s limit</string>
+    <string name="goal_card_title_week">This week\'s allowance</string>
+    <string name="goal_card_value">%1$s of %2$s drinks</string>
+    <string name="goal_left_day">%1$s left for today.</string>
+    <string name="goal_left_week">%1$s left, with %2$d %3$s of the week to go.</string>
+    <string name="goal_over_day">%1$s over today\'s limit.</string>
+    <string name="goal_over_week">%1$s over this week\'s allowance.</string>
+    <string name="chart_goal_label_weekly">Goal (per day)</string>
     <string name="currency_label">Currency</string>
     <string name="currency_system_default">System default</string>
 

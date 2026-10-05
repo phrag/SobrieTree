@@ -9,6 +9,8 @@ import com.sobrietree.android.engine.DayLedger
 import com.sobrietree.android.engine.EducationCard
 import com.sobrietree.android.engine.EducationLibrary
 import com.sobrietree.android.engine.EncouragementEngine
+import com.sobrietree.android.engine.GoalEngine
+import com.sobrietree.android.engine.GoalMode
 import com.sobrietree.android.engine.HealthMilestone
 import com.sobrietree.android.engine.HealthTimeline
 import com.sobrietree.android.engine.HighRiskSupport
@@ -39,6 +41,8 @@ class GamificationManager(context: Context) {
     data class HomeState(
         val metrics: MetricsEngine.Result,
         val streaks: StreakEngine.Result,
+        /** The goal the ring is counting down, over the window the user chose. */
+        val goalRing: GoalEngine.Ring,
         val isTodayAf: Boolean,
         /** Growth of the tree currently in the ring, 0..1 over 30 AF days (today counts). */
         val treeProgress: Float,
@@ -58,6 +62,13 @@ class GamificationManager(context: Context) {
         val cravingSupport: String?,
         /** Badges earned but not yet celebrated with the bottom sheet. */
         val uncelebrated: List<Badge>
+    )
+
+    /** The active goal on its own, for screens that don't need the whole of Home. */
+    data class GoalState(
+        val ring: GoalEngine.Ring,
+        /** What counts as one drink, so the ring can be quoted in drinks. */
+        val drinkSizeMl: Double
     )
 
     data class TimelineEntry(
@@ -102,6 +113,8 @@ class GamificationManager(context: Context) {
         val ledger: DayLedger,
         val entries: List<BeerEntry>,
         val metrics: MetricsEngine.Result,
+        val goalMode: GoalMode,
+        val goalRing: GoalEngine.Ring,
         val streaks: StreakEngine.Result,
         val savings: SavingsEngine.Result
     )
@@ -117,6 +130,8 @@ class GamificationManager(context: Context) {
 
         val ledger = DayLedger(entries, trackingStart, today, weekStartDay())
         val metrics = MetricsEngine.compute(ledger, prefs.goalDailyMl, prefs.goalWeeklyMl, prefs.baselineDailyMl)
+        val goalMode = prefs.goalMode
+        val goalRing = GoalEngine.ring(goalMode, metrics)
         val alreadyBridged = prefs.shieldBridgedDates.mapNotNull {
             try { LocalDate.parse(it) } catch (_: Exception) { null }
         }.toSet()
@@ -142,7 +157,7 @@ class GamificationManager(context: Context) {
             // Preferred when set: what the user says they used to spend per week
             baselineWeeklySpend = prefs.baselineWeeklySpend.toDouble()
         )
-        return Computed(ledger, entries, metrics, streaks, savings)
+        return Computed(ledger, entries, metrics, goalMode, goalRing, streaks, savings)
     }
 
     private fun badgeInputs(c: Computed): BadgeEngine.Inputs = BadgeEngine.Inputs(
@@ -170,6 +185,13 @@ class GamificationManager(context: Context) {
 
     fun markCelebrated(badgeId: String) {
         prefs.celebratedMilestones = prefs.celebratedMilestones + badgeId
+    }
+
+    /** The ring as Home draws it, for the stats screen to restate in words. */
+    fun goalState(): GoalState {
+        val c = compute()
+        val drinkSize = (DrinkPresetStore.defaultPreset(prefs.prefs)?.volume ?: prefs.defaultDrinkSizeMl).toDouble()
+        return GoalState(ring = c.goalRing, drinkSizeMl = drinkSize)
     }
 
     /** This week measured in UK units, against the CMO/NHS low-risk guideline. */
@@ -203,12 +225,16 @@ class GamificationManager(context: Context) {
             ?.takeIf { it.kind == com.sobrietree.android.engine.BadgeKind.AF_TOTAL || it.kind == com.sobrietree.android.engine.BadgeKind.STREAK }
             ?.let { it.threshold - BadgeEngine.currentValue(it, inputs) }
 
-        val yesterdayOverGoal = c.metrics.effectiveDailyGoalMl > 0 &&
-            ledger.totalFor(ledger.todayEffective.minusDays(1)) > c.metrics.effectiveDailyGoalMl
+        // A single day is judged by the day's share of whichever goal is live:
+        // in weekly mode the stored daily figure is only a prefill, so pacing
+        // against it would measure the user against a plan they moved off.
+        val dailyYardstickMl = GoalEngine.dailyYardstickMl(c.goalMode, c.metrics)
+        val yesterdayOverGoal = dailyYardstickMl > 0 &&
+            ledger.totalFor(ledger.todayEffective.minusDays(1)) > dailyYardstickMl
         val state = EncouragementEngine.state(
             isTodayAfSoFar = isTodayAf,
             todayMl = c.metrics.todayMl,
-            effectiveDailyGoalMl = c.metrics.effectiveDailyGoalMl,
+            effectiveDailyGoalMl = dailyYardstickMl,
             yesterdayOverGoal = yesterdayOverGoal,
             daysToNextBadge = daysToNextBadge
         )
@@ -220,7 +246,7 @@ class GamificationManager(context: Context) {
             val dotState = when {
                 date > ledger.todayEffective -> DayDotState.FUTURE
                 ledger.totalFor(date) == 0.0 -> DayDotState.AF
-                c.metrics.effectiveDailyGoalMl > 0 && ledger.totalFor(date) > c.metrics.effectiveDailyGoalMl -> DayDotState.OVER_GOAL
+                dailyYardstickMl > 0 && ledger.totalFor(date) > dailyYardstickMl -> DayDotState.OVER_GOAL
                 else -> DayDotState.UNDER_GOAL
             }
             DayDot(date, dotState, date == ledger.todayEffective)
@@ -246,6 +272,7 @@ class GamificationManager(context: Context) {
         return HomeState(
             metrics = c.metrics,
             streaks = streaks,
+            goalRing = c.goalRing,
             isTodayAf = isTodayAf,
             treeProgress = StreakEngine.treeProgress(displayAfDays),
             treesCollected = StreakEngine.treesCollected(displayAfDays),

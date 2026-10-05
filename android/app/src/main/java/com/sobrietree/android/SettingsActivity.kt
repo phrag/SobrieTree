@@ -9,6 +9,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.button.MaterialButtonToggleGroup
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.ArrayAdapter
@@ -27,6 +28,8 @@ import org.json.JSONObject
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
 import com.sobrietree.android.engine.AbvRepair
+import com.sobrietree.android.engine.GoalEngine
+import com.sobrietree.android.engine.GoalMode
 import android.content.ContentResolver
 import java.io.InputStream
 import java.io.OutputStream
@@ -238,9 +241,48 @@ class SettingsActivity : AppCompatActivity() {
         commitOnBlurAndDone(weeklySpendEdit) { persistWeeklySpend() }
         flushSettings = { persistBeerSize(); persistBeerStrength(); persistEndOfDay(); persistWeeklySpend() }
 
+        // Which window the goal is set in. Switching only changes which of the
+        // two stored figures the app lives by, so nobody has to re-enter a goal
+        // to try the other way round.
+        val modeToggle = findViewById<MaterialButtonToggleGroup>(R.id.toggle_goal_mode)
+        val modeSummary = findViewById<TextView>(R.id.tv_goal_mode_summary)
+        fun renderGoalMode() {
+            val weekly = appPrefs.goalMode == GoalMode.WEEKLY
+            val drinkMl = (DrinkPresetStore.defaultPreset(prefs)?.volume ?: appPrefs.defaultDrinkSizeMl).toDouble()
+            // Each figure prefills the other, so a goal entered one way round
+            // can still be quoted the other way.
+            val goalMl = if (weekly) {
+                appPrefs.goalWeeklyMl.takeIf { it > 0 } ?: GoalEngine.weeklyFromDaily(appPrefs.goalDailyMl)
+            } else {
+                appPrefs.goalDailyMl.takeIf { it > 0 } ?: GoalEngine.dailyFromWeekly(appPrefs.goalWeeklyMl)
+            }
+            modeSummary.text = when {
+                goalMl <= 0 || drinkMl <= 0 -> getString(R.string.goal_mode_summary_unset)
+                weekly -> getString(R.string.goal_mode_summary_week, formatDrinks(goalMl / drinkMl))
+                else -> getString(R.string.goal_mode_summary_day, formatDrinks(goalMl / drinkMl))
+            }
+        }
+        fun syncGoalModeToggle() {
+            modeToggle.check(
+                if (appPrefs.goalMode == GoalMode.WEEKLY) R.id.btn_goal_mode_week
+                else R.id.btn_goal_mode_day
+            )
+            renderGoalMode()
+        }
+        syncGoalModeToggle()
+        modeToggle.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (!isChecked) return@addOnButtonCheckedListener
+            appPrefs.goalMode =
+                if (checkedId == R.id.btn_goal_mode_week) GoalMode.WEEKLY else GoalMode.DAILY
+            renderGoalMode()
+            // Home and the widget draw whichever ring this chooses.
+            SobrieTreeWidget.refresh(this)
+        }
+
         // Edit goals & baseline directly from Settings
         findViewById<MaterialButton>(R.id.btn_edit_goals).setOnClickListener {
-            GoalsSetupDialog.show(this) {}
+            // The dialog can change the mode too, so re-read it on the way back.
+            GoalsSetupDialog.show(this) { syncGoalModeToggle() }
         }
 
         // Daily check-in reminder (opt-in, local only)
@@ -866,4 +908,10 @@ class SettingsActivity : AppCompatActivity() {
         }
         return ImportResult(imported, skipped, abvFilled, defaultAbv, earliest)
     }
+
+    /** Whole numbers stay clean; fractions keep one decimal ("14", "2.5"). */
+    private fun formatDrinks(value: Double): String =
+        if (value == Math.floor(value)) value.toInt().toString()
+        else String.format("%.1f", value)
+
 }

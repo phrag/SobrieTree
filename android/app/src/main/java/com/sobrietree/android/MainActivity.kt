@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import com.sobrietree.android.engine.GoalMode
 import java.time.LocalDate
 
 class MainActivity : AppCompatActivity() {
@@ -217,22 +218,32 @@ class MainActivity : AppCompatActivity() {
         else String.format("%.1f", value)
 
     private fun bindHomeState(state: GamificationManager.HomeState) {
-        findViewById<GrowthRingView>(R.id.growth_ring).setState(
-            consumedRatio = state.metrics.dailyRatio.toFloat(),
-            isAfToday = state.isTodayAf,
+        // The ring counts down whichever window the goal is set in: today in
+        // daily mode, the whole week in weekly mode.
+        val ring = state.goalRing
+        val weekly = ring.mode == GoalMode.WEEKLY
+        val ringView = findViewById<GrowthRingView>(R.id.growth_ring)
+        ringView.setState(
+            consumedRatio = ring.consumedRatio.toFloat(),
+            isUntouched = ring.untouched,
             treeProgress = state.treeProgress,
-            overGoal = state.metrics.overDailyGoal
+            overGoal = ring.overGoal
         )
+        ringView.contentDescription =
+            getString(if (weekly) R.string.ring_description_week else R.string.ring_description)
 
         val drinkVolume = state.drinkSizeMl
-        val todayDrinks = if (drinkVolume > 0) state.metrics.todayMl / drinkVolume else 0.0
-        val goalDrinks = if (drinkVolume > 0) state.metrics.effectiveDailyGoalMl / drinkVolume else 0.0
+        val consumedDrinks = if (drinkVolume > 0) ring.consumedMl / drinkVolume else 0.0
         // A weekly-only goal spreads to a fractional daily figure; show one decimal for those.
-        val goalLabel = if (goalDrinks == Math.floor(goalDrinks)) goalDrinks.toInt().toString()
-            else String.format("%.1f", goalDrinks)
-        findViewById<TextView>(R.id.tv_ring_progress).text =
-            if (state.isTodayAf) "Alcohol-free so far"
-            else "${todayDrinks.toInt()} of $goalLabel drinks"
+        val goalLabel = formatDrinks(if (drinkVolume > 0) ring.allowanceMl / drinkVolume else 0.0)
+        findViewById<TextView>(R.id.tv_today_label)
+            .setText(if (weekly) R.string.stats_this_week else R.string.today)
+        findViewById<TextView>(R.id.tv_ring_progress).text = when {
+            ring.untouched && weekly -> getString(R.string.ring_af_week)
+            ring.untouched -> getString(R.string.ring_af_today)
+            weekly -> getString(R.string.ring_drinks_week, consumedDrinks.toInt(), goalLabel)
+            else -> getString(R.string.ring_drinks_today, consumedDrinks.toInt(), goalLabel)
+        }
 
         val bestPart = if (state.streaks.bestStreak > 0) " · best ${state.streaks.bestStreak}" else ""
         findViewById<TextView>(R.id.tv_streak).text =

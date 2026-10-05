@@ -11,6 +11,8 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.sobrietree.android.engine.GoalEngine
+import com.sobrietree.android.engine.GoalMode
 import java.time.LocalDate
 
 /**
@@ -68,12 +70,21 @@ class TrendChart(
         chart.visibility = View.VISIBLE
         emptyView.visibility = View.GONE
 
-        // Per-day reference values in drinks
+        // Per-day reference values in drinks. A weekly allowance has no daily
+        // figure of its own, so it is spread evenly across the week rather than
+        // plotted against a daily goal the user is no longer working to.
         val baselinePerDay = (prefs.baselineDailyMl / sizeMl).toFloat()
-        val goalDailyMl = if (prefs.goalDailyMl > 0) prefs.goalDailyMl else prefs.baselineDailyMl
+        val weekly = prefs.goalMode == GoalMode.WEEKLY
+        val goalDailyMl = if (weekly) {
+            val weeklyMl = if (prefs.goalWeeklyMl > 0) prefs.goalWeeklyMl
+                else GoalEngine.weeklyFromDaily(prefs.baselineDailyMl)
+            GoalEngine.dailyFromWeekly(weeklyMl)
+        } else {
+            if (prefs.goalDailyMl > 0) prefs.goalDailyMl else prefs.baselineDailyMl
+        }
         val goalPerDay = (goalDailyMl / sizeMl).toFloat()
 
-        renderChart(chart, points, baselinePerDay, goalPerDay, startDate)
+        renderChart(chart, points, baselinePerDay, goalPerDay, startDate, weekly)
     }
 
     private fun renderChart(
@@ -81,7 +92,8 @@ class TrendChart(
         points: List<Pair<Int, Float>>,
         baseline: Float,
         goal: Float,
-        startDate: LocalDate
+        startDate: LocalDate,
+        weeklyGoal: Boolean
     ) {
         val actualColor = ContextCompat.getColor(context, R.color.chart_actual)
         val baselineColor = ContextCompat.getColor(context, R.color.chart_baseline)
@@ -109,7 +121,7 @@ class TrendChart(
             })
         }
         if (goal > 0) {
-            dataSets.add(LineDataSet(points.map { Entry(it.first.toFloat(), goal) }, context.getString(R.string.chart_goal_label)).apply {
+            dataSets.add(LineDataSet(points.map { Entry(it.first.toFloat(), goal) }, context.getString(if (weeklyGoal) R.string.chart_goal_label_weekly else R.string.chart_goal_label)).apply {
                 color = goalColor
                 setDrawCircles(false)
                 enableDashedLine(6f, 6f, 0f)

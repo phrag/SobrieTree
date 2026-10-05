@@ -27,6 +27,50 @@
         android:textColor="@color/text_secondary"
         android:layout_marginBottom="16dp" />
 
+    <!-- Which window the goal is set in. Both figures below are always saved and
+         each prefills the other; this only picks which one the ring lives by. -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/goal_mode_label"
+        android:textColor="@color/text_primary"
+        android:layout_marginBottom="8dp" />
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggle_goal_mode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        app:singleSelection="true"
+        app:selectionRequired="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_goal_mode_day"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/goal_mode_daily"
+            style="@style/Widget.SobrieTree.Button.Segmented" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_goal_mode_week"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/goal_mode_weekly"
+            style="@style/Widget.SobrieTree.Button.Segmented" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <TextView
+        android:id="@+id/tv_goal_mode_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="@string/goal_mode_hint_daily"
+        android:textAppearance="@style/TextAppearance.SobrieTree.Caption"
+        android:textColor="@color/text_secondary" />
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layout_default_drink"
         android:layout_width="match_parent"
