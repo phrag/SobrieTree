@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     private var sobrieTree: SobrieTree? = null
     private var hasShownFavoriteSetup = false
     private var celebrationShowing = false
+    private var yesterdayPromptShowing = false
     private val prefsName = AppPrefs.NAME
 
     private val repo by lazy { EntryRepository() }
@@ -88,6 +89,39 @@ class MainActivity : AppCompatActivity() {
         SecureWindow.apply(this)
         // Also re-checks for badges earned by days passing since the last visit
         try { loadData() } catch (_: Exception) {}
+        maybeAskAboutYesterday()
+    }
+
+    /**
+     * Once per day, the first time the app opens after a day ends, asks whether
+     * yesterday's count was accurate - forgotten or mis-logged drinks are easiest
+     * to fix while they're still fresh.
+     */
+    private fun maybeAskAboutYesterday() {
+        val prefs = AppPrefs(this)
+        if (!prefs.onboardingComplete || celebrationShowing) return
+        val today = com.sobrietree.android.engine.DayBoundary.effectiveDate(
+            java.time.LocalDateTime.now(), prefs.endOfDayHour
+        )
+        val yesterday = today.minusDays(1)
+        if (prefs.lastReviewedDay == yesterday.toString() || yesterdayPromptShowing) return
+        // Nothing to review for people who haven't started logging yet.
+        val hasAnyEntries = try { repo.getEntries(yesterday.minusDays(365), yesterday).isNotEmpty() } catch (_: Exception) { false }
+        if (!hasAnyEntries) return
+        val count = try { repo.getEntries(yesterday, yesterday).size } catch (_: Exception) { return }
+
+        yesterdayPromptShowing = true
+        prefs.lastReviewedDay = yesterday.toString()
+        AlertDialog.Builder(this)
+            .setTitle(R.string.review_title)
+            .setMessage(if (count == 0) getString(R.string.review_body_none) else getString(R.string.review_body_some, count))
+            .setPositiveButton(R.string.review_accurate, null)
+            .setNeutralButton(R.string.review_edit) { _, _ ->
+                startActivity(Intent(this, CalendarActivity::class.java)
+                    .putExtra(CalendarActivity.EXTRA_DATE, yesterday.toString()))
+            }
+            .setOnDismissListener { yesterdayPromptShowing = false }
+            .show()
     }
 
     private fun setupClickListeners() {
