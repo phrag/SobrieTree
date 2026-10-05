@@ -23,9 +23,6 @@ class ProgressActivity : AppCompatActivity() {
     private val trend by lazy {
         TrendChart(this, findViewById(R.id.line_chart), findViewById(R.id.tv_chart_empty), repo)
     }
-    private val trend by lazy {
-        TrendChart(this, findViewById(R.id.line_chart), findViewById(R.id.tv_chart_empty), repo)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
