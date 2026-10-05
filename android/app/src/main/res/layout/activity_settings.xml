@@ -183,6 +183,40 @@
                         android:textAppearance="@style/TextAppearance.SobrieTree.Body2"
                         android:layout_marginBottom="12dp" />
 
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/toggle_goal_mode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        app:singleSelection="true"
+                        app:selectionRequired="true">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_goal_mode_day"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/goal_mode_daily"
+                            style="@style/Widget.SobrieTree.Button.Segmented" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_goal_mode_week"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/goal_mode_weekly"
+                            style="@style/Widget.SobrieTree.Button.Segmented" />
+
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                    <TextView
+                        android:id="@+id/tv_goal_mode_summary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:textAppearance="@style/TextAppearance.SobrieTree.Caption"
+                        android:textColor="@color/text_secondary" />
+
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_edit_goals"
                         android:layout_width="match_parent"

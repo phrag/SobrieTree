@@ -40,6 +40,14 @@ class MetricsEngineTest {
     }
 
     @Test
+    fun `days elapsed this week counts today, not the whole week`() {
+        // Fri 10 Jul is the fifth day of a week that starts on Monday. The
+        // weekly ring divides its allowance by what is left of this figure.
+        val m = MetricsEngine.compute(DayLedger(emptyList(), start, today), 0.0, 0.0, 0.0)
+        assertEquals(5, m.daysElapsedThisWeek)
+    }
+
+    @Test
     fun `fewer than usual never goes negative when drinking above baseline`() {
         val entries = (6..10).flatMap { day ->
             (0..3).map { TestFixtures.entry(LocalDate.of(2026, 7, day)) }

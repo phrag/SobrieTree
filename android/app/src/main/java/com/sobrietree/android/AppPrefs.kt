@@ -3,6 +3,7 @@ package com.sobrietree.android
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
+import com.sobrietree.android.engine.GoalMode
 import org.json.JSONObject
 import java.time.LocalDate
 
@@ -45,6 +46,16 @@ class AppPrefs(context: Context) {
     var goalWeeklyMl: Double
         get() = prefs.getFloat("goal_weekly_ml", 0f).toDouble()
         set(value) = prefs.edit().putFloat("goal_weekly_ml", value.toFloat()).apply()
+
+    /**
+     * Whether the plan the app lives by is the daily limit or the weekly
+     * allowance. Both figures are always stored; this says which one the ring
+     * and its copy follow. Daily by default, so installs from before the
+     * setting existed carry on exactly as they were.
+     */
+    var goalMode: GoalMode
+        get() = GoalMode.fromKey(prefs.getString("goal_mode", null))
+        set(value) = prefs.edit().putString("goal_mode", value.key).apply()
 
     var baselineDailyMl: Double
         get() = prefs.getFloat("baseline_daily_ml", 0f).toDouble()

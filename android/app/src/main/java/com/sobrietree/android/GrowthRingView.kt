@@ -17,11 +17,15 @@ import kotlin.math.sin
 /**
  * The app's signature visual.
  *
- * An arc ring shows what is *left* of today's allowance: it starts full and
+ * An arc ring shows what is *left* of the current allowance: it starts full and
  * retracts as drinks are logged, shifting from calm green toward soft amber as
  * it runs low - never red. Depletion (rather than filling) keeps the app's
- * language honest: an untouched day is the fullest ring, and logging spends it.
- * On an alcohol-free day the ring renders full and gently pulsing.
+ * language honest: an untouched window is the fullest ring, and logging spends
+ * it. With nothing logged at all the ring renders full and gently pulsing.
+ *
+ * Which window that is comes from the user's goal mode: the day in daily mode,
+ * the whole week in weekly mode. The view itself is told only the ratio, so it
+ * draws both the same way (see GoalEngine.Ring).
  *
  * The centre grows a tree, one alcohol-free day at a time, completing in 30 AF
  * days (see StreakEngine.TREE_DAYS) - finished trees join the Journey forest
@@ -49,10 +53,10 @@ class GrowthRingView @JvmOverloads constructor(
     }
     private val arcBounds = RectF()
 
-    /** Share of today's allowance still unspent (1 = untouched, 0 = goal reached). */
+    /** Share of the allowance still unspent (1 = untouched, 0 = goal reached). */
     private var animatedRatio = 0f
     private var targetRatio = -1f
-    private var isAfToday = false
+    private var isUntouched = false
     private var overGoal = false
 
     private var animatedTreeProgress = 0f
@@ -65,12 +69,16 @@ class GrowthRingView @JvmOverloads constructor(
     private var treeAnimator: ValueAnimator? = null
     private var idleAnimator: ValueAnimator? = null
 
-    fun setState(consumedRatio: Float, isAfToday: Boolean, treeProgress: Float, overGoal: Boolean) {
-        this.isAfToday = isAfToday
+    /**
+     * @param consumedRatio share of the allowance spent, uncapped
+     * @param isUntouched nothing logged in the window yet
+     */
+    fun setState(consumedRatio: Float, isUntouched: Boolean, treeProgress: Float, overGoal: Boolean) {
+        this.isUntouched = isUntouched
         this.overGoal = overGoal
 
         // The ring draws what's LEFT, so logging a drink retracts it.
-        val newTarget = if (isAfToday) 1f else (1f - consumedRatio).coerceIn(0f, 1f)
+        val newTarget = if (isUntouched) 1f else (1f - consumedRatio).coerceIn(0f, 1f)
         if (newTarget != targetRatio) {
             val first = targetRatio < 0f
             targetRatio = newTarget
@@ -185,7 +193,7 @@ class GrowthRingView @JvmOverloads constructor(
         canvas.drawArc(arcBounds, 0f, 360f, false, trackPaint)
 
         when {
-            isAfToday -> {
+            isUntouched -> {
                 // Fullest state: complete ring, softly pulsing green with a glow.
                 glowPaint.color = color(R.color.ring_af_glow)
                 glowPaint.alpha = (pulseAlpha * 0.25f).toInt()
@@ -203,7 +211,7 @@ class GrowthRingView @JvmOverloads constructor(
             }
             else -> {
                 // What's left, retracting clockwise from the top. Green shifts to
-                // soft amber once 70% of the day's allowance is spent.
+                // soft amber once 70% of the allowance is spent.
                 val spent = 1f - animatedRatio
                 val t = ((spent - 0.7f) / 0.3f).coerceIn(0f, 1f)
                 progressPaint.color = lerpColor(color(R.color.ring_progress_start), color(R.color.ring_progress_end), t)
